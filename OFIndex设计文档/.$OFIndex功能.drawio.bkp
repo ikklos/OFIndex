@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" modified="2024-12-12T14:51:12.964Z" version="22.0.2" etag="lfHjPa_ot48-a0GgnXet" type="device">
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" modified="2024-12-12T14:53:42.662Z" version="22.0.2" etag="RiIg_HtITz0g8TLvnPie" type="device">
   <diagram name="第 1 页" id="O_TVJAIN3mI4gC8E25hf">
     <mxGraphModel dx="2658" dy="1701" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -711,7 +711,7 @@
         <mxCell id="rNs3XIDjv4wiHK7FwPoO-56" value="更改头像" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-130" y="1350" width="140" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="rNs3XIDjv4wiHK7FwPoO-61" value="更改密码" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="rNs3XIDjv4wiHK7FwPoO-61" value="管理登录信息" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="-320" y="1430" width="140" height="70" as="geometry" />
         </mxCell>
       </root>
