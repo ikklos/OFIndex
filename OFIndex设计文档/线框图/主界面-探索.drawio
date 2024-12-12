@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
   <diagram name="第 1 页" id="TEYKT1qixROiFxjkDTGD">
-    <mxGraphModel dx="2840" dy="1644" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2302" dy="1349" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -38,16 +38,16 @@
           <mxGeometry x="240" y="300" width="130" height="518" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-49" value="科教" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
-          <mxGeometry x="240" y="414" width="130" height="30" as="geometry" />
+          <mxGeometry x="240" y="461" width="130" height="30" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-50" value="小说" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
-          <mxGeometry x="240" y="303" width="130" height="30" as="geometry" />
+          <mxGeometry x="240" y="350" width="130" height="30" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-51" value="艺术" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
-          <mxGeometry x="240" y="444" width="130" height="30" as="geometry" />
+          <mxGeometry x="240" y="491" width="130" height="30" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-52" value="文学" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
-          <mxGeometry x="240" y="474" width="130" height="30" as="geometry" />
+          <mxGeometry x="240" y="521" width="130" height="30" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-55" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="400" y="360" width="770" height="110" as="geometry" />
@@ -71,16 +71,16 @@
           <mxGeometry x="399" y="750" width="770" height="80" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-62" value="" style="triangle;whiteSpace=wrap;html=1;rotation=90;" parent="1" vertex="1">
-          <mxGeometry x="350" y="311" width="10" height="14" as="geometry" />
+          <mxGeometry x="350" y="358" width="10" height="14" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-63" value="古典" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="240" y="333" width="130" height="27" as="geometry" />
+          <mxGeometry x="240" y="380" width="130" height="27" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-64" value="科幻" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="240" y="360" width="130" height="27" as="geometry" />
+          <mxGeometry x="240" y="407" width="130" height="27" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-65" value="爱情" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="240" y="387" width="130" height="27" as="geometry" />
+          <mxGeometry x="240" y="434" width="130" height="27" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-67" value="排序" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" parent="1" vertex="1">
           <mxGeometry x="1130" y="325" width="40" height="25" as="geometry" />
@@ -134,7 +134,7 @@
         <mxCell id="aA4Id0uSG5UaYZLyrY37-160" value="资源包介绍" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="615" y="1221" width="135" height="39" as="geometry" />
         </mxCell>
-        <mxCell id="aA4Id0uSG5UaYZLyrY37-161" value="下载" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" parent="1" vertex="1">
+        <mxCell id="aA4Id0uSG5UaYZLyrY37-161" value="订阅" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="1030" y="1196" width="60" height="33" as="geometry" />
         </mxCell>
         <mxCell id="aA4Id0uSG5UaYZLyrY37-162" value="下载次数" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
@@ -173,7 +173,7 @@
         <mxCell id="KDRSRYC82BVxWry2g-rX-3" value="资源包1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="840" y="1594" width="120" height="46" as="geometry" />
         </mxCell>
-        <mxCell id="KDRSRYC82BVxWry2g-rX-4" value="显示已下载的资源包" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
+        <mxCell id="KDRSRYC82BVxWry2g-rX-4" value="显示已订阅的资源包" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="910" y="1560" width="210" height="30" as="geometry" />
         </mxCell>
         <mxCell id="KDRSRYC82BVxWry2g-rX-5" value="资源包2" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
@@ -275,14 +275,20 @@
         <mxCell id="G4Zy9-JbaatdThs6KkDZ-2" value="指上传书籍的功能&lt;div style=&quot;font-size: 20px;&quot;&gt;只有管理员有这个功能&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="1090" y="100" width="220" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="jjh2pw-vxyTSB3nyHysx-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="aA4Id0uSG5UaYZLyrY37-67">
+        <mxCell id="jjh2pw-vxyTSB3nyHysx-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="aA4Id0uSG5UaYZLyrY37-67" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="1370" y="340" as="sourcePoint" />
             <mxPoint x="1320" y="290" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="jjh2pw-vxyTSB3nyHysx-2" value="点击展开" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+        <mxCell id="jjh2pw-vxyTSB3nyHysx-2" value="点击展开" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="1" vertex="1">
           <mxGeometry x="1310" y="266" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="mJzWWfNhI3TUwkiDJA5p-1" value="全部" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=default;" vertex="1" parent="1">
+          <mxGeometry x="240" y="320" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="mJzWWfNhI3TUwkiDJA5p-2" value="作者" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="1109" y="366.5" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
