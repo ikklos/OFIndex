@@ -6,6 +6,7 @@ import AccountCardRegister from "@/components/account-cards/AccountCardRegister.
 import AccountCardAdmin from "@/components/account-cards/AccountCardAdmin.vue";
 import AccountCardPhoneLogin from "@/components/account-cards/AccountCardPhoneLogin.vue";
 import AccountCardRegisterSucceed from "@/components/account-cards/AccountCardRegisterSucceed.vue";
+import Index from "@/components/index/Index.vue";
 
 const routes = [
     {
@@ -43,8 +44,15 @@ const routes = [
         ]
     },{
         path: "/index",
-        name: "index",
+        name: "r-index",
+        component: Index,
         redirect: "/index/explore",
+        children: [
+            {
+                path: "explore",
+                name: "r-index-explore",
+            }
+        ]
     }
 ];
 const router = createRouter({
