@@ -4,11 +4,19 @@ html, body {
     width: 100%;
     height: 100%;
 }
-.center-layout{
+.center-layout-column{
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
+    flex-direction: column;
+}
+.center-layout-row{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: row;
 }
 .full-fix{
     width: 100%;

@@ -6,21 +6,18 @@ import AccountCardHeader from "@/components/account-cards/AccountCardHeader.vue"
 
 <template>
   <div class="account-index">
-    <el-row style="width: 100%">
-      <el-col :span="8" :offset="8">
-        <el-card class="account-card">
-          <template v-slot:header>
-            <AccountCardHeader></AccountCardHeader>
-          </template>
-          <RouterView></RouterView>
-        </el-card>
-      </el-col>
-    </el-row>
+    <div class="account-card" >
+      <AccountCardHeader></AccountCardHeader>
+      <transition name="el-fade-in">
+        <RouterView></RouterView>
+      </transition>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .account-index {
+  background-color: #292929;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -28,7 +25,10 @@ import AccountCardHeader from "@/components/account-cards/AccountCardHeader.vue"
   align-items: center;
 }
 .account-card {
-  width: 100%;
-  height: 650px;
+  background-color: #000000;
+  border-radius: 10px;
+  border: 5px solid #AAAAAA;
+  width: 25vw;
+  height: 60vh;
 }
 </style>
