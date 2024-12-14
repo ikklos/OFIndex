@@ -27,6 +27,7 @@ public class UserModel implements Serializable {
     private String username;
 
     @Column(name="passwd")
+    @Setter
     private String passwd;
 
     @Column(name="phonenum")
