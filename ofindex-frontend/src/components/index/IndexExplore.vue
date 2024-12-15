@@ -1,15 +1,16 @@
 <script setup>
-import {ref,reactive} from "vue";
+import {ref,reactive,onMounted} from "vue";
+import BookItem from "@/components/index/BookItem.vue";
 let BatchSize = 20;
 const ClassList = reactive([
   {
     name: "全部",
     classId: 0,
-  },{
-    name: "小说",
-    classId: 1,
   }
 ]);
+for(let i = 1; i <= 100; i++){
+  ClassList.push({name:"小说",classId:i});
+}
 const NowClass = ref(0);
 const SearchString = ref("");
 const BookItems = ref([]);
@@ -29,23 +30,31 @@ let FilterByString = function (Page) {
     };
     for(let i = 0; i < 20; i++){
       result.data.push({
+        bookId: i,
         name: "支柱霞：血本无归",
         author: "last炫、",
-        description: "S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~",
-        cover: "https://smms.app/delete/KBgrZeLW7w6ua5MzUFIEk2pj4G",
+        description: "S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~ S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~ S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~",
+        cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
         tag:["搞笑","炫狗","皮套"],
       });
     }
     //更新结果数量
     TotalCount.value = result.totalResult;
     LoadedPages.value = 1;
-
+    for(let i = 0; i < BatchSize; i++) {
+      BookItems.value.push(
+          result.data[i]
+      );
+    }
 }
 let ReqForMore = function (Page) {
   if(LoadedPages.value * BatchSize < TotalCount.value){
     
   }
 }
+onMounted(()=>{
+  FilterByString("bookId");
+})
 </script>
 
 <template>
@@ -67,6 +76,16 @@ let ReqForMore = function (Page) {
             </el-input>
           </el-col>
         </el-row>
+        <ul v-infinite-scroll="ReqForMore" class="infinite-list" style="overflow: auto; overflow-x:hidden;">
+          <li v-for="{bookId,name,author,description,cover,tag} in BookItems" :key="bookId" class="infinite-list-item">
+            <BookItem :cover-url="cover"
+                      :book-author="author"
+                      :book-description="description"
+                      :book-name="name"
+                      :id="bookId"
+            ></BookItem>
+          </li>
+        </ul>
 
       </div>
     </el-main>
@@ -74,12 +93,17 @@ let ReqForMore = function (Page) {
 </template>
 
 <style scoped>
+.el-container{
+  height: 92vh;
+}
 .el-aside{
   width: 12vw;
+  height: 100%;
 }
-.el-scrollbar{
-  background: gray;
+:deep(.el-scrollbar__wrap) {
+  overflow: scroll !important; /* 确保滚动条逻辑正常 */
 }
+
 .el-menu-item {
   width: 100%;
   color: #409EFF !important;
@@ -98,11 +122,6 @@ let ReqForMore = function (Page) {
 .el-menu-item.is-active {
   color: #fff !important;
   background: #409EFF !important;
-}
-
-
-:deep(.el-scrollbar__wrap){
-  overflow: visible !important;
 }
 
 .el-submenu :deep(.el-submenu__title)  {
@@ -126,5 +145,29 @@ let ReqForMore = function (Page) {
 }
 .el-input{
   height: 40px;
+}
+:deep() .el-input__wrapper {
+  background-color: #80aaff;
+}
+:deep() .el-input__inner {
+  color: #FFFFFF !important;
+}
+:deep() .el-input__prefix {
+  color: #FFFFFF;
+}
+.infinite-list{
+  height: 84vh;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.infinite-list .infinite-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+.infinite-list .infinite-list-item + .list-item {
+  margin-top: 10px;
 }
 </style>
