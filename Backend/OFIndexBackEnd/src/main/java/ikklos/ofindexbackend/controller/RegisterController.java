@@ -31,16 +31,17 @@ public class RegisterController {
 
     @GetMapping
     public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest){
-        if(repository.existsUserModelByPhonenum(registerRequest.phoneNumber)){
-            RegisterResponse response=new RegisterResponse();
-            response.result=false;
-            response.message="Exist Phone Number";
+        if(registerRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
+            RegisterResponse response = new RegisterResponse();
+            response.result = false;
+            response.message = "Exist Phone Number";
             return response;
         }
         UserModel user=new UserModel();
-        user.setPhonenum(registerRequest.phoneNumber);
         user.setPasswd(registerRequest.passwd);
         user.setUsername(registerRequest.username);
+        if(registerRequest.phoneNumber!=null)
+            user.setPhonenum(registerRequest.phoneNumber);
         repository.save(user);
 
         Integer id=user.getUserid();
