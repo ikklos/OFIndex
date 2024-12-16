@@ -1,0 +1,83 @@
+<script setup>
+import {ref,defineProps} from 'vue'
+const bookId = ref(0);
+const props = defineProps({
+  id: Number,
+  coverUrl: String,
+  bookName: String,
+  bookAuthor: String,
+  bookDescription: String,
+});
+bookId.value = props.id;
+const JumpToDetail = function(){
+    this.$emit('jumpToDetail',bookId.value);
+}
+</script>
+
+<template>
+  <div class="book-item" @click="JumpToDetail">
+    <el-row style="height: 20vh">
+      <el-col :span="4">
+        <div style="height: 100%; display: flex; align-items: flex-start">
+          <img :src="coverUrl" alt="封面图" style="height: 100%;width: 5vw;object-fit: cover;">
+        </div>
+      </el-col>
+      <el-col :span="20">
+        <!--标题，作者-->
+        <el-row style="height: 10vh; width: 100%">
+          <el-col :span="8" class="single-line-text" style="font-size: 25px">
+            {{bookName}}
+          </el-col>
+          <el-col :span="4" :offset="12" class="single-line-text">
+            作者：{{bookAuthor}}
+          </el-col>
+        </el-row>
+        <!--介绍-->
+        <el-row style="height: 10vh; width: 100%">
+          <div class="description-field">
+            {{bookDescription}}
+          </div>
+        </el-row>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<style scoped>
+.book-item {
+  height: 20vh;
+  width: 100%;
+  transition: all 0.3s ease;
+  background: var(--el-color-primary-light-9);
+  color: var(--el-color-danger-dark-2);
+}
+.book-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05,1.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.el-col{
+  height: 100%;
+}
+.single-line-text{
+  text-align: left;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.description-field{
+  line-height: 3vh;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  height: 100%;
+  width: 100%;
+  padding : 5px;
+  box-sizing: border-box;
+  background-color: #F5FFFA;
+}
+</style>

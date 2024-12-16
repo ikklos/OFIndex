@@ -1,5 +1,5 @@
 <script setup>
-import {ref,watch} from 'vue'
+import {ref,watch,onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 
 const router = useRouter();
@@ -20,8 +20,7 @@ const SetHeaderInfo = function (nowRoute){
       headString.value = "管理员";
   }
 }
-SetHeaderInfo(route.name);
-
+onMounted(() => {SetHeaderInfo(route.name);});
 watch(()=>route.name,
     (newVal, oldVal) => {
         SetHeaderInfo(newVal);

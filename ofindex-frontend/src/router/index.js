@@ -7,6 +7,12 @@ import AccountCardAdmin from "@/components/account-cards/AccountCardAdmin.vue";
 import AccountCardPhoneLogin from "@/components/account-cards/AccountCardPhoneLogin.vue";
 import AccountCardRegisterSucceed from "@/components/account-cards/AccountCardRegisterSucceed.vue";
 import Index from "@/components/index/Index.vue";
+import IndexExplore from "@/components/index/IndexExplore.vue";
+import {Upload} from "@element-plus/icons-vue";
+import IndexUploadBook from "@/components/index/IndexUploadBook.vue";
+import IndexShelf from "@/components/index/IndexShelf.vue";
+import IndexForum from "@/components/index/IndexForum.vue";
+import UserAccountIndex from "@/components/index/UserAccountIndex.vue";
 
 const routes = [
     {
@@ -51,7 +57,24 @@ const routes = [
             {
                 path: "explore",
                 name: "r-index-explore",
-            }
+                component: IndexExplore
+            },{
+                path:"upload-book",
+                name: "r-index-upload-book",
+                component: IndexUploadBook
+            },{
+                path:"shelf",
+                name: "r-index-shelf",
+                component: IndexShelf
+            }, {
+                path:"forum",
+                name:"r-index-forum",
+                component: IndexForum
+            },{
+                path:"user-account-index",
+                name: "r-index-user-account",
+                component: UserAccountIndex
+            },
         ]
     }
 ];
