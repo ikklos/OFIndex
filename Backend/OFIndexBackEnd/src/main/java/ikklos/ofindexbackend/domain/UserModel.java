@@ -35,6 +35,11 @@ public class UserModel implements Serializable {
     @Setter
     private String phonenum;
 
+    @Column(name="avatar")
+    @Getter
+    @Setter
+    private String avatar;
+
     public boolean checkPassword(String password){
         return passwd.equals(password);
     }
