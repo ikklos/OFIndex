@@ -4,12 +4,10 @@ import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/register",produces = "application/json")
 public class RegisterController {
 
@@ -20,7 +18,7 @@ public class RegisterController {
     }
 
     public static class RegisterResponse extends UniversalResponse {
-        public Integer id;
+        public String id;
     }
 
     private final UserRepository repository;
@@ -29,7 +27,7 @@ public class RegisterController {
         this.repository=repository;
     }
 
-    @GetMapping
+    @PostMapping
     public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest){
         if(registerRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
             RegisterResponse response = new RegisterResponse();
@@ -44,11 +42,13 @@ public class RegisterController {
             user.setPhonenum(registerRequest.phoneNumber);
         repository.save(user);
 
+        //TODO create shelf
+
         Integer id=user.getUserid();
         RegisterResponse response=new RegisterResponse();
         response.result=true;
         response.message="Register success";
-        response.id=id;
+        response.id=id.toString();
         return response;
     }
 

@@ -5,15 +5,13 @@ import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
 
 @RestController
+@CrossOrigin
 @RequestMapping(value="/search",produces = "application/json")
 public class SearchController {
 
@@ -39,7 +37,7 @@ public class SearchController {
         this.bookRepository=bookRepository;
     }
 
-    @GetMapping("/pack/{bookId}")
+    @PostMapping("/pack/{bookId}")
     public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){
 
         SearchPackResponse response=new SearchPackResponse();

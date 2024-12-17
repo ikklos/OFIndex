@@ -3,12 +3,10 @@ package ikklos.ofindexbackend.controller;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/login",produces = "application/json")
 public class LoginController {
 
@@ -32,7 +30,7 @@ public class LoginController {
         this.repository=repository;
     }
 
-    @GetMapping
+    @PostMapping
     public LoginResponse tryLogin(@RequestBody LoginRequest loginRequest){
         if(loginRequest.userid!=null){
             var data=repository.findById(loginRequest.userid);
@@ -57,7 +55,7 @@ public class LoginController {
         return response;
     }
 
-    @GetMapping("/phone")
+    @PostMapping("/phone")
     public LoginResponse TryPhoneLogin(@RequestBody PhoneLoginRequest loginRequest){
         if(loginRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(loginRequest.phoneNumber)){
             var data=repository.findUserModelByPhonenum(loginRequest.phoneNumber);
