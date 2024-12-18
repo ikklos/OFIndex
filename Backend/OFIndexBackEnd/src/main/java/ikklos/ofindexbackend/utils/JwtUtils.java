@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ public class JwtUtils {
         long expMillis = System.currentTimeMillis() + ttlMillis;
         Date exp = new Date(expMillis);
 
-        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
 
         JwtBuilder builder = Jwts.builder()
                 .signWith(key)
@@ -43,7 +44,7 @@ public class JwtUtils {
     public static String generateSecretKey(){
         SecureRandom secureRandom=new SecureRandom();
         var keyBuilder=Jwts.SIG.HS256.key().random(secureRandom);
-        return keyBuilder.build().toString();
+        return Base64.getEncoder().encodeToString(keyBuilder.build().getEncoded());
     }
 
 }
