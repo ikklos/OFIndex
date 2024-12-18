@@ -1,44 +1,63 @@
 package site.sayaz.ofindex
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import site.sayaz.ofindex.api.RetrofitInstance
-import site.sayaz.ofindex.data.remote.ApiService
-import site.sayaz.ofindex.data.repository.BookRepository
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import site.sayaz.ofindex.data.remote.RetrofitInstance
+import site.sayaz.ofindex.data.repository.ExploreRepository
+import site.sayaz.ofindex.data.repository.ForumRepository
+import site.sayaz.ofindex.data.repository.AuthRepository
+import site.sayaz.ofindex.data.repository.ShelfRepository
 import site.sayaz.ofindex.ui.navigation.AppNavigation
-import site.sayaz.ofindex.ui.theme.OFIndexTheme
-import site.sayaz.ofindex.viewmodel.ReaderViewModel
-import site.sayaz.ofindex.viewmodel.ReaderViewModelFactory
+import site.sayaz.ofindex.viewmodel.ExploreViewModel
+import site.sayaz.ofindex.viewmodel.ForumViewModel
+import site.sayaz.ofindex.viewmodel.AuthViewModel
+import site.sayaz.ofindex.viewmodel.ShelfViewModel
+import site.sayaz.ofindex.viewmodel.ViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
-
-
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        val bookRepository = BookRepository(RetrofitInstance.apiService)
 
+        val apiService = RetrofitInstance.apiService
 
-        val readerViewModel: ReaderViewModel by viewModels {
-            ReaderViewModelFactory(bookRepository)
+        val loginRep = AuthRepository(apiService,applicationContext)
+        val exploreRep = ExploreRepository(apiService)
+        val forumRep = ForumRepository(apiService)
+        val shelfRep = ShelfRepository(apiService)
+
+        val authViewModel: AuthViewModel by viewModels{
+            ViewModelFactory(AuthViewModel::class.java){
+                AuthViewModel(loginRep)
+            }
+        }
+        val exploreViewModel: ExploreViewModel by viewModels{
+            ViewModelFactory(ExploreViewModel::class.java){
+                ExploreViewModel(exploreRep)
+            }
+        }
+        val forumViewModel: ForumViewModel by viewModels{
+            ViewModelFactory(ForumViewModel::class.java){
+                ForumViewModel(forumRep)
+            }
+        }
+        val shelfViewModel: ShelfViewModel by viewModels{
+            ViewModelFactory(ShelfViewModel::class.java){
+                ShelfViewModel(shelfRep)
+            }
         }
 
-
-        setContent { AppNavigation(readerViewModel) }
+        setContent { AppNavigation(
+            authViewModel = authViewModel,
+            exploreViewModel = exploreViewModel,
+            forumViewModel = forumViewModel,
+            shelfViewModel = shelfViewModel
+        ) }
     }
 }
