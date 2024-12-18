@@ -1,9 +1,14 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -21,7 +26,7 @@ public class LoginController {
     }
 
     public static class LoginResponse extends UniversalResponse {
-        public int token;
+        public String token;
     }
 
     private final UserRepository repository;
@@ -39,7 +44,7 @@ public class LoginController {
                     LoginResponse response = new LoginResponse();
                     response.result = true;
                     response.message = "Login success!";
-                    response.token=-1;
+                    response.token=generateLoginJWT(data.get());
                     return response;
                 }else{
                     LoginResponse response = new LoginResponse();
@@ -63,7 +68,7 @@ public class LoginController {
                     LoginResponse response=new LoginResponse();
                     response.result=true;
                     response.message="Login success!";
-                    response.token=-1;
+                    response.token=generateLoginJWT(data);
                     return response;
                 }else{
                     LoginResponse response = new LoginResponse();
@@ -77,5 +82,16 @@ public class LoginController {
         response.message="No such user!";
         return response;
     }
+
+    private String generateLoginJWT(UserModel userModel){
+
+        Map<String, Object> claims=new HashMap<>();
+        claims.put(JwtUtils.Claims_UserID,userModel.getUserid());
+
+        long ttl=7200000L;
+
+        return JwtUtils.createJwt(userModel.getJwtKey(),ttl,claims);
+    }
+
 }
 

@@ -3,6 +3,7 @@ package ikklos.ofindexbackend.controller;
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,10 @@ public class RegisterController {
         user.setUsername(registerRequest.username);
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
+
+        user.setJwtKey(JwtUtils.generateSecretKey());
+        //TODO Jwt key interval refresh
+
         repository.save(user);
 
         //TODO create shelf
