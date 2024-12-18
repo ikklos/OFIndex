@@ -43,7 +43,7 @@ fun AppNavigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.login(),//TODO("已登陆后应该跳转到explore")
+            startDestination = Route.login(),
             modifier = Modifier.padding(innerPadding)
         ) {
 
