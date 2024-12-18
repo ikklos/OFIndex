@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">OFIndex</string>
+    <string name="action_explore">Explore</string>
+    <string name="action_shelf">Shelf</string>
+    <string name="action_forum">forum</string>
+    <string name="action_more">More</string>
+    <string name="description_explore">Explore</string>
+    <string name="description_shelf">Shelf</string>
+    <string name="description_forum">forum</string>
+    <string name="description_more">More</string>
 </resources>
