@@ -37,11 +37,11 @@ const gotoAdmin = function () {
 
 <template>
   <el-row :span="24" class="center-layout-row">
-    <el-col :span="5" v-show="sideButtonVisible">
+    <el-col :span="6" v-show="sideButtonVisible">
       <el-button link type="primary" @click="gotoPhoneLogin">手机号登录</el-button>
     </el-col>
-    <el-col :span="14" style="font-size: 48px">{{headString}}</el-col>
-    <el-col :span="5" v-show="sideButtonVisible">
+    <el-col :span="12" style="font-size: 48px">{{headString}}</el-col>
+    <el-col :span="6" v-show="sideButtonVisible">
       <el-button link type="primary" @click="gotoAdmin">管理员入口</el-button>
     </el-col>
   </el-row>

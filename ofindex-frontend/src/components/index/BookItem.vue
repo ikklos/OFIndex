@@ -15,37 +15,45 @@ const JumpToDetail = function(){
 </script>
 
 <template>
-  <div class="book-item" @click="JumpToDetail">
-    <el-row style="height: 20vh">
-      <el-col :span="4">
-        <div style="height: 100%; display: flex; align-items: flex-start">
-          <img :src="coverUrl" alt="封面图" style="height: 100%;width: 5vw;object-fit: cover;">
-        </div>
-      </el-col>
-      <el-col :span="20">
-        <!--标题，作者-->
-        <el-row style="height: 10vh; width: 100%">
-          <el-col :span="8" class="single-line-text" style="font-size: 25px">
-            {{bookName}}
-          </el-col>
-          <el-col :span="4" :offset="12" class="single-line-text">
-            作者：{{bookAuthor}}
-          </el-col>
-        </el-row>
-        <!--介绍-->
-        <el-row style="height: 10vh; width: 100%">
-          <div class="description-field">
-            {{bookDescription}}
+  <div class="book-item-container">
+    <div class="book-item" @click="JumpToDetail">
+      <el-row style="height: 100%">
+        <el-col :span="4">
+          <div style="height: 100%; display: flex; align-items: flex-start;">
+            <img :src="coverUrl" alt="封面图" style="height: 100%;width: 5vw;object-fit: contain;">
           </div>
-        </el-row>
-      </el-col>
-    </el-row>
+        </el-col>
+        <el-col :span="20">
+          <!--标题，作者-->
+          <el-row style="height: 50%; width: 100%">
+            <el-col :span="8" class="single-line-text" style="font-size: 25px">
+              {{bookName}}
+            </el-col>
+            <el-col :span="4" :offset="12" class="single-line-text">
+              作者：{{bookAuthor}}
+            </el-col>
+          </el-row>
+          <!--介绍-->
+          <el-row style="height: 50%; width: 100%">
+            <div class="description-field">
+              {{bookDescription}}
+            </div>
+          </el-row>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.book-item {
+.book-item-container {
   height: 20vh;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.book-item {
+  height: 100%;
   width: 100%;
   transition: all 0.3s ease;
   background: var(--el-color-primary-light-9);

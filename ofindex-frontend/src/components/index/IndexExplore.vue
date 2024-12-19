@@ -60,7 +60,7 @@ onMounted(()=>{
 <template>
   <el-container>
     <el-aside>
-      <el-scrollbar>
+      <el-scrollbar style="height:calc(100vh - max(8vh,60px))">
         <el-menu default-active="0">
           <el-menu-item v-for="{name,classId} in ClassList" :key="classId" :index="String(classId)">
             {{name}}
@@ -68,24 +68,24 @@ onMounted(()=>{
         </el-menu>
       </el-scrollbar>
     </el-aside>
-    <el-main style="background: #292929" class="center-layout-column">
+    <el-main class="center-layout-column">
       <div class="div-main">
-        <el-row>
+        <el-row style="padding: 20px 0 20px 0; box-sizing: border-box; height: 10vh">
           <el-col :span="16" :offset="4">
             <el-input v-model="SearchString" prefix-icon="Search" @keyup.enter="FilterByString">
             </el-input>
           </el-col>
         </el-row>
-        <ul v-infinite-scroll="ReqForMore" class="infinite-list" style="overflow: auto; overflow-x:hidden;">
-          <li v-for="{bookId,name,author,description,cover,tag} in BookItems" :key="bookId" class="infinite-list-item">
+        <el-scrollbar v-infinite-scroll="ReqForMore" class="infinite-list" style="height: 80vh; overflow: auto; overflow-x:hidden;">
+          <div v-for="{bookId,name,author,description,cover,tag} in BookItems" :key="bookId">
             <BookItem :cover-url="cover"
                       :book-author="author"
                       :book-description="description"
                       :book-name="name"
                       :id="bookId"
             ></BookItem>
-          </li>
-        </ul>
+          </div>
+        </el-scrollbar>
 
       </div>
     </el-main>
@@ -93,17 +93,9 @@ onMounted(()=>{
 </template>
 
 <style scoped>
-.el-container{
-  height: 92vh;
-}
 .el-aside{
-  width: 12vw;
-  height: 100%;
+  width: 10vw;
 }
-:deep(.el-scrollbar__wrap) {
-  overflow: scroll !important; /* 确保滚动条逻辑正常 */
-}
-
 .el-menu-item {
   width: 100%;
   color: #409EFF !important;
@@ -111,7 +103,7 @@ onMounted(()=>{
     color: #fff!important;
   }
   font-size: large;
-  justify-content: center
+  justify-content: center;
 }
 
 .el-menu-item:hover {
@@ -139,35 +131,19 @@ onMounted(()=>{
   padding: 0 10vw 0 10vw;
 }
 .div-main{
-  width: 100%;
-  height: 100%;
   background: #FFFFFF;
 }
 .el-input{
   height: 40px;
 }
 :deep() .el-input__wrapper {
-  background-color: #80aaff;
+  background-color: rgba(128,170,255,0.2);
+  border-radius: 25px;
 }
 :deep() .el-input__inner {
-  color: #FFFFFF !important;
+  color: #000000 !important;
 }
 :deep() .el-input__prefix {
-  color: #FFFFFF;
-}
-.infinite-list{
-  height: 84vh;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.infinite-list .infinite-list-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 10px;
-}
-.infinite-list .infinite-list-item + .list-item {
-  margin-top: 10px;
+  color: #000000;
 }
 </style>

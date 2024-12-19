@@ -1,17 +1,18 @@
 <script setup>
-
-import {Avatar, CoffeeCup, Reading, Search, Upload} from "@element-plus/icons-vue";
 import {ref,computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
+import UserAccountDetailsMenu from "@/components/index/UserAccountDetailsMenu.vue";
+
 const HelloText = ref('hello');
 const route = useRoute();
 const router = useRouter();
 const RouteName = computed(()=>route.name);
 const IsAdmin = ref(false);
+//控制账号设置目录折叠
+const Fold = ref(true);
+const Timeout = ref(null);
+
 //跳转页面函数
-const jumpToUserAccountIndex = function () {
-  router.push('/index/user-account-index');
-}
 const jumpToExplore = function () {
   router.push('/index/explore');
 }
@@ -21,17 +22,34 @@ const jumpToShelf = function () {
 const jumpToForum = function () {
   router.push('/index/forum');
 }
+//折叠展开目录函数
+const foldMenu = function () {
+  Timeout.value = setTimeout(() => {
+    Fold.value = true;
+  }, 200)
+}
+const unfoldMenu = function () {
+  if(Timeout.value){
+    clearTimeout(Timeout.value);
+  }
+  Fold.value = false;
+}
 </script>
 
 <template>
   <div class="index center-layout-column">
-    <el-container>
-      <el-header height="8vh">
+    <el-container id="index-container" class="index-container">
+      <el-header>
         <el-row :gutter="10">
           <el-col :span="2">
             <div class="avatar-left full-fix">
-              <el-avatar class="user-avatar" size="large" @click="jumpToUserAccountIndex"></el-avatar>
+              <el-avatar id="user-avatar" class="user-avatar" size="large"  :class="{hovered:!Fold}"
+                         @mouseover="unfoldMenu" @mouseleave="foldMenu">
+              </el-avatar>
             </div>
+            <transition name="el-fade-in-linear">
+              <user-account-details-menu v-if="!Fold" @mouseover="unfoldMenu" @mouseleave="foldMenu" class=""/>
+            </transition>
           </el-col>
           <el-col :span="4" :offset="8" style="font-size: 25px">
             <div class="text-center">{{HelloText}}</div>
@@ -72,13 +90,18 @@ const jumpToForum = function () {
 </template>
 
 <style scoped>
+
 /*用户头像*/
 .user-avatar{
+  aspect-ratio: auto 1 / 1;
   transition: all 0.3s ease;
+  z-index: 100;
+  width: 60px;
+  height: 60px;
 }
-.user-avatar:hover{ /*悬停动画效果*/
+.user-avatar.hovered{ /*悬停动画效果*/
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影 */
-  transform: scale(1.1,1.1);
+  transform: scale(1.1,1.1) translateY(10px) translateX(10px);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -93,15 +116,23 @@ const jumpToForum = function () {
 .index{
   width: 100vw;
   height: 100vh;
-  background-image:url('https://i.loli.net/2021/04/07/QgHvB7hlJyCnN8s.jpg');
+  background: #f0fcff;
+  min-width: 800px;
+  min-height: 600px;
 }
-.el-container {
+.index-container {
   width: 90vw;
+  height: 100%;
+  min-width: 720px;
   background: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .el-header{
+  height: 8vh;
   position: sticky;
-  background-color: #AAAAAA;
+  min-height: 60px;
+  z-index: 11;
+  background-color: #e9e7ef;
 }
 .el-col{
   height: 100%;

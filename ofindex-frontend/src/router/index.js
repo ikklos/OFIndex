@@ -12,7 +12,6 @@ import {Upload} from "@element-plus/icons-vue";
 import IndexUploadBook from "@/components/index/IndexUploadBook.vue";
 import IndexShelf from "@/components/index/IndexShelf.vue";
 import IndexForum from "@/components/index/IndexForum.vue";
-import UserAccountIndex from "@/components/index/UserAccountIndex.vue";
 
 const routes = [
     {
@@ -70,10 +69,6 @@ const routes = [
                 path:"forum",
                 name:"r-index-forum",
                 component: IndexForum
-            },{
-                path:"user-account-index",
-                name: "r-index-user-account",
-                component: UserAccountIndex
             },
         ]
     }

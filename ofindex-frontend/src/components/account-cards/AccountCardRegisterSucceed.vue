@@ -11,7 +11,7 @@ const goBack = function () {
   router.back();
 }
 const gotoIndex = function () {
-
+  router.push('/index');
 }
 </script>
 

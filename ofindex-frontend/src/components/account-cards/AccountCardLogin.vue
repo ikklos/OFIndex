@@ -2,6 +2,7 @@
 import {ref} from 'vue'
 import {Right} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
+import axiosApp from "@/main.js";
 
 const router = useRouter();
 const AccountId = ref('');
@@ -11,9 +12,17 @@ const gotoRegister = function () {
 }
 //发送登录请求
 const SendLoginReq = function () {
-  let token = "dsjakldjskaldjsal";
-  localStorage.setItem("Token", token);
-  router.push('/index');
+  axiosApp.post('/login',{
+    userid: AccountId.value,
+    passwd: Password.value,
+  }).then(res => {
+    if(res.status === 200){
+      localStorage.setItem('Token', res.data.token);
+      router.push('/index');
+    }else throw new Error('登陆失败');
+  }).catch(err => {
+    //弹窗显示
+  })
 }
 </script>
 
@@ -63,6 +72,7 @@ const SendLoginReq = function () {
   width: 100%;
   margin-bottom: 50px;
   color:#FFFFFF;
+  min-height: 50px
 }
 .full-fix {
   width: 100%;
@@ -71,11 +81,15 @@ const SendLoginReq = function () {
 .input-bar{
   width: 16vw;
   height: 5vh;
+  min-width: 200px;
+  min-height: 30px;
 }
 .el-button{
   width: 6vw;
   height: 4vh;
   font-size: 20px;
+  min-width: 80px;
+  min-height: 40px;
 }
 :deep() .el-input__inner {
   color: #FFFFFF;
@@ -85,5 +99,6 @@ const SendLoginReq = function () {
 }
 .card-body {
   height: 40vh;
+  min-height: 250px;
 }
 </style>
