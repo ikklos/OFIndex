@@ -24,7 +24,7 @@ public class ShelfModel implements Serializable {
     @Setter
     private Integer userId;
 
-    @Column(name="index")
+    @Column(name="shelfidx")
     @Setter
     private Integer index;
 
