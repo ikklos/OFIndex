@@ -1,5 +1,6 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.ShelfBookModel;
 import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
@@ -42,6 +43,11 @@ public class ShelfController {
     public static class HistoryShelfResponse extends UniversalResponse{
         public int count;
         public List<ShelfBook> items;
+    }
+
+    public static class ShelfEditRequest extends TokenRequest{
+        public Integer shelfId;
+        public Integer bookId;
     }
 
     private final ShelfRepository shelfRepository;
@@ -167,6 +173,74 @@ public class ShelfController {
             response.message="history removed!";
             return response;
         }
+    }
+
+    private UniversalResponse shelfEditRequestTest(ShelfEditRequest request){
+        UniversalResponse response=new UniversalResponse();
+
+        Integer userid=JwtUtils.getUserIdJWT(request.token);
+
+        var shelf=shelfRepository.findById(request.shelfId);
+        if(shelf.isEmpty()){
+            response.result=false;
+            response.message="No such shelf";
+            return response;
+        }
+
+        if(!Objects.equals(shelf.get().getUserId(), userid)){
+            response.result=false;
+            response.message="Not your shelf";
+            return response;
+        }
+
+        if(!bookRepository.existsById(request.bookId)){
+            response.result=false;
+            response.message="No such book";
+            return response;
+        }
+        return null;
+    }
+
+    @PostMapping("/add")
+    public UniversalResponse addBookToShelf(@RequestBody ShelfEditRequest request){
+
+
+        UniversalResponse response=shelfEditRequestTest(request);
+        if(response!=null)return response;
+        response=new UniversalResponse();
+
+        ShelfBookModel sBook=new ShelfBookModel();
+        sBook.setBookId(request.bookId);
+        sBook.setShelfId(request.shelfId);
+        sBook.setTimeStamp(LocalDateTime.now());
+
+        shelfBookRepository.save(sBook);
+
+        response.result=true;
+        response.message="Book added";
+        return response;
+    }
+
+    @PostMapping("/remove")
+    public UniversalResponse removeBookFromShelf(@RequestBody ShelfEditRequest request){
+
+        UniversalResponse response=shelfEditRequestTest(request);
+        if(response!=null)return response;
+        response=new UniversalResponse();
+
+        var sBooks=shelfBookRepository.findShelfBookModelByShelfIdAndBookId(request.shelfId, request.bookId);
+
+        if(sBooks.isEmpty()){
+            response.result=false;
+            response.message="this book is not in this shelf";
+            return response;
+        }
+
+        shelfBookRepository.deleteAll(sBooks);
+
+        response.result=true;
+        response.message="Book removed";
+        return response;
     }
 
 }
