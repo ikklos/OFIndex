@@ -5,7 +5,6 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
-import ikklos.ofindexbackend.request.TokenRequest;
 import ikklos.ofindexbackend.response.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class ShelfController {
         public List<ShelfBook> items;
     }
 
-    public static class ShelfEditRequest extends TokenRequest{
+    public static class ShelfEditRequest{
         public Integer shelfId;
         public Integer bookId;
     }
@@ -64,8 +63,8 @@ public class ShelfController {
     }
 
     @PostMapping
-    public BookShelfResponse getAllBookShelf(@RequestBody TokenRequest request){
-        Integer userId= JwtUtils.getUserIdJWT(request.token);
+    public BookShelfResponse getAllBookShelf(@RequestHeader("Authorization") String token){
+        Integer userId= JwtUtils.getUserIdJWT(token);
 
         BookShelfResponse response=new BookShelfResponse();
         response.result=true;
@@ -107,8 +106,8 @@ public class ShelfController {
     }
 
     @PostMapping("/history")
-    public HistoryShelfResponse getHistoryShelf(@RequestBody TokenRequest request){
-        Integer userId= JwtUtils.getUserIdJWT(request.token);
+    public HistoryShelfResponse getHistoryShelf(@RequestHeader("Authorization") String token){
+        Integer userId= JwtUtils.getUserIdJWT(token);
 
         var historyShelf=shelfRepository.findShelfModelByUserIdAndIndex(userId,0);
 
@@ -148,8 +147,8 @@ public class ShelfController {
 
     @PostMapping("/history/clear")
     @Transactional
-    public UniversalResponse clearHistoryShelf(@RequestBody TokenRequest request){
-        Integer userId= JwtUtils.getUserIdJWT(request.token);
+    public UniversalResponse clearHistoryShelf(@RequestHeader("Authorization") String token){
+        Integer userId= JwtUtils.getUserIdJWT(token);
 
         UniversalResponse response=new UniversalResponse();
 
@@ -175,10 +174,10 @@ public class ShelfController {
         }
     }
 
-    private UniversalResponse shelfEditRequestTest(ShelfEditRequest request){
+    private UniversalResponse shelfEditRequestTest(String token,ShelfEditRequest request){
         UniversalResponse response=new UniversalResponse();
 
-        Integer userid=JwtUtils.getUserIdJWT(request.token);
+        Integer userid=JwtUtils.getUserIdJWT(token);
 
         var shelf=shelfRepository.findById(request.shelfId);
         if(shelf.isEmpty()){
@@ -202,10 +201,10 @@ public class ShelfController {
     }
 
     @PostMapping("/add")
-    public UniversalResponse addBookToShelf(@RequestBody ShelfEditRequest request){
+    public UniversalResponse addBookToShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request){
 
 
-        UniversalResponse response=shelfEditRequestTest(request);
+        UniversalResponse response=shelfEditRequestTest(token,request);
         if(response!=null)return response;
         response=new UniversalResponse();
 
@@ -222,9 +221,9 @@ public class ShelfController {
     }
 
     @PostMapping("/remove")
-    public UniversalResponse removeBookFromShelf(@RequestBody ShelfEditRequest request){
+    public UniversalResponse removeBookFromShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request){
 
-        UniversalResponse response=shelfEditRequestTest(request);
+        UniversalResponse response=shelfEditRequestTest(token, request);
         if(response!=null)return response;
         response=new UniversalResponse();
 
