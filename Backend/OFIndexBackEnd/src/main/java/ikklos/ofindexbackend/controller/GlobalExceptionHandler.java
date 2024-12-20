@@ -1,5 +1,6 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.response.UniversalResponse;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
@@ -11,17 +12,27 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({SignatureException.class, MalformedJwtException.class})
-    public ResponseEntity<String> handleSignatureException(SignatureException ex){
-        return ResponseEntity.status(601).body("Token failed! : "+ex.getClass()+"\n"+ex.getMessage());
+    public ResponseEntity<UniversalResponse> handleSignatureException(SignatureException ex){
+        UniversalResponse response=new UniversalResponse();
+        response.result=false;
+        response.message="Token failed! : "+ex.getClass()+" : "+ex.getMessage();
+        return ResponseEntity.status(601).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getClass()+" : "+ex.getMessage());
+    public ResponseEntity<UniversalResponse> handleRuntimeException(RuntimeException ex) {
+        UniversalResponse response=new UniversalResponse();
+        response.result=false;
+        response.message=ex.getClass()+" : "+ex.getMessage();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + ex.getMessage());
+    public ResponseEntity<UniversalResponse> handleGenericException(Exception ex) {
+        UniversalResponse response=new UniversalResponse();
+        response.result=false;
+        response.message="Error: " + ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 }

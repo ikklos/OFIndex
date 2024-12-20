@@ -1,9 +1,11 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.request.TokenRequest;
+import ikklos.ofindexbackend.response.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -12,20 +14,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/shelf",produces = "application/json")
 public class ShelfController {
 
+    public static class ShelfBook{
+        public int bookId;
+        public LocalDateTime addTime;
+        public String name;
+    }
 
-    public static class BookShelfResponse {
+    public static class BookShelfResponse extends UniversalResponse {
         public static class ResponseItem{
-            public static class ShelfBook{
-                public int bookId;
-                public LocalDateTime addTime;
-                public String name;
-            }
             public String name;
             public int index;
             public int count;
@@ -33,6 +36,11 @@ public class ShelfController {
         }
         public int count;
         public List<ResponseItem> items;
+    }
+
+    public static class HistoryShelfResponse extends UniversalResponse{
+        public int count;
+        public List<ShelfBook> items;
     }
 
     private final ShelfRepository shelfRepository;
@@ -53,6 +61,7 @@ public class ShelfController {
         Integer userId= JwtUtils.getUserIdJWT(request.token);
 
         BookShelfResponse response=new BookShelfResponse();
+        response.result=true;
 
         var bookShelf=shelfRepository.findShelfModelsByUserId(userId, Sort.unsorted());
         response.items=new ArrayList<>();
@@ -70,7 +79,7 @@ public class ShelfController {
             respItem.books=new ArrayList<>();
 
             for(var book:shelfBooks){
-                BookShelfResponse.ResponseItem.ShelfBook bookItem=new BookShelfResponse.ResponseItem.ShelfBook();
+                ShelfBook bookItem=new ShelfBook();
 
                 var bookModel=bookRepository.findById(book.getId());
 
@@ -90,5 +99,44 @@ public class ShelfController {
         return response;
     }
 
+    @PostMapping("/history")
+    public HistoryShelfResponse getHistoryShelf(@RequestBody TokenRequest request){
+        Integer userId= JwtUtils.getUserIdJWT(request.token);
+
+        var historyShelf=shelfRepository.findShelfModelByUserIdAndIndex(userId,0);
+
+        Integer shelfId;
+
+        if(historyShelf.isEmpty()){
+            ShelfModel history=new ShelfModel();
+            history.setUserId(userId);
+            history.setIndex(0);
+            history.setName("history");
+            shelfRepository.save(history);
+            shelfId= history.getShelfId();
+        }else{
+            shelfId=historyShelf.get(0).getShelfId();
+        }
+
+        var shelfBooks=shelfBookRepository.findShelfBookModelsByShelfId(shelfId,Sort.unsorted());
+
+        HistoryShelfResponse response=new HistoryShelfResponse();
+        response.result=true;
+
+        response.items=shelfBooks.stream().map(book->{
+            ShelfBook sBook=new ShelfBook();
+            var bookModel=bookRepository.findById(book.getBookId());
+            if(bookModel.isEmpty())return null;
+            sBook.addTime=book.getTimeStamp();
+            sBook.bookId=book.getBookId();
+            sBook.name=bookModel.get().getName();
+
+            return sBook;
+        }).filter(Objects::nonNull).toList();
+        response.count=response.items.size();
+
+        return response;
+
+    }
 
 }
