@@ -9,6 +9,7 @@ import ikklos.ofindexbackend.response.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -137,6 +138,35 @@ public class ShelfController {
 
         return response;
 
+    }
+
+    @PostMapping("/history/clear")
+    @Transactional
+    public UniversalResponse clearHistoryShelf(@RequestBody TokenRequest request){
+        Integer userId= JwtUtils.getUserIdJWT(request.token);
+
+        UniversalResponse response=new UniversalResponse();
+
+        var historyShelf=shelfRepository.findShelfModelByUserIdAndIndex(userId,0);
+
+        Integer shelfId;
+
+        if(historyShelf.isEmpty()){
+            ShelfModel history=new ShelfModel();
+            history.setUserId(userId);
+            history.setIndex(0);
+            history.setName("history");
+            shelfRepository.save(history);
+            response.result=true;
+            response.message="No history shelf!";
+            return response;
+        }else{
+            shelfId=historyShelf.get(0).getShelfId();
+            shelfBookRepository.removeShelfBookModelsByShelfId(shelfId);
+            response.result=true;
+            response.message="history removed!";
+            return response;
+        }
     }
 
 }

@@ -10,4 +10,6 @@ public interface ShelfBookRepository extends JpaRepository<ShelfBookModel,Intege
 
     List<ShelfBookModel> findShelfBookModelsByShelfId(Integer shelfId, Sort sort);
 
+    void removeShelfBookModelsByShelfId(Integer shelfId);
+    
 }
