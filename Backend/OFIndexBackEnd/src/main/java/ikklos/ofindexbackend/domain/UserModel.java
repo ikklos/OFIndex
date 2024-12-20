@@ -40,11 +40,6 @@ public class UserModel implements Serializable {
     @Setter
     private String avatar;
 
-    @Column(name="jwtkey")
-    @Getter
-    @Setter
-    private String jwtKey;
-
 
     public boolean checkPassword(String password){
         return passwd.equals(password);

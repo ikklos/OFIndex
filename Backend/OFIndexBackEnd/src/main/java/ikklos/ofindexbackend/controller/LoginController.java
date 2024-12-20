@@ -7,9 +7,6 @@ import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/login",produces = "application/json")
@@ -84,13 +81,7 @@ public class LoginController {
     }
 
     private String generateLoginJWT(UserModel userModel){
-
-        Map<String, Object> claims=new HashMap<>();
-        claims.put(JwtUtils.Claims_UserID,userModel.getUserid());
-
-        long ttl=7200000L;
-
-        return JwtUtils.createJwt(userModel.getJwtKey(),ttl,claims);
+        return JwtUtils.createUserIdJWT(userModel.getUserid());
     }
 
 }

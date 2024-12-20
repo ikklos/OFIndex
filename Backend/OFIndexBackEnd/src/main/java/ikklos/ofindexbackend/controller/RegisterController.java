@@ -1,9 +1,10 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.domain.UserModel;
+import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.response.UniversalResponse;
-import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +24,11 @@ public class RegisterController {
     }
 
     private final UserRepository repository;
+    private final ShelfRepository shelfRepository;
 
-    public RegisterController(@Autowired UserRepository repository){
+    public RegisterController(@Autowired UserRepository repository,@Autowired ShelfRepository shelfRepository){
         this.repository=repository;
+        this.shelfRepository=shelfRepository;
     }
 
     @PostMapping
@@ -42,14 +45,22 @@ public class RegisterController {
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
 
-        user.setJwtKey(JwtUtils.generateSecretKey());
-        //TODO Jwt key interval refresh
-
         repository.save(user);
-
-        //TODO create shelf
-
         Integer id=user.getUserid();
+
+        ShelfModel history=new ShelfModel();
+        history.setUserId(id);
+        history.setIndex(0);
+        history.setName("history");
+
+        ShelfModel defaultShelf=new ShelfModel();
+        defaultShelf.setUserId(id);
+        defaultShelf.setIndex(1);
+        defaultShelf.setName("Default");
+
+        shelfRepository.save(history);
+        shelfRepository.save(defaultShelf);
+
         RegisterResponse response=new RegisterResponse();
         response.result=true;
         response.message="Register success";

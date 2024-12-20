@@ -8,4 +8,7 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
     UserModel findUserModelByPhonenum(String phonenum);
 
     boolean existsUserModelByPhonenum(String phonenum);
+
+
+
 }
