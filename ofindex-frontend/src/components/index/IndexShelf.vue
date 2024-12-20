@@ -13,78 +13,16 @@ const DataList = ref([
     name: "书单",
     id: 1,
     type: "list",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  },
+  }
 ]);
+for(let i = 0; i < 80; i++){
+  DataList.value.push({
+    name: "支柱虾：血本无归",
+    id: 1,
+    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
+    type: "book",
+  })
+}
 </script>
 
 <template>

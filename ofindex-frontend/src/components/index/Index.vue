@@ -2,12 +2,16 @@
 import {ref,computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import UserAccountDetailsMenu from "@/components/index/UserAccountDetailsMenu.vue";
+import {CaretLeft} from "@element-plus/icons-vue";
 
 const HelloText = ref('hello');
 const route = useRoute();
 const router = useRouter();
 const RouteName = computed(()=>route.name);
 const IsAdmin = ref(false);
+const showBackButton = computed(()=>{
+  return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail');
+});
 //控制账号设置目录折叠
 const Fold = ref(true);
 const Timeout = ref(null);
@@ -34,6 +38,9 @@ const unfoldMenu = function () {
   }
   Fold.value = false;
 }
+const jumpBack = function () {
+  router.back();
+}
 </script>
 
 <template>
@@ -56,29 +63,34 @@ const unfoldMenu = function () {
           </el-col>
           <el-col :span="2" :offset="2">
             <div class="button-area center-layout-row">
-              <el-button icon="Upload" type="primary" v-if="IsAdmin.value">
+              <el-button class="shift-button" icon="Upload" type="primary" v-if="IsAdmin && (!showBackButton)">
                 上传
               </el-button>
             </div>
           </el-col>
           <el-col :span="2" >
             <div class="button-area center-layout-row">
-              <el-button icon="Search" type="primary" :disabled="RouteName === 'r-index-explore'" @click="jumpToExplore">
+              <el-button class="shift-button" icon="Search" type="primary" :disabled="RouteName === 'r-index-explore'" @click="jumpToExplore" v-if="!showBackButton">
                 探索
               </el-button>
             </div>
           </el-col>
           <el-col :span="2">
             <div class="button-area center-layout-row">
-              <el-button icon="Reading" type="primary" :disabled="RouteName === 'r-index-shelf'" @click="jumpToShelf">
+              <el-button class="shift-button" icon="Reading" type="primary" :disabled="RouteName === 'r-index-shelf'" @click="jumpToShelf" v-if="!showBackButton">
                 书架
               </el-button>
             </div>
           </el-col>
           <el-col :span="2">
             <div class="button-area center-layout-row">
-              <el-button icon="CoffeeCup" type="primary" :disabled="RouteName === 'r-index-forum'" @click="jumpToForum">
+              <el-button class="shift-button" icon="CoffeeCup" type="primary" :disabled="RouteName === 'r-index-forum'" @click="jumpToForum" v-if="!showBackButton">
                 社区
+              </el-button>
+              <el-button class="back-button" link v-if="showBackButton" style="font-size: 25px" @click="jumpBack">
+                <el-icon>
+                  <CaretLeft></CaretLeft>
+                </el-icon>
               </el-button>
             </div>
           </el-col>
@@ -128,6 +140,8 @@ const unfoldMenu = function () {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .el-header{
+  box-sizing: border-box;
+  border-top: 5px solid #0099cc;
   height: 8vh;
   position: sticky;
   min-height: 60px;
@@ -152,7 +166,7 @@ const unfoldMenu = function () {
   height: 100%;
   width: 100%;
 }
-.el-button{
+.shift-button{
   width: 5vw;
   height: 4vh;
 }

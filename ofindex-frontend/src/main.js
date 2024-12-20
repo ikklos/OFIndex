@@ -5,6 +5,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import axios from "axios";
+import Icon from 'view-ui-plus'
+import 'view-ui-plus/dist/styles/viewuiplus.css'
 
 //从配置文件中读取后端ip和端口
 let url = '';
@@ -34,6 +36,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 //添加ElementPlus
 app.use(ElementPlus);
+app.component(Icon);
 app.use(router);
 app.mount('#app');
 

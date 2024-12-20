@@ -9,8 +9,9 @@ const props = defineProps({
   bookDescription: String,
 });
 bookId.value = props.id;
+const emit = defineEmits(['jumpToDetail']);
 const JumpToDetail = function(){
-    this.$emit('jumpToDetail',bookId.value);
+    emit('jumpToDetail',bookId.value);
 }
 </script>
 
