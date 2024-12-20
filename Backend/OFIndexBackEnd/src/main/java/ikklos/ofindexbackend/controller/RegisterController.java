@@ -42,7 +42,8 @@ public class RegisterController {
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
 
-        user.setJwtKey(JwtUtils.generateSecretKey());
+        var keyFactory=new JwtUtils.JwtkeyFactory();
+        user.setJwtKey(keyFactory.generateJwtKey());
         //TODO Jwt key interval refresh
 
         repository.save(user);

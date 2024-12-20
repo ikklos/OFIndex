@@ -2,6 +2,7 @@ package ikklos.ofindexbackend.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecretKeyBuilder;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,21 @@ import java.util.Map;
 public class JwtUtils {
 
     public static final String Claims_UserID="USER_ID";
+
+    public static class JwtkeyFactory{
+
+        private final SecretKeyBuilder keyBuilder;
+
+        public JwtkeyFactory(){
+            SecureRandom sr = new SecureRandom();
+            keyBuilder=Jwts.SIG.HS256.key().random(sr);
+        }
+
+        public String generateJwtKey(){
+            return Base64.getEncoder().encodeToString(keyBuilder.build().getEncoded());
+        }
+
+    }
 
     public static String createJwt(String secretKey, long ttlMillis, Map<String, Object> claims) {
         long expMillis = System.currentTimeMillis() + ttlMillis;
@@ -39,12 +55,6 @@ public class JwtUtils {
                 .build();
         Jws<Claims> jws = parser.parseSignedClaims(token);
         return jws.getPayload();
-    }
-
-    public static String generateSecretKey(){
-        SecureRandom secureRandom=new SecureRandom();
-        var keyBuilder=Jwts.SIG.HS256.key().random(secureRandom);
-        return Base64.getEncoder().encodeToString(keyBuilder.build().getEncoded());
     }
 
 }
