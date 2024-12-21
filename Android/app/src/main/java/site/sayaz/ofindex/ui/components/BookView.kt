@@ -61,7 +61,7 @@ fun BookView(
 
             // 书名，在封面的左下角
             Text(
-                text = book.name,
+                text = book.name?:"null",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

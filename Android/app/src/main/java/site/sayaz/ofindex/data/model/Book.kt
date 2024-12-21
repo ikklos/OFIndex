@@ -1,12 +1,16 @@
 package site.sayaz.ofindex.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Book(
     val bookId: Int,
-    val name: String,
-    val cover: String,
-    val author: String = "no author",
-    val description: String = "no description",
-    val tag: String = "no tag",
-    val isbn: String = "00000000",
-    val bookClass:Int = 0
+    val name: String? = null,
+    val cover: String? = null,
+    val author: String? = null,
+    val description: String? = null,
+    val tag: String? = null,
+    val isbn: String? = null,
+    val bookClass: Int? = null
 )
+
