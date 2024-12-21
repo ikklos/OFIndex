@@ -1,29 +1,21 @@
 package site.sayaz.ofindex.ui.navigation
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBarComponentOverride
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import site.sayaz.ofindex.data.remote.RetrofitInstance
+import site.sayaz.ofindex.ui.navigation.bottom.BottomNavigation
+import site.sayaz.ofindex.ui.navigation.top.ExploreTopBar
+import site.sayaz.ofindex.ui.navigation.top.ForumTopBar
+import site.sayaz.ofindex.ui.navigation.top.MoreTopBar
+import site.sayaz.ofindex.ui.navigation.top.ShelfTopBar
 import site.sayaz.ofindex.ui.screen.auth.LoginScreen
 import site.sayaz.ofindex.ui.screen.auth.RegisterScreen
 import site.sayaz.ofindex.ui.screen.explore.ExploreScreen
@@ -67,7 +59,17 @@ fun AppNavigation(
                     navController.navigate(route)
                 }
             }
-        }
+        },
+        topBar = {
+            when(currentRoute){
+                Route.explore() -> ExploreTopBar(exploreViewModel)
+                Route.shelf() -> ShelfTopBar(shelfViewModel)
+                Route.forum() -> ForumTopBar(forumViewModel)
+                Route.more() -> MoreTopBar()
+                else -> {}
+            }
+        },
+
     ) { innerPadding ->
         NavHost(
             navController = navController,

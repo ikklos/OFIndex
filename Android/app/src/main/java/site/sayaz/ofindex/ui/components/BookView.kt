@@ -1,14 +1,9 @@
 package site.sayaz.ofindex.ui.components
 
-import android.widget.StackView
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -54,7 +49,7 @@ fun BookView(
                     placeholder = painterResource(id = R.drawable.ic_action_no_image), // 加载中显示的占位符
                     error = painterResource(id = R.drawable.ic_action_no_image) // 加载失败时显示的图片
                 ),
-                contentDescription = null, // 可选：提供内容描述
+                contentDescription = book.description,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
