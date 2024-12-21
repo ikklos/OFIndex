@@ -38,6 +38,8 @@ public class LoadController {
             return ResponseEntity.notFound().build();
         }
 
+        //TODO history stuff
+
         Path filePath = bookFileFinder.getBookDocumentPath(booko.get());
         Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
         if (resource.exists() || resource.isReadable()) {
