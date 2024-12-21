@@ -56,7 +56,7 @@ let ReqForMore = function (Page) {
   }
 }
 let handleJumpToDetail = function (id){
-  router.push('/index/book-detail/' + id);
+  router.push('/index/detail/book-detail/' + id);
 }
 onMounted(() => {
   FilterByString("bookId");

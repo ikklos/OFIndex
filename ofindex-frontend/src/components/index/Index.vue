@@ -1,7 +1,7 @@
 <script setup>
 import {ref,computed} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import UserAccountDetailsMenu from "@/components/index/UserAccountDetailsMenu.vue";
+import UserAccountDetailsMenu from "@/components/detail-pages/UserAccountDetailsMenu.vue";
 import {CaretLeft} from "@element-plus/icons-vue";
 
 const HelloText = ref('hello');

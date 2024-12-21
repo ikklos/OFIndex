@@ -27,7 +27,7 @@ for(let i = 0; i < 80; i++){
 }
 const jumpToDetail = function(bookId, type) {
   if(type==='book'){
-    router.push('/index/book-detail/'+bookId);
+    router.push('/index/detail/book-detail/'+bookId);
   }else{
     //请求书单下的列表，覆盖当前的DataList
   }
