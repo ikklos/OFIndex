@@ -39,6 +39,7 @@ public class SearchController {
 
     public static class SearchBookResponse extends UniversalResponse{
         public static class RespItem{
+            public Integer id;
             public String name;
             public String author;
             public String description;
@@ -77,6 +78,7 @@ public class SearchController {
         response.items=books.stream().map(
                 bookModel -> {
                     SearchBookResponse.RespItem item=new SearchBookResponse.RespItem();
+                    item.id=bookModel.getBookId();
                     item.author=bookModel.getAuthor();
                     item.cover=bookModel.getCover();
                     item.tag=bookModel.getTags();

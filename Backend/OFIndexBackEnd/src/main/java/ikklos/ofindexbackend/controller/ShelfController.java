@@ -70,7 +70,7 @@ public class ShelfController {
         response.result=true;
 
         var bookShelf=shelfRepository.findShelfModelsByUserId(userId, Sort.unsorted());
-        response.items=new ArrayList<>();
+        response.items =new ArrayList<>();
 
         for(var shelf:bookShelf){
 
