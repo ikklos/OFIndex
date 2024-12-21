@@ -4,7 +4,7 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

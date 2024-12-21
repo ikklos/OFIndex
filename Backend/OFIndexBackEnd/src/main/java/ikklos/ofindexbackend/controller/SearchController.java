@@ -1,10 +1,13 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +30,26 @@ public class SearchController {
         public List<SearchPackResponseItem> items;
     }
 
+    public static class SearchBookRequest{
+        public String text;
+        public Integer bookClass;
+        public Integer count;
+        public Integer page;
+    }
+
+    public static class SearchBookResponse extends UniversalResponse{
+        public static class RespItem{
+            public String name;
+            public String author;
+            public String description;
+            public String cover;
+            public String tag;
+        }
+        public Integer count;
+        public Integer totalResult;
+        public List<RespItem> items;
+    }
+
     private final PackRepository packRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
@@ -36,6 +59,40 @@ public class SearchController {
         this.userRepository=userRepository;
         this.bookRepository=bookRepository;
     }
+
+    @PostMapping
+    public SearchBookResponse searchBook(@RequestBody SearchBookRequest request){
+        SearchBookResponse response=new SearchBookResponse();
+
+        response.totalResult= Math.toIntExact(bookRepository.count());
+
+        Page<BookModel> books;
+
+        if(request.bookClass==null){
+            books=bookRepository.findBookModelsByNameLike("%"+request.text+"%", PageRequest.of(request.page,request.count));
+        }else{
+            books=bookRepository.findBookModelsByBookClassAndNameLike(request.bookClass, "%"+request.text+"%", PageRequest.of(request.page,request.count));
+        }
+
+        response.items=books.stream().map(
+                bookModel -> {
+                    SearchBookResponse.RespItem item=new SearchBookResponse.RespItem();
+                    item.author=bookModel.getAuthor();
+                    item.cover=bookModel.getCover();
+                    item.tag=bookModel.getTags();
+                    item.name=bookModel.getName();
+                    item.description=bookModel.getDescription();
+                    return item;
+                }
+        ).toList();
+
+        response.message="Result found";
+        response.count=response.items.size();
+
+        return response;
+
+    }
+
 
     @PostMapping("/pack/{bookId}")
     public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){

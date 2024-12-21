@@ -1,6 +1,6 @@
 package ikklos.ofindexbackend.controller;
 
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;

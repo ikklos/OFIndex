@@ -5,7 +5,7 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
