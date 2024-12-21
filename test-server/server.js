@@ -14,7 +14,7 @@ function authenticateToken(req, res, next) {
     if (token == null) return res.sendStatus(401); // 如果没有提供token
 
     jwt.verify(token, 'your_secret_key', (err, user) => {
-        if (err) return res.sendStatus(403); // 如果token无效
+        if (err) return res.sendStatus(601); // 如果token无效
         console.log('Verified token:', token); // 输出验证后的token
         req.user = user; // 将用户信息附加到req对象上
         next(); // 继续处理请求
@@ -25,18 +25,25 @@ function authenticateToken(req, res, next) {
 app.post('/login', (req, res) => {
     // 假设我们有一个简单的用户验证逻辑
     const { userid, passwd } = req.body;
-    
-    // 简单的硬编码验证（实际应用中应使用数据库）
-    if (userid === '111' && passwd === '111') {
-        // 如果验证成功，生成JWT
         const token = jwt.sign({ user: userid }, 'your_secret_key', { expiresIn: '1h' });
-        
         // 返回带有token的JSON响应
         return res.json({ token });
-    } else {
-        return res.status(401).json({ message: 'Invalid credentials' });
-    }
+
+    
 });
+
+app.get('/books', (req, res) => {
+    // // 硬编码的书籍数据
+    // const books = [
+    //     { id: '1', title: 'Book 1', author: 'Author' },
+    //     { id: '2', title: 'Book 2', author: 'Author' }
+    // ]
+    // res.json(books);
+    //返回601状态码
+    console.log('601');
+    res.status(601).json({ message: 'Invalid token' });
+});
+
 
 app.post('/register', (req, res) => {
   // 假设我们有一个简单的用户验证逻辑

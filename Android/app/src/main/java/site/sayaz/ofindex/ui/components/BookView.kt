@@ -25,20 +25,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import site.sayaz.ofindex.R
-
+import site.sayaz.ofindex.data.model.Book
 
 
 @Composable
 fun BookView(
-    bookTitle: String,
-    bookCoverImageUrl: String,
+    book: Book,
+    onBookClick: (Book) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.padding(8.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
-        // 使用 Box 布局来堆叠 Image 和 Text
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -46,7 +45,7 @@ fun BookView(
         ) {
             // 书封面
             Image(
-                painter = rememberAsyncImagePainter(bookCoverImageUrl),
+                painter = rememberAsyncImagePainter(book.cover),
                 contentDescription = null, // 可选：提供内容描述
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -54,7 +53,7 @@ fun BookView(
 
             // 书名，在封面的左下角
             Text(
-                text = bookTitle,
+                text = book.name,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.White,
@@ -73,8 +72,17 @@ fun BookView(
 @Composable
 fun BookViewPreview() {
     BookView(
-        "ysssss",
-        "http://10.194.189.228:3000/{id}/cover.jpg",
+        Book(
+            bookId = 1,
+            name = "bookname",
+            author = "author",
+            description = "desp",
+            cover = "TODO()",
+            tag = "TODO()",
+            isbn = "TODO()",
+            bookClass = 1,
+        ),
+        {},
         Modifier
             .width(100.dp)
             .height(150.dp)

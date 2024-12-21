@@ -17,7 +17,7 @@ import site.sayaz.ofindex.data.remote.response.RegisterResponse
 
 interface ApiService {
     @GET("/books")
-    suspend fun getBooks(): List<Book>
+    suspend fun getBooks(): Response<List<Book>>
 
     @GET("/book/{id}")
     suspend fun getBook(@Path("id") id: Int): Response<BookResponse>
