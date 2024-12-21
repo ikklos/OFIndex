@@ -1,6 +1,6 @@
 package ikklos.ofindexbackend.controller;
 
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({SignatureException.class, MalformedJwtException.class})
-    public ResponseEntity<UniversalResponse> handleSignatureException(SignatureException ex){
+    @ExceptionHandler(value={SignatureException.class, MalformedJwtException.class})
+    public ResponseEntity<UniversalResponse> handleSignatureException(Exception ex){
         UniversalResponse response=new UniversalResponse();
         response.result=false;
         response.message="Token failed! : "+ex.getClass()+" : "+ex.getMessage();

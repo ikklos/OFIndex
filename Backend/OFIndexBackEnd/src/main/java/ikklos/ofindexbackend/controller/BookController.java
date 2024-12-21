@@ -1,7 +1,7 @@
 package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.repository.BookRepository;
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
