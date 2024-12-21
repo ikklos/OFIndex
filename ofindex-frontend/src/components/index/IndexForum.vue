@@ -1,5 +1,8 @@
 <script setup>
  import {ref, onMounted} from 'vue'
+ import {useRouter} from "vue-router";
+
+ let router= useRouter();
  const additionReqSize = 40;
  //帖子列表
  const CommunityPostList = ref([]);
@@ -22,7 +25,9 @@
    }
    console.log(CommunityPostList.value.length);
  }
-
+  const jumpToDetail = function (id){
+    router.push('/index/post-detail/'+id);
+  }
 </script>
 
 <template>
@@ -38,7 +43,7 @@
                 </div>
                 {{item.title}}
               </el-row>
-              <el-row class="text-row">
+              <el-row class="text-row" @click="jumpToDetail(item.postId)">
                 {{item.text}}
               </el-row>
               <el-row class="pictures-row" v-if="item.pictures.length > 0">

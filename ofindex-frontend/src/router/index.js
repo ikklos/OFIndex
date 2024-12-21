@@ -76,7 +76,7 @@ const routes = [
                 name:"r-index-book-detail",
                 component: BookDetailPage,
             },{
-                path:"post-detail",
+                path:"post-detail/:postId",
                 name:"r-index-post-detail",
                 component: PostDetailPage,
             }

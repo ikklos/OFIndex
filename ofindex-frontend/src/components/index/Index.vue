@@ -141,7 +141,7 @@ const jumpBack = function () {
 }
 .el-header{
   box-sizing: border-box;
-  border-top: 5px solid #0099cc;
+  border-top: 5px solid #3c5cd7;
   height: 8vh;
   position: sticky;
   min-height: 60px;

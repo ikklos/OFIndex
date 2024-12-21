@@ -1,9 +1,11 @@
 <script setup>
 
 import LittleBalls from "@/components/index/LittleBalls.vue";
-import {ref, onMounted, onBeforeUnmount} from 'vue'
+import {ref, onMounted, onBeforeUnmount} from 'vue';
+import {useRouter} from 'vue-router'
 import {Picture} from "@element-plus/icons-vue";
 
+let router = useRouter();
 const menuItems = ref([
   {name: "1"}, {name: "2"}, {name: "3"},
 ]);
@@ -23,6 +25,13 @@ for(let i = 0; i < 80; i++){
     type: "book",
   })
 }
+const jumpToDetail = function(bookId, type) {
+  if(type==='book'){
+    router.push('/index/book-detail/'+bookId);
+  }else{
+    //请求书单下的列表，覆盖当前的DataList
+  }
+}
 </script>
 
 <template>
@@ -31,7 +40,7 @@ for(let i = 0; i < 80; i++){
       <el-scrollbar style="height: 80vh; min-height: 520px;">
         <div class="items-container">
           <div v-for="(item,index) in DataList" :key="index" class="data-item">
-            <div class="item-inner">
+            <div class="item-inner" @click="jumpToDetail(item.id,item.type)">
               <el-image :src="item.cover" fit="contain">
                 <template #error>
                   <div class="error-image">
