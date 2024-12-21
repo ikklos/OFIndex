@@ -108,7 +108,7 @@ onMounted(() => {
 
 .el-menu-item {
   width: 100%;
-  color: #409EFF !important;
+  color: #3621ef !important;
 
   i {
     color: #fff !important;
@@ -120,12 +120,13 @@ onMounted(() => {
 
 .el-menu-item:hover {
   outline: 0 !important;
-  color: #409EFF !important;
+  color: #3621ef !important;
+  background: #b198fa;
 }
 
 .el-menu-item.is-active {
   color: #fff !important;
-  background: #409EFF !important;
+  background: #3621ef !important;
 }
 
 .el-submenu :deep(.el-submenu__title) {
@@ -153,7 +154,7 @@ onMounted(() => {
 }
 
 :deep() .el-input__wrapper {
-  background-color: rgba(128, 170, 255, 0.2);
+  background-color: #fcfce5;
   border-radius: 25px;
 }
 

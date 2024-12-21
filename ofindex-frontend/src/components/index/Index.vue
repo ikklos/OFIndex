@@ -8,7 +8,8 @@ const HelloText = ref('hello');
 const route = useRoute();
 const router = useRouter();
 const RouteName = computed(()=>route.name);
-const IsAdmin = ref(false);
+const userAvatar = ref('https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg');
+const IsAdmin = ref(true);
 const showBackButton = computed(()=>{
   return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail');
 });
@@ -38,6 +39,9 @@ const unfoldMenu = function () {
   }
   Fold.value = false;
 }
+const jumpToUpload = function () {
+  router.push('/index/upload-book');
+}
 const jumpBack = function () {
   router.back();
 }
@@ -51,7 +55,7 @@ const jumpBack = function () {
           <el-col :span="2">
             <div class="avatar-left full-fix">
               <el-avatar id="user-avatar" class="user-avatar" size="large"  :class="{hovered:!Fold}"
-                         @mouseover="unfoldMenu" @mouseleave="foldMenu">
+                         @mouseover="unfoldMenu" @mouseleave="foldMenu" :src="userAvatar" fit="cover">
               </el-avatar>
             </div>
             <transition name="el-fade-in-linear">
@@ -63,31 +67,35 @@ const jumpBack = function () {
           </el-col>
           <el-col :span="2" :offset="2">
             <div class="button-area center-layout-row">
-              <el-button class="shift-button" icon="Upload" type="primary" v-if="IsAdmin && (!showBackButton)">
+              <el-button class="shift-button" icon="Upload" type="primary" v-if="IsAdmin && (!showBackButton)"
+                         :disabled="RouteName === 'r-index-upload-book'" @click="jumpToUpload" color="#3621ef">
                 上传
               </el-button>
             </div>
           </el-col>
           <el-col :span="2" >
             <div class="button-area center-layout-row">
-              <el-button class="shift-button" icon="Search" type="primary" :disabled="RouteName === 'r-index-explore'" @click="jumpToExplore" v-if="!showBackButton">
+              <el-button class="shift-button" icon="Search" type="primary" :disabled="RouteName === 'r-index-explore'"
+                         @click="jumpToExplore" v-if="!showBackButton" color="#3621ef">
                 探索
               </el-button>
             </div>
           </el-col>
           <el-col :span="2">
             <div class="button-area center-layout-row">
-              <el-button class="shift-button" icon="Reading" type="primary" :disabled="RouteName === 'r-index-shelf'" @click="jumpToShelf" v-if="!showBackButton">
+              <el-button class="shift-button" icon="Reading" type="primary" :disabled="RouteName === 'r-index-shelf'"
+                         @click="jumpToShelf" v-if="!showBackButton" color="#3621ef">
                 书架
               </el-button>
             </div>
           </el-col>
           <el-col :span="2">
             <div class="button-area center-layout-row">
-              <el-button class="shift-button" icon="CoffeeCup" type="primary" :disabled="RouteName === 'r-index-forum'" @click="jumpToForum" v-if="!showBackButton">
+              <el-button class="shift-button" icon="CoffeeCup" type="primary" :disabled="RouteName === 'r-index-forum'"
+                         @click="jumpToForum" v-if="!showBackButton" color="#3621ef">
                 社区
               </el-button>
-              <el-button class="back-button" link v-if="showBackButton" style="font-size: 25px" @click="jumpBack">
+              <el-button class="back-button" link v-if="showBackButton" style="font-size: 25px; color:#3621ef" @click="jumpBack">
                 <el-icon>
                   <CaretLeft></CaretLeft>
                 </el-icon>
@@ -128,7 +136,7 @@ const jumpBack = function () {
 .index{
   width: 100vw;
   height: 100vh;
-  background: #f0fcff;
+  background: #eee6fe;
   min-width: 800px;
   min-height: 600px;
 }
@@ -141,12 +149,13 @@ const jumpBack = function () {
 }
 .el-header{
   box-sizing: border-box;
-  border-top: 5px solid #3c5cd7;
+  border-top: 5px solid #6f4bf8;
   height: 8vh;
   position: sticky;
   min-height: 60px;
   z-index: 11;
-  background-color: #e9e7ef;
+  background-color: #d1c2fb;
+  color: #0219e7;
 }
 .el-col{
   height: 100%;

@@ -84,11 +84,11 @@ const sendRegisterReq = function () {
     <div class="card-footer">
       <el-row>
         <el-col :span="8" class="center-layout-row">
-          <el-button color="#80aaff" @click="goBack" :icon="Back">
+          <el-button color="#3621ef" @click="goBack" :icon="Back">
           </el-button>
         </el-col>
         <el-col :span="8" :offset="8" class="center-layout-row">
-          <el-button color="#80aaff" @click="sendRegisterReq" :icon="Right">
+          <el-button color="#3621ef" @click="sendRegisterReq" :icon="Right">
           </el-button>
         </el-col>
       </el-row>
@@ -98,48 +98,47 @@ const sendRegisterReq = function () {
 </template>
 
 <style scoped>
-.text-right {
+.text-right{
   text-align: right;
   line-height: 5vh;
 }
-
 .el-row {
   width: 100%;
   margin-bottom: 50px;
-  color: #FFFFFF;
-  min-height: 30px
+  color:#292929;
+  min-height: 50px
 }
-
 .full-fix {
   width: 100%;
   height: 100%;
 }
-
-.input-bar {
+.input-bar{
   width: 16vw;
   height: 5vh;
   min-width: 200px;
   min-height: 30px;
-}
 
-.el-button {
+}
+.el-button{
   width: 6vw;
   height: 4vh;
   font-size: 20px;
   min-width: 80px;
   min-height: 40px;
 }
-
 :deep() .el-input__inner {
-  color: #FFFFFF;
+  font-size: 20px;
+  color: #000000;
 }
-
 :deep() .el-input__wrapper {
-  background-color: #000000;
+  background-color: #d1c2fb;
 }
-
 .card-body {
   height: 40vh;
   min-height: 250px;
+}
+.text-right{
+  color: #000000;
+  font-size: 20px;
 }
 </style>

@@ -35,7 +35,7 @@ const jumpToDetail = function(bookId, type) {
 </script>
 
 <template>
-  <el-container>
+  <el-container class="shelf-page-container">
     <el-main style="z-index: 9" id="shelf-main-field">
       <el-scrollbar style="height: 80vh; min-height: 520px;">
         <div class="items-container">
@@ -64,7 +64,8 @@ const jumpToDetail = function(bookId, type) {
 </template>
 
 <style scoped>
-.el-container {
+.shelf-page-container {
+  background: #fcfce5;
   min-width: 720px;
 }
 .el-aside {

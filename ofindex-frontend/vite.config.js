@@ -17,5 +17,14 @@ export default defineConfig({
   },
   server: {
     port: 4999,
-  }
+    proxy:{
+      '/api': {
+        target: 'https://sm.ms/api/v2/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
+      }
+    }
+  },
+
 })
