@@ -1,7 +1,8 @@
 <script setup>
 import {ref, reactive, onMounted} from "vue";
+import {useRouter} from "vue-router";
 import BookItem from "@/components/index/BookItem.vue";
-
+let router = useRouter();
 let BatchSize = 20;
 const ClassList = reactive([
   {
@@ -54,6 +55,9 @@ let ReqForMore = function (Page) {
 
   }
 }
+let handleJumpToDetail = function (id){
+  router.push('/index/detail/book-detail/' + id);
+}
 onMounted(() => {
   FilterByString("bookId");
 })
@@ -87,6 +91,7 @@ onMounted(() => {
                         :book-description="description"
                         :book-name="name"
                         :id="bookId"
+                        @jump-to-detail="handleJumpToDetail"
               ></BookItem>
             </li>
           </ul>

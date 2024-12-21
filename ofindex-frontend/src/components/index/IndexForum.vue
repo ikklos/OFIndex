@@ -1,5 +1,9 @@
 <script setup>
  import {ref, onMounted} from 'vue'
+ import {useRouter} from "vue-router";
+ import PostItem from "@/components/index/PostItem.vue";
+
+ let router= useRouter();
  const additionReqSize = 40;
  //帖子列表
  const CommunityPostList = ref([]);
@@ -22,7 +26,9 @@
    }
    console.log(CommunityPostList.value.length);
  }
-
+  const jumpToDetail = function (id){
+    router.push('/index/detail/post-detail/'+id);
+  }
 </script>
 
 <template>
@@ -31,21 +37,7 @@
       <el-scrollbar>
         <ul v-infinite-scroll="ReqForMore" class="post-list">
           <li v-for="(item,index) in CommunityPostList" :key="index" class="post-item">
-            <div class="item-inner">
-              <el-row class="title-row">
-                <div class="avatar-area">
-                  <el-avatar size="large"></el-avatar>
-                </div>
-                {{item.title}}
-              </el-row>
-              <el-row class="text-row">
-                {{item.text}}
-              </el-row>
-              <el-row class="pictures-row" v-if="item.pictures.length > 0">
-                <el-image v-for="(picture,index) in item.pictures" :key="index" :src="picture" class="post-picture">
-                </el-image>
-              </el-row>
-            </div>
+            <post-item :post-data="item" @jump-to-detail="jumpToDetail"></post-item>
           </li>
         </ul>
       </el-scrollbar>
@@ -75,39 +67,5 @@
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
-}
-.item-inner{
-  width: 50%;
-  border: 1px solid #292929;
-  border-radius: 24px;
-  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.2);
-}
-.title-row{
-  font-size: larger;
-  box-sizing: border-box;
-  padding: 20px 20px 20px 20px;
-  text-align: center;
-  align-items: center;      /*垂直方向居中*/
-}
-.avatar-area{
-  box-sizing: border-box;
-  padding: 0 20px 0 0;
-}
-.text-row{
-  box-sizing: border-box;
-  padding: 0 20px 0 20px;
-  text-align: left;
-}
-.text-row:hover{
-  cursor: pointer;
-}
-.pictures-row{
-
-}
-.pictures-row:hover{
-
-}
-.post-picture:hover{
-  cursor: zoom-in;
 }
 </style>

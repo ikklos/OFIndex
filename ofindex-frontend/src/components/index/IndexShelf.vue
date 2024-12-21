@@ -1,9 +1,11 @@
 <script setup>
 
 import LittleBalls from "@/components/index/LittleBalls.vue";
-import {ref, onMounted, onBeforeUnmount} from 'vue'
+import {ref, onMounted, onBeforeUnmount} from 'vue';
+import {useRouter} from 'vue-router'
 import {Picture} from "@element-plus/icons-vue";
 
+let router = useRouter();
 const menuItems = ref([
   {name: "1"}, {name: "2"}, {name: "3"},
 ]);
@@ -13,78 +15,23 @@ const DataList = ref([
     name: "书单",
     id: 1,
     type: "list",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  }, {
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  },
+  }
 ]);
+for(let i = 0; i < 80; i++){
+  DataList.value.push({
+    name: "支柱虾：血本无归",
+    id: 1,
+    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
+    type: "book",
+  })
+}
+const jumpToDetail = function(bookId, type) {
+  if(type==='book'){
+    router.push('/index/detail/book-detail/'+bookId);
+  }else{
+    //请求书单下的列表，覆盖当前的DataList
+  }
+}
 </script>
 
 <template>
@@ -93,7 +40,7 @@ const DataList = ref([
       <el-scrollbar style="height: 80vh; min-height: 520px;">
         <div class="items-container">
           <div v-for="(item,index) in DataList" :key="index" class="data-item">
-            <div class="item-inner">
+            <div class="item-inner" @click="jumpToDetail(item.id,item.type)">
               <el-image :src="item.cover" fit="contain">
                 <template #error>
                   <div class="error-image">

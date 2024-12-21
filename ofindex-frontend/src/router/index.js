@@ -12,6 +12,8 @@ import {Upload} from "@element-plus/icons-vue";
 import IndexUploadBook from "@/components/index/IndexUploadBook.vue";
 import IndexShelf from "@/components/index/IndexShelf.vue";
 import IndexForum from "@/components/index/IndexForum.vue";
+import BookDetailPage from "@/components/detail-pages/BookDetailPage.vue";
+import PostDetailPage from "@/components/detail-pages/PostDetailPage.vue";
 
 const routes = [
     {
@@ -69,7 +71,15 @@ const routes = [
                 path:"forum",
                 name:"r-index-forum",
                 component: IndexForum
-            },
+            },{
+                path:"detail/book-detail/:bookId",
+                name:"r-index-book-detail",
+                component: BookDetailPage,
+            },{
+                path:"detail/post-detail/:postId",
+                name:"r-index-post-detail",
+                component: PostDetailPage,
+            }
         ]
     }
 ];
