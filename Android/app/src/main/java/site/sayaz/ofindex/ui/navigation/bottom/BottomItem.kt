@@ -1,4 +1,4 @@
-package site.sayaz.ofindex.ui.navigation
+package site.sayaz.ofindex.ui.navigation.bottom
 
 import site.sayaz.ofindex.R
 

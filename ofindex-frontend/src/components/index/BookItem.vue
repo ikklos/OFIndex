@@ -35,7 +35,7 @@ const JumpToDetail = function(){
             </el-col>
           </el-row>
           <!--介绍-->
-          <el-row style="height: 50%; width: 100%">
+          <el-row style="height: 50%; width: 100%; box-sizing: border-box; padding: 0 10px 10px 0;">
             <div class="description-field">
               {{bookDescription}}
             </div>
@@ -57,8 +57,8 @@ const JumpToDetail = function(){
   height: 100%;
   width: 100%;
   transition: all 0.3s ease;
-  background: var(--el-color-primary-light-9);
-  color: var(--el-color-danger-dark-2);
+  background: #d1c2fb;
+  color: #000000;
 }
 .book-item:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -87,6 +87,7 @@ const JumpToDetail = function(){
   width: 100%;
   padding : 5px;
   box-sizing: border-box;
-  background-color: #F5FFFA;
+  background-color: #eee6fe;
+  color: #292929;
 }
 </style>

@@ -69,13 +69,13 @@ onMounted(() => {
                       </el-col>
                       <el-col :span="19">
                         <el-row>
-                          <el-col :span="8" style="background: #dee466; border-radius: 5px; font-size:18px; line-height: 20px; padding:5px; box-sizing: border-box" >
+                          <el-col :span="8" style="background: #fcfce5; border-radius: 5px; font-size:18px; line-height: 20px; padding:5px; box-sizing: border-box" >
                             {{item.name}}
                           </el-col>
                           <el-col :span="16">
                             <Icon type="ios-heart-outline" class="like-icon" @click="flagLike(index)" v-if="!item.liked"/>
                             <Icon type="ios-heart" class="like-icon" v-if="item.liked"/>
-                            <el-button color="#dee466" style="border-radius: 20px">添加此资源包</el-button>
+                            <el-button color="#4825f6" style="border-radius: 20px">添加此资源包</el-button>
                           </el-col>
                         </el-row>
                         <el-row class="pack-description-row">
@@ -90,13 +90,13 @@ onMounted(() => {
           </el-row>
           <el-row class="buttons-row">
             <el-col :span="8">
-              <el-button color="#dee466" class="bottom-button">开始阅读</el-button>
+              <el-button color="#4825f6" class="bottom-button">开始阅读</el-button>
             </el-col>
             <el-col :span="8" >
-              <el-button color="#dee466" class="bottom-button">选择资源包</el-button>
+              <el-button color="#4825f6" class="bottom-button">选择资源包</el-button>
             </el-col>
             <el-col :span="8" class="bottom-button">
-              <el-button color="#dee466" class="bottom-button">添加到书架</el-button>
+              <el-button color="#4825f6" class="bottom-button">添加到书架</el-button>
             </el-col>
           </el-row>
         </el-col>
@@ -131,13 +131,13 @@ onMounted(() => {
   border-radius: 5px;
 }
 .book-cover-area{
-  padding: 20px;
+  padding: 10px;
 }
 .book-cover-img{
   max-width: 28vw;
-  max-height: 72vh;
-  min-width: 210px;
-  min-height: 280px;
+  max-height: 68vh;
+  min-width: 180px;
+  min-height: 210px;
   border: 1px solid #e9e7ef;
   border-radius: 10px;
   box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
@@ -202,7 +202,7 @@ onMounted(() => {
   padding: 5px 10px 5px 10px;
 }
 .pack-item-inner{
-  color: #3c5cd7;
+  color: #000000;
   height: 10vh;
   min-height: 80px;
   width: 100%;
@@ -219,6 +219,7 @@ onMounted(() => {
   padding: 5px;
   font-size: 16px;
   line-height: 20px;
+  color: #292929;
 }
 .like-icon{
   font-size:20px;
@@ -238,5 +239,6 @@ onMounted(() => {
   text-align: center;
   line-height: 100%;
   font-size: 18px;
+  border-radius: 30px;
 }
 </style>

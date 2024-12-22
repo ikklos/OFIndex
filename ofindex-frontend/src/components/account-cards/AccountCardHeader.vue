@@ -38,11 +38,11 @@ const gotoAdmin = function () {
 <template>
   <el-row :span="24" class="center-layout-row">
     <el-col :span="6" v-show="sideButtonVisible">
-      <el-button link type="primary" @click="gotoPhoneLogin">手机号登录</el-button>
+      <el-button link @click="gotoPhoneLogin">手机号登录</el-button>
     </el-col>
-    <el-col :span="12" style="font-size: 48px">{{headString}}</el-col>
+    <el-col :span="12" style="font-size: 30px; color: #000000;">{{headString}}</el-col>
     <el-col :span="6" v-show="sideButtonVisible">
-      <el-button link type="primary" @click="gotoAdmin">管理员入口</el-button>
+      <el-button link @click="gotoAdmin" color="#3621ef">管理员入口</el-button>
     </el-col>
   </el-row>
 </template>
@@ -51,11 +51,11 @@ const gotoAdmin = function () {
 .el-button{
   text-align: center;
   font-size: 16px;
-  color: #80aaff
+  color: #3621ef;
 }
 .el-col{
   text-align: center;
-  color: #FFFFFF
+  color: #000000;
 }
 .el-row{
   height: 20%;

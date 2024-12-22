@@ -18,26 +18,21 @@ const gotoIndex = function () {
 <template>
   <div style="height: 80%; width:100%">
     <div class="card-body center-layout-column">
-      <el-row>
-        <el-col :span="6" class="text-right">
-          你的账号是：
-        </el-col>
-        <el-col :span="18">
-          <el-input v-model="AccountId" placeholder="请输入昵称" class="input-bar"></el-input>
-        </el-col>
+      <el-row style="align-items: center; justify-content: center; font-size: 24px">
+        你的账号是：
       </el-row>
-      <el-row>
-
+      <el-row style="align-items: center; justify-content: center;">
+          <el-input v-model="AccountId" placeholder="给它删了干什么玩意" class="input-bar"></el-input>
       </el-row>
     </div>
     <div class="card-footer">
       <el-row>
         <el-col :span="8" class="center-layout-row">
-          <el-button color="#80aaff" @click="goBack" :icon="Back">
+          <el-button color="#3621ef" @click="goBack" :icon="Back">
           </el-button>
         </el-col>
         <el-col :span="8" :offset="8" class="center-layout-row">
-          <el-button color="#80aaff" @click="gotoIndex" :icon="Right">
+          <el-button color="#3621ef" @click="gotoIndex" :icon="Right">
           </el-button>
         </el-col>
       </el-row>
@@ -54,7 +49,8 @@ const gotoIndex = function () {
 .el-row {
   width: 100%;
   margin-bottom: 50px;
-  color:#FFFFFF;
+  color:#292929;
+  min-height: 50px
 }
 .full-fix {
   width: 100%;
@@ -63,19 +59,30 @@ const gotoIndex = function () {
 .input-bar{
   width: 16vw;
   height: 5vh;
+  min-width: 200px;
+  min-height: 30px;
+
 }
 .el-button{
   width: 6vw;
   height: 4vh;
   font-size: 20px;
+  min-width: 80px;
+  min-height: 40px;
 }
 :deep() .el-input__inner {
-  color: #FFFFFF;
+  font-size: 20px;
+  color: #000000;
 }
 :deep() .el-input__wrapper {
-  background-color: #000000;
+  background-color: #d1c2fb;
 }
 .card-body {
   height: 40vh;
+  min-height: 250px;
+}
+.text-right{
+  color: #000000;
+  font-size: 20px;
 }
 </style>

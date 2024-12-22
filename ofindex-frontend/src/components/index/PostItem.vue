@@ -58,6 +58,7 @@ const jumpDetail = function(id){
   padding: 20px 20px 20px 20px;
   text-align: center;
   align-items: center;      /*垂直方向居中*/
+  color: #000000;
 }
 .avatar-area{
   box-sizing: border-box;

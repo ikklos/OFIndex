@@ -8,7 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    vueDevTools()
   ],
   resolve: {
     alias: {
@@ -17,5 +17,14 @@ export default defineConfig({
   },
   server: {
     port: 4999,
-  }
+    proxy:{
+      '/api': {
+        target: 'https://sm.ms/api/v2/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
+      }
+    }
+  },
+
 })
