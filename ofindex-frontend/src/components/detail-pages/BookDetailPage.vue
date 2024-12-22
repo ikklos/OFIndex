@@ -131,13 +131,13 @@ onMounted(() => {
   border-radius: 5px;
 }
 .book-cover-area{
-  padding: 20px;
+  padding: 10px;
 }
 .book-cover-img{
   max-width: 28vw;
-  max-height: 72vh;
-  min-width: 210px;
-  min-height: 280px;
+  max-height: 68vh;
+  min-width: 180px;
+  min-height: 210px;
   border: 1px solid #e9e7ef;
   border-radius: 10px;
   box-shadow: 1px 1px 2px rgba(0,0,0,0.2);

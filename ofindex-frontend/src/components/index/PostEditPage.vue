@@ -1,7 +1,6 @@
-<script lang="ts" setup>
+<script lang="js" setup>
 
 import {reactive, ref} from "vue";
-import type {UploadUserFile} from "element-plus";
 import axios from "axios";
 import {Plus} from "@element-plus/icons-vue";
 
@@ -11,7 +10,7 @@ const PostEditData = reactive({
   text: '',
   pictures: [],
 });
-const PicturesRaw = ref<UploadUserFile[]>([]);
+const PicturesRaw = ref([]);
 const imageUrl = ref('');
 const dialogVisible = ref(false);
 const uploadForm = function (){

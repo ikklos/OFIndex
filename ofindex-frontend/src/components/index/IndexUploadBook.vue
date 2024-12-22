@@ -1,19 +1,11 @@
-<script lang="ts" setup>
+<script setup>
 import {reactive, ref} from 'vue'
-import {ElMessage, FormInstance, FormRules} from 'element-plus'
+import {ElMessage} from 'element-plus'
 import {Plus} from "@element-plus/icons-vue";
 import axios from "axios";
 
-interface FormStruct{
-  name: string,
-  author: string,
-  description: string,
-  cover: string,
-  tags: string,
-  bookClass: number,
-}
 //数据
-const formData = ref<FormStruct>({
+const formData = ref({
   name: '',
   author: '',
   isbn:'',
@@ -22,9 +14,9 @@ const formData = ref<FormStruct>({
   tags: [],
   bookClass: null,
 });
-const formRef = ref<FormInstance>();
+const formRef = ref(null);
 //校验规则
-const formRules = reactive<FormRules<FormStruct>>({
+const formRules = reactive({
   name:{
     required: true,
     message: '请输入书名',
@@ -91,22 +83,22 @@ const handleRemove = function (file, fileList){
 }
 const handleSuccess = function (response, file, fileList) {
   if(response.data.success === true){
-    formData.cover = response.data.data.url;
+    formData.value.cover = response.data.data.url;
   }else{
-    formData.cover = response.data.images;
+    formData.value.cover = response.data.images;
   }
 }
-const submitForm = async(formEl: FormInstance | undefined) => {
+const submitForm = async (formEl) => {
   if(!formEl)return;
   await formEl.validate((valid, fields) => {
     if (valid) {
       //submit
     } else {
-      Elmessage.error('不是哥们，有表没填',fields);
+      throw new Error();
     }
   })
 }
-const resetForm = async(formEl: FormInstance | undefined) => {
+const resetForm = (formEl) => {
   if(!formEl)return
   formEl.resetFields()
 }
@@ -115,53 +107,57 @@ const resetForm = async(formEl: FormInstance | undefined) => {
 <template>
   <el-container>
     <el-main class="form-main">
-      <div class="form-container">
-        <el-form ref="formRef"
-        :model="formData"
-        :rules="formRules"
-        label-width="auto">
-          <el-form-item label="书名" prop="name">
-            <el-input v-model="formData.name"></el-input>
-          </el-form-item>
-          <el-form-item label="作者" prop="author">
-            <el-input v-model="formData.author"></el-input>
-          </el-form-item>
-          <el-form-item label="ISBN" prop="isbn">
-            <el-input v-model="formData.isbn"></el-input>
-          </el-form-item>
-          <el-form-item label="封面" prop="cover">
-            <el-upload :http-request="handleUploadCover"
-                       list-type="picture-card"
-                       :limit="1"
-                       :on-preview="handlePreview"
-                       :on-success="handleSuccess"
-                       :on-exceed="handleExceed"
-                       :on-remove="handleRemove"
-                        v-model="imageData">
-              <el-icon><Plus/></el-icon>
-            </el-upload>
-          </el-form-item>
-          <el-form-item label="简介" prop="description">
-            <el-input type="textarea" v-model="formData.description" :autosize="{minRows: 6, maxRows: 10}"></el-input>
-          </el-form-item>
-          <el-form-item label="分类" prop="bookClass">
-            <el-select v-model="formData.bookClass" placeholder="Select">
+      <el-scrollbar>
+        <div class="form-container">
+          <el-form ref="formRef"
+                   :model="formData"
+                   :rules="formRules"
+                   label-width="auto"
+          >
+            <el-form-item label="书名" prop="name">
+              <el-input v-model="formData.name"></el-input>
+            </el-form-item>
+            <el-form-item label="作者" prop="author">
+              <el-input v-model="formData.author"></el-input>
+            </el-form-item>
+            <el-form-item label="ISBN" prop="isbn">
+              <el-input v-model="formData.isbn"></el-input>
+            </el-form-item>
+            <el-form-item label="封面" prop="cover">
+              <el-upload :http-request="handleUploadCover"
+                         list-type="picture-card"
+                         :limit="1"
+                         :on-preview="handlePreview"
+                         :on-success="handleSuccess"
+                         :on-exceed="handleExceed"
+                         :on-remove="handleRemove"
+                         v-model="imageData">
+                <el-icon><Plus/></el-icon>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="简介" prop="description">
+              <el-input type="textarea" v-model="formData.description" :autosize="{minRows: 6, maxRows: 10}"></el-input>
+            </el-form-item>
+            <el-form-item label="分类" prop="bookClass">
+              <el-select v-model="formData.bookClass" placeholder="Select">
                 <el-option v-for="(item,index) in classList" :key="index" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="tags" prop="tags">
-            <el-input-tag v-model="formData.tags"></el-input-tag>
-          </el-form-item>
-          <el-button color="#3621ef" @click="submitForm(formRef)">创建书目</el-button>
-          <el-button color="#3621ef" @click="resetForm(formRef)">清空表单</el-button>
-        </el-form>
-      </div>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="tags" prop="tags">
+              <el-input-tag v-model="formData.tags"></el-input-tag>
+            </el-form-item>
+            <el-button color="#3621ef" @click="submitForm(formRef)">创建书目</el-button>
+            <el-button color="#3621ef" @click="resetForm(formRef)">清空表单</el-button>
+          </el-form>
+        </div>
+      </el-scrollbar>
     </el-main>
   </el-container>
 </template>
 
 <style scoped>
 .form-main{
+  box-sizing: border-box;
   width: 100%;
   align-items: center;
   justify-content: center;
@@ -169,5 +165,9 @@ const resetForm = async(formEl: FormInstance | undefined) => {
 }
 .form-container{
   width: 50%;
+  min-width: 680px;
+  box-sizing: border-box;
+  height: 60vh;
+  min-height: 500px;
 }
 </style>

@@ -2,74 +2,102 @@
 import {ref, reactive, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import BookItem from "@/components/index/BookItem.vue";
+import axiosApp from "@/main.js";
+import {ElMessageBox, ElMessage} from 'element-plus'
+
 let router = useRouter();
-let BatchSize = 20;
-const ClassList = reactive([
-  {
-    name: "全部",
-    classId: 0,
-  }
-]);
-for (let i = 1; i <= 100; i++) {
-  ClassList.push({name: "小说", classId: i});
-}
-const NowClass = ref(0);
-const SearchString = ref("");
+const ClassList = ref([]);
+const filter = reactive({
+  text: '',
+  bookClass: 0,
+  count: 20,
+  page: 0,
+})
 const BookItems = ref([]);
 //总共的查询结果数量
 const TotalCount = ref(0);
-//目前已加载的页数
-const LoadedPages = ref(0);
-//发送带查询字符串的查询请求
-let FilterByString = function (Page) {
+//是否禁用加载
+const noMore = ref(false);
+//发送查询请求
+let firstReq = function () {
   //清空数组
-  TotalCount.value = LoadedPages.value = 0;
+  TotalCount.value = filter.page = 0;
   BookItems.value.splice(0, BookItems.value.length);
-  //获取查询结果
-  let result = {
-    totalResult: 1000,
-    data: [],
-  };
-  for (let i = 0; i < 20; i++) {
-    result.data.push({
-      bookId: i,
-      name: "支柱霞：血本无归",
-      author: "last炫、",
-      description: "S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~ S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~ S6第一个王者的含金量  我！是！梓！神！ wtm顶死你~",
-      cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-      tag: ["搞笑", "炫狗", "皮套"],
-    });
-  }
-  //更新结果数量
-  TotalCount.value = result.totalResult;
-  LoadedPages.value = 1;
-  for (let i = 0; i < BatchSize; i++) {
-    BookItems.value.push(
-        result.data[i]
-    );
-  }
+  noMore.value = false;
+  //发送请求部分
+  ReqForMore();
 }
-let ReqForMore = function (Page) {
-  console.log("ok")
-  if (LoadedPages.value * BatchSize < TotalCount.value) {
-
-  }
+let ReqForMore = function () {
+  axiosApp.post('/search',filter).then(response => {
+    if(response.status === 200){
+      if(response.data.message === 'Result found'){
+        for(let i=0; i < response.data.count; i++){
+          BookItems.value.push(response.data.items[i]);
+        }
+        filter.page += 1;
+        if(response.data.totalResult <= filter.count*filter.page){
+          noMore.value = true;
+        }
+      }
+    }else if(response.status === 601){
+      throw new Error('tokenFailed');
+    }
+  }).catch(error => {
+    ElMessage.error('哎怎么似了');
+    if (error.message === 'tokenFailed') {
+      ElMessageBox.alert('哥们怎么不登录','不是哥们').then(()=>{
+        router.push('/account/login');
+      }).catch(()=>{
+        router.push('/account/login');
+      })
+    }
+  })
 }
-let handleJumpToDetail = function (id){
+let handleJumpToDetail = function (id) {
   router.push('/index/detail/book-detail/' + id);
 }
+let handleSelect = function (id) {
+  filter.bookId = id;
+  firstReq();
+}
+let getClassList = function () {
+  axiosApp.get('/class').then(response => {
+    if(response.status === 200) {
+      if(response.data.result === true){
+        for(let i=0; i < response.data.count; i++){
+          ClassList.value.push(response.data.items[i]);
+        }
+      }
+    }else{
+      if(response.status === 601){
+        throw new Error('tokenFailed');
+      }
+    }
+  }).catch(error => {
+    ElMessage.error('哎怎么似了');
+    if (error.message === 'tokenFailed') {
+      ElMessageBox.alert('哥们怎么不登录','不是哥们').then(()=>{
+        router.push('/account/login');
+      }).catch(()=>{
+        router.push('/account/login');
+      })
+    }
+  })
+}
 onMounted(() => {
-  FilterByString("bookId");
+  getClassList()
+  firstReq();
 })
 </script>
 
 <template>
   <el-container>
-    <el-aside>
+    <el-aside class="explore-aside">
       <el-scrollbar style="height:calc(100vh - max(8vh,60px))">
         <el-menu default-active="0">
-          <el-menu-item v-for="{name,classId} in ClassList" :key="classId" :index="String(classId)">
-            {{ name }}
+          <el-menu-item :disabled="true" key="no-class">No List</el-menu-item>
+          <el-menu-item v-for="(item,index) in ClassList" :key="index" :index="item.id.toString()" @click="handleSelect(item.id)">
+            {{item.name}}
           </el-menu-item>
         </el-menu>
       </el-scrollbar>
@@ -78,13 +106,14 @@ onMounted(() => {
       <div class="div-main">
         <el-row style="padding: 20px 0 20px 0; box-sizing: border-box; height: 10vh">
           <el-col :span="16" :offset="4">
-            <el-input v-model="SearchString" prefix-icon="Search" @keyup.enter="FilterByString">
+            <el-input v-model="filter.text" prefix-icon="Search" @keyup.enter="firstReq">
             </el-input>
           </el-col>
         </el-row>
-        <el-scrollbar style="height:calc(100vh - max(8vh,60px) - 10vh)">
-          <ul v-infinite-scroll="ReqForMore" class="infinite-list"
-              style="overflow-x:hidden;">
+        <div class="infinite-list">
+          <ul v-infinite-scroll="ReqForMore"
+              style="overflow-x:hidden;" :infinite-scroll-distance="20"
+              :infinite-scroll-disabled="noMore">
             <li v-for="{bookId,name,author,description,cover,tag} in BookItems" :key="bookId">
               <BookItem :cover-url="cover"
                         :book-author="author"
@@ -95,7 +124,8 @@ onMounted(() => {
               ></BookItem>
             </li>
           </ul>
-        </el-scrollbar>
+          <p v-if="noMore">No more</p>
+        </div>
       </div>
     </el-main>
   </el-container>
@@ -105,7 +135,9 @@ onMounted(() => {
 .el-aside {
   width: 10vw;
 }
-
+.explore-aside{
+  background: #fcfce5;
+}
 .el-menu-item {
   width: 100%;
   color: #3621ef !important;
@@ -167,8 +199,29 @@ onMounted(() => {
 }
 
 .infinite-list {
+  height: calc(100vh - max(8vh, 60px) - 10vh);
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+.infinite-list::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+  /**/
+}
+.infinite-list::-webkit-scrollbar-track{
+  background: #FFFFFF;
+  border-radius:2px;
+}
+.infinite-list::-webkit-scrollbar-thumb{
+  background: #8e6df9;
+  border-radius:10px;
+}
+.infinite-list::-webkit-scrollbar-thumb:hover{
+  background: #0012e2;
+  cursor: pointer;
+}
+.infinite-list::-webkit-scrollbar-corner{
+  background: #179a16;
 }
 </style>

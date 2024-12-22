@@ -62,6 +62,7 @@ const commentText = ref('');
     border-top:none;
     background: #f2f5c6;
     border-bottom-color:#d7b83c;
+    color: #3c5cd7;
   }
   .comment-collapse-item :deep(.el-collapse-item__wrap){
     border: none;
