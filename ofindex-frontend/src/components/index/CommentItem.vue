@@ -1,5 +1,7 @@
 <script setup>
 
+import {ref} from "vue";
+
 const props = defineProps({
   avatar:{
     type: String,
@@ -13,7 +15,8 @@ const props = defineProps({
     type: Array,
     default: null,
   },
-})
+});
+const commentText = ref('');
 </script>
 
 <template>
@@ -28,7 +31,11 @@ const props = defineProps({
         </el-row>
         <el-row class="collapse-row">
           <el-collapse class="comment-collapse">
-            <el-collapse-item title="展开回复" v-if="children_list && children_list.length" class="comment-collapse-item">
+            <el-collapse-item title="展开回复" class="comment-collapse-item">
+              <el-input type="textarea" v-model="commentText" :autosize="{minRows:3,maxRows:5}" class="text-input"></el-input>
+              <el-row class="button-row">
+                <el-button color="#3621ef">回复</el-button>
+              </el-row>
               <CommentItem v-for="(child,index) in children_list" :key="index"
                           :avatar="child.userAvatar"
                           :children_list="child.children_array"
@@ -59,5 +66,16 @@ const props = defineProps({
   .comment-collapse-item :deep(.el-collapse-item__wrap){
     border: none;
     background: #f2f5c6;
+  }
+  .text-input{
+    box-sizing: border-box;
+    padding: 10px 0 10px 0;
+  }
+  .text-input:deep(.el-textarea__inner){
+    background: #fcfce5;
+  }
+  .button-row{
+    width: 100%;
+    justify-content: flex-end;
   }
 </style>

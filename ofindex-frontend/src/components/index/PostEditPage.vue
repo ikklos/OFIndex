@@ -26,7 +26,6 @@ const uploadPicturesHttp = function (options){
   }).then(response => {
     if(response.status === 200){
       if(response.data.success === true || response.data.code === 'image_repeated'){
-        console.log(response.data);
         options.onSuccess(response);
       }else{
         throw new Error('上传失败');
@@ -48,7 +47,6 @@ const handleSuccess = function (response, file, fileList) {
   }else {
     PostEditData.pictures.push(response.data.images);
   }
-  console.log(PostEditData.pictures);
 }
 </script>
 
@@ -72,7 +70,7 @@ const handleSuccess = function (response, file, fileList) {
       <el-dialog v-model="dialogVisible">
         <img w-full :src="imageUrl" alt="Preview Image" />
       </el-dialog>
-      <el-row class="button-row"><el-button @click="uploadForm">发布</el-button></el-row>
+      <el-row class="button-row"><el-button @click="uploadForm" color="#3621ef">发布</el-button></el-row>
     </el-form>
   </div>
 </template>
@@ -108,5 +106,11 @@ const handleSuccess = function (response, file, fileList) {
   padding: 10px;
   align-items: center;
   justify-content: flex-end;
+}
+.input-row:deep(.el-input__wrapper){
+  background: #f7f6bf;
+}
+.input-row:deep(.el-textarea__inner){
+  background: #f7f6bf;
 }
 </style>
