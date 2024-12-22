@@ -1,5 +1,6 @@
 package site.sayaz.ofindex.ui.navigation.top
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -11,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 @Composable
 fun BaseTopBar(
     title: String,
-    actions: @Composable () -> Unit = {},
+    actions:  @Composable() (RowScope.() -> Unit) = {},
 ){
     TopAppBar(
         title = {

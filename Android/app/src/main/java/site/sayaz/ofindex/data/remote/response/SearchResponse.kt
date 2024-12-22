@@ -5,7 +5,7 @@ import site.sayaz.ofindex.data.model.Book
 
 
 @Serializable
-data class SearchBookResponse (
+data class SearchResponse (
     val count: Long,
     val items: List<Book>,
     val message: String,

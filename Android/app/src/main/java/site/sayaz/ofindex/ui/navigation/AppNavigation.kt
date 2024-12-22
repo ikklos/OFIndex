@@ -44,10 +44,7 @@ fun AppNavigation(
     }
 
     LaunchedEffect(key1 = isAuthed) {
-        println("isAuthed: $isAuthed")
-        println(currentRoute)
         if (!isAuthed ) {
-            println("nav to login")
             navToAuth()
         }
 
@@ -80,8 +77,7 @@ fun AppNavigation(
             composable(Route.explore()){
                 ExploreScreen(
                     exploreViewModel,
-                    onNavigateRead = { bookID ->
-                        navController.navigate(Route.read(bookID))
+                    onNavigateBookDetail = {
                     }
                 )
             }

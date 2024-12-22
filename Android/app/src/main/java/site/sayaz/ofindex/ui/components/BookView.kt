@@ -29,13 +29,13 @@ import site.sayaz.ofindex.data.model.Book
 @Composable
 fun BookView(
     book: Book,
-    onBookClick: (Book) -> Unit,
+    onBookClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.padding(4.dp),
         shape = RoundedCornerShape(8.dp),
-        onClick = { onBookClick(book) },
+        onClick = { onBookClick(book.bookId) },
         ) {
         Box(
             modifier = Modifier

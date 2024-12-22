@@ -10,7 +10,7 @@ import okhttp3.OkHttpClient
 
 object RetrofitInstance {
 
-    private const val BASE_URL = "http://10.194.189.228:3000"
+    private const val BASE_URL = "http://10.194.189.228:8080"
     // private const val BASE_URL = "http://175.178.5.83:8080"
 
     private val _token = MutableStateFlow<String?>("")

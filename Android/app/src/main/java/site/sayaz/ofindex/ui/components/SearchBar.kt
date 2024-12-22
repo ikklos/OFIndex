@@ -1,6 +1,7 @@
 package site.sayaz.ofindex.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.copy
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
@@ -10,9 +11,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -30,16 +35,24 @@ import site.sayaz.ofindex.R
 
 @Composable
 fun SearchBar(
+    placeHolder:String = "Search",
     query: String,
     onQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
     active: Boolean,
-    onActiveChange: (Boolean) -> Unit
+    onActiveChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    LaunchedEffect(active) {
+        if (active) {
+            focusRequester.requestFocus()
+        }
+    }
+
+    Box(modifier = modifier) {
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,11 +65,13 @@ fun SearchBar(
                 },
             value = query,
             onValueChange = onQueryChange,
-            placeholder = { Text("Search") },
+            placeholder = { Text(placeHolder) },
             leadingIcon = {
                 if (active) {
                     IconButton(onClick = {
                         onActiveChange(false)
+                        onQueryChange("")
+                        onSearch()
                         focusManager.clearFocus()
                     }) {
                         Icon(painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "Back")
@@ -84,6 +99,12 @@ fun SearchBar(
                 focusManager.clearFocus()
             }),
             singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
         )
     }
 }

@@ -20,7 +20,6 @@ class TokenInterceptor(
         }
 
         if (response.code == 601) { // 检查响应码是否为 601
-            println("token expired")
             tokenClearer() // 清空 token
         }
 
