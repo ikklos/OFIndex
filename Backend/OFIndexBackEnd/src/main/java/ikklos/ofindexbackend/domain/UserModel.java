@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name="user")
+@Table(name="account")
 @Getter
 public class UserModel implements Serializable {
 
@@ -39,6 +39,7 @@ public class UserModel implements Serializable {
     @Getter
     @Setter
     private String avatar;
+
 
     public boolean checkPassword(String password){
         return passwd.equals(password);

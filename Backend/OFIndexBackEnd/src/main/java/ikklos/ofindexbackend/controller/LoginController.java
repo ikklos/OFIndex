@@ -1,14 +1,14 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
-import ikklos.ofindexbackend.response.UniversalResponse;
+import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/login",produces = "application/json")
 public class LoginController {
 
@@ -23,7 +23,7 @@ public class LoginController {
     }
 
     public static class LoginResponse extends UniversalResponse {
-        public int token;
+        public String token;
     }
 
     private final UserRepository repository;
@@ -32,7 +32,7 @@ public class LoginController {
         this.repository=repository;
     }
 
-    @GetMapping
+    @PostMapping
     public LoginResponse tryLogin(@RequestBody LoginRequest loginRequest){
         if(loginRequest.userid!=null){
             var data=repository.findById(loginRequest.userid);
@@ -41,7 +41,7 @@ public class LoginController {
                     LoginResponse response = new LoginResponse();
                     response.result = true;
                     response.message = "Login success!";
-                    response.token=-1;
+                    response.token=generateLoginJWT(data.get());
                     return response;
                 }else{
                     LoginResponse response = new LoginResponse();
@@ -57,7 +57,7 @@ public class LoginController {
         return response;
     }
 
-    @GetMapping("/phone")
+    @PostMapping("/phone")
     public LoginResponse TryPhoneLogin(@RequestBody PhoneLoginRequest loginRequest){
         if(loginRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(loginRequest.phoneNumber)){
             var data=repository.findUserModelByPhonenum(loginRequest.phoneNumber);
@@ -65,7 +65,7 @@ public class LoginController {
                     LoginResponse response=new LoginResponse();
                     response.result=true;
                     response.message="Login success!";
-                    response.token=-1;
+                    response.token=generateLoginJWT(data);
                     return response;
                 }else{
                     LoginResponse response = new LoginResponse();
@@ -79,5 +79,10 @@ public class LoginController {
         response.message="No such user!";
         return response;
     }
+
+    private String generateLoginJWT(UserModel userModel){
+        return JwtUtils.createUserIdJWT(userModel.getUserid());
+    }
+
 }
 

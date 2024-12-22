@@ -15,4 +15,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    port: 4999,
+    proxy:{
+      '/api': {
+        target: 'https://sm.ms/api/v2/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false,
+      }
+    }
+  },
+
 })
