@@ -2,6 +2,7 @@ package ikklos.ofindexbackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         @ComponentScan("ikklos.ofindexbackend.repository"),
         @ComponentScan("ikklos.ofindexbackend.filesystem")
 })
+@EntityScan(basePackages="ikklos.ofindexbackend.domain")
 public class OfIndexBackEndApplication {
 
     public static void main(String[] args) {

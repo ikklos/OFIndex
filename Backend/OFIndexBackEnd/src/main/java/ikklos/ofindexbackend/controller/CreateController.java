@@ -1,12 +1,18 @@
 package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.BookModel;
+import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @CrossOrigin
@@ -29,28 +35,29 @@ public class CreateController {
 
     private final BookRepository bookRepository;
     private final BookClassRepository bookClassRepository;
+    private final BookFileFinder bookFileFinder;
 
     public CreateController(@Autowired BookRepository bookRepository,
-                            @Autowired BookClassRepository bookClassRepository){
+                            @Autowired BookClassRepository bookClassRepository,
+                            @Autowired BookFileFinder bookFileFinder){
         this.bookRepository=bookRepository;
         this.bookClassRepository=bookClassRepository;
+        this.bookFileFinder=bookFileFinder;
     }
 
-    @PostMapping("/book")
-    public CreateBookResponse createBook(@RequestBody CreateBookRequest request,@RequestHeader("Authorization") String token){
+    @PostMapping(value="/book",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CreateBookResponse createBook(@RequestPart("formData") CreateBookRequest request,
+                                         @RequestPart("file") MultipartFile file,
+                                         @RequestHeader("Authorization") String token) throws IOException, UniversalBadReqException {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
         if(userId!=0){
-            response.result=false;
-            response.message="Not Administrator";
-            return response;
+            throw new UniversalBadReqException("Not Administrator");
         }
 
         if(!bookClassRepository.existsById(request.bookClass)){
-            response.result=false;
-            response.message="No such book class";
-            return response;
+            throw new UniversalBadReqException("No such book class");
         }
 
         BookModel bookModel=new BookModel();
@@ -64,8 +71,9 @@ public class CreateController {
 
         bookRepository.save(bookModel);
 
+        bookFileFinder.uploadDocument(file,bookModel);
+
         response.id=bookModel.getBookId();
-        response.result=true;
         response.message="Book created";
 
         return response;

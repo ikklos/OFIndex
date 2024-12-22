@@ -25,38 +25,4 @@ public class UploadController {
         this.bookFileFinder=bookFileFinder;
     }
 
-    @PostMapping("/book")
-    public UniversalResponse uploadBook(@RequestParam("file") MultipartFile file,
-                                        @RequestParam("id") Integer bookId,
-                                        @RequestHeader("Authorization") String token) throws IOException {
-        Integer userId= JwtUtils.getUserIdJWT(token);
-        UniversalResponse response=new UniversalResponse();
-
-        if(userId!=0){
-            response.result=false;
-            response.message="Not Administrator";
-            return response;
-        }
-
-        var bookO=bookRepository.findById(bookId);
-        if(bookO.isEmpty()){
-            response.result=false;
-            response.message="No such book,create it first";
-            return response;
-        }
-
-        BookModel bookModel=bookO.get();
-        if(bookFileFinder.bookDocumentExist(bookModel)){
-            response.result=false;
-            response.message="book file already exists";
-            return response;
-        }
-
-        bookFileFinder.uploadDocument(file,bookModel);
-
-        response.result=true;
-        response.message="Uploaded";
-        return response;
-    }
-
 }

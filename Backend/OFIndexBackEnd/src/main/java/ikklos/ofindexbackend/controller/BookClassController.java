@@ -40,7 +40,6 @@ public class BookClassController {
                 }
         ).toList();
         response.count=response.items.size();
-        response.result=true;
         response.message="BookClass Found";
         return response;
     }

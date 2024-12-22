@@ -21,7 +21,7 @@ public class JwtUtils {
     private static String secretKey0;
 
     static {
-        secretKey0 = "ImG3nsh1nM4st3r";
+        secretKey0 = "ForAPersonWhoDoesNotPlayGenshinImpactThereAre2PossibilitiesOneIsThatYouDontHaveTheAbilityToPlayGenshinImpactBecauseHeCantAffordToBuyAHighendMobilePhone";
     }
 
     public static class JwtKeyFactory {

@@ -4,6 +4,7 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,12 +34,9 @@ public class RegisterController {
     }
 
     @PostMapping
-    public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest){
+    public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest) throws UniversalBadReqException {
         if(registerRequest.phoneNumber!=null&& userRepository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
-            RegisterResponse response = new RegisterResponse();
-            response.result = false;
-            response.message = "Exist Phone Number";
-            return response;
+            throw new UniversalBadReqException("Exist Phone Number");
         }
         UserModel user=new UserModel();
         user.setPasswd(registerRequest.passwd);
@@ -63,7 +61,6 @@ public class RegisterController {
         shelfRepository.save(defaultShelf);
 
         RegisterResponse response=new RegisterResponse();
-        response.result=true;
         response.message="Register success";
         response.id=id.toString();
         return response;

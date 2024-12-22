@@ -4,6 +4,7 @@ import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -97,17 +98,14 @@ public class SearchController {
 
 
     @GetMapping("/pack/{bookId}")
-    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){
+    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId) throws UniversalBadReqException {
 
         SearchPackResponse response=new SearchPackResponse();
 
         if(!bookRepository.existsById(bookId)){
-            response.result=false;
-            response.message="Invalid Book ID";
-            return response;
+            throw new UniversalBadReqException("Invalid Book ID");
         }
 
-        response.result=true;
         response.message="Found Book";
 
         var packs=packRepository.findAllByBookId(bookId);
