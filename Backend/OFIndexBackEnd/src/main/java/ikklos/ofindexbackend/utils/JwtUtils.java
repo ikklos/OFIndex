@@ -16,13 +16,12 @@ public class JwtUtils {
 
     public static final String Claims_UserID="USER_ID";
 
-    public static final long KeyDuration = 60*1000;
+    public static final long KeyDuration = 5*60*1000;
 
     private static String secretKey0;
 
     static {
-        JwtKeyFactory factory=new JwtKeyFactory();
-        secretKey0 = factory.generateJwtKey();
+        secretKey0 = "ImG3nsh1nM4st3r";
     }
 
     public static class JwtKeyFactory {

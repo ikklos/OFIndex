@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
         UniversalResponse response=new UniversalResponse();
         response.result=false;
         response.message="Error: " + ex.getMessage();
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
