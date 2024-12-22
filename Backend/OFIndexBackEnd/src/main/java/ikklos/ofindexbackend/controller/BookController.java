@@ -28,7 +28,7 @@ public class BookController {
         this.repository=repository;
     }
 
-    @PostMapping("/{bookId}")
+    @GetMapping("/{bookId}")
     public BookInfoResponse getBookInfo(@PathVariable("bookId") Integer bookId){
 
         if(bookId==null){

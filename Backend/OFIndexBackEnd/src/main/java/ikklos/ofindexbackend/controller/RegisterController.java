@@ -5,6 +5,7 @@ import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +24,18 @@ public class RegisterController {
         public String id;
     }
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final ShelfRepository shelfRepository;
 
-    public RegisterController(@Autowired UserRepository repository,@Autowired ShelfRepository shelfRepository){
-        this.repository=repository;
+    public RegisterController(@Autowired ShelfRepository shelfRepository,
+                              @Autowired UserRepository userRepository){
+        this.userRepository =userRepository;
         this.shelfRepository=shelfRepository;
     }
 
     @PostMapping
     public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest){
-        if(registerRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
+        if(registerRequest.phoneNumber!=null&& userRepository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
             RegisterResponse response = new RegisterResponse();
             response.result = false;
             response.message = "Exist Phone Number";
@@ -45,7 +47,7 @@ public class RegisterController {
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
 
-        repository.save(user);
+        userRepository.save(user);
         Integer id=user.getUserid();
 
         ShelfModel history=new ShelfModel();

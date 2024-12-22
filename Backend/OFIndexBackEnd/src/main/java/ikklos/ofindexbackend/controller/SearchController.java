@@ -96,7 +96,7 @@ public class SearchController {
     }
 
 
-    @PostMapping("/pack/{bookId}")
+    @GetMapping("/pack/{bookId}")
     public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){
 
         SearchPackResponse response=new SearchPackResponse();

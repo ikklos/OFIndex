@@ -3,10 +3,7 @@ package ikklos.ofindexbackend.controller;
 import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,7 +28,7 @@ public class BookClassController {
         bookClassRepository=repository;
     }
 
-    @PostMapping
+    @GetMapping
     public BookClassResponse getBookClass(){
         BookClassResponse response=new BookClassResponse();
         response.items=bookClassRepository.findAll().stream().map(

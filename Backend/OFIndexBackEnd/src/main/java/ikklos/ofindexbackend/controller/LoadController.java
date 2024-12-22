@@ -27,7 +27,7 @@ public class LoadController {
         this.bookRepository=bookRepository;
     }
 
-    @PostMapping("/ebook/{bookid}")
+    @GetMapping("/ebook/{bookid}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Integer bookid,
                                                  @RequestHeader("Authorization") String token) throws IOException {
 

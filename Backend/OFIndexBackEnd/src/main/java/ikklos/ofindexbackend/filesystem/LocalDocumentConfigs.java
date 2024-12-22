@@ -5,19 +5,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource("classpath:ofindex.properties")
+//@PropertySource("classpath:ofindex.properties")
+//TODO better config
 public class LocalDocumentConfigs {
 
-    @Value("${ikklos.ofindexbackend.localFileRoot}")
+    //@Value("${ikklos.ofindexbackend.localFileRoot}")
     public String localFileRoot = "/of_index";
 
-    @Value("${ikklos.ofindexbackend.localFileBookPath}")
+    //@Value("${ikklos.ofindexbackend.localFileBookPath}")
     public String bookPath = "books";
 
-    @Value("${ikklos.ofindexbackend.localFileBookDocuments}")
+    //@Value("${ikklos.ofindexbackend.localFileBookDocuments}")
     public String bookDocument = "document.pdf";
 
-    @Value("${ikklos.ofindexbackend.localFileUserPack}")
+    //@Value("${ikklos.ofindexbackend.localFileUserPack}")
     public String userDocument = "users";
 
 }
