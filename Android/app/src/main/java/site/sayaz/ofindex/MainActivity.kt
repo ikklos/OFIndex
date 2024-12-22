@@ -53,6 +53,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+
+
         setContent { AppNavigation(
             authViewModel = authViewModel,
             exploreViewModel = exploreViewModel,

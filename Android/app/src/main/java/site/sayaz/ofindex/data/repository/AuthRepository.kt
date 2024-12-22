@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import site.sayaz.ofindex.data.remote.ApiService
 import site.sayaz.ofindex.data.remote.request.LoginRequest
@@ -67,9 +68,10 @@ class AuthRepository(
         }
     }
 
-    fun getToken(): Flow<String?> {
+    suspend fun getLocalToken(): String? {
         return context.dataStore.data.map { preferences ->
             preferences[TOKEN_KEY]
-        }
+        }.firstOrNull()
     }
+
 }

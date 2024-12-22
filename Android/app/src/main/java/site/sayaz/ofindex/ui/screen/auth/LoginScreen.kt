@@ -37,8 +37,8 @@ fun LoginScreen(
     val password = remember { mutableStateOf("") }
     val textEnabled = remember { mutableStateOf(true) }
 
-
     LaunchedEffect(loginState) {
+        authViewModel.resetLoginState()
         when (loginState) {
             is LoginState.Success -> {
                 Toast.makeText(
