@@ -63,7 +63,7 @@ let handleSelect = function (id) {
 let getClassList = function () {
   axiosApp.get('/class').then(response => {
     if(response.status === 200) {
-      if(response.data.result === true){
+      if(response.data.message === 'BookClass Found'){
         for(let i=0; i < response.data.count; i++){
           ClassList.value.push(response.data.items[i]);
         }
@@ -95,7 +95,7 @@ onMounted(() => {
     <el-aside class="explore-aside">
       <el-scrollbar style="height:calc(100vh - max(8vh,60px))">
         <el-menu default-active="0">
-          <el-menu-item :disabled="true" key="no-class">No List</el-menu-item>
+          <el-menu-item v-if="ClassList.length === 0" :disabled="true" key="no-class">No List</el-menu-item>
           <el-menu-item v-for="(item,index) in ClassList" :key="index" :index="item.id.toString()" @click="handleSelect(item.id)">
             {{item.name}}
           </el-menu-item>
@@ -114,12 +114,12 @@ onMounted(() => {
           <ul v-infinite-scroll="ReqForMore"
               style="overflow-x:hidden;" :infinite-scroll-distance="20"
               :infinite-scroll-disabled="noMore">
-            <li v-for="{bookId,name,author,description,cover,tag} in BookItems" :key="bookId">
-              <BookItem :cover-url="cover"
-                        :book-author="author"
-                        :book-description="description"
-                        :book-name="name"
-                        :id="bookId"
+            <li v-for="(item,index) in BookItems" :key="index">
+              <BookItem :cover-url="item.cover"
+                        :book-author="item.author"
+                        :book-description="item.description"
+                        :book-name="item.name"
+                        :id="item.id"
                         @jump-to-detail="handleJumpToDetail"
               ></BookItem>
             </li>

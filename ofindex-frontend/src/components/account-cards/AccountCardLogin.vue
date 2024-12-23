@@ -3,6 +3,7 @@ import {ref} from 'vue'
 import {Right} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import axiosApp from "@/main.js";
+import {ElMessage} from "element-plus";
 
 const router = useRouter();
 const AccountId = ref('');
@@ -12,16 +13,22 @@ const gotoRegister = function () {
 }
 //发送登录请求
 const SendLoginReq = function () {
+  if(AccountId.value === null || Password.value === null || Password.value.length === 0
+      || AccountId.value.length === 0) {
+    ElMessage.error('账号密码不能为空');
+    return;
+  }
   axiosApp.post('/login',{
-    userid: AccountId.value,
+    userid: Number(AccountId.value),
     passwd: Password.value,
   }).then(res => {
-    if(res.status === 200){
+    if(res.status === 200 && res.data.message === 'Login success!'){
       localStorage.setItem('Token', res.data.token);
       router.push('/index');
-    }else throw new Error('登陆失败');
+    }else throw new Error('登录失败');
   }).catch(err => {
     //弹窗显示
+    ElMessage.error(err.message);
   })
 }
 </script>

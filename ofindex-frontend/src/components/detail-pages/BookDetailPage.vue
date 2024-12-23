@@ -4,6 +4,7 @@ import {onMounted, reactive, ref} from 'vue'
 import {useRoute} from 'vue-router'
 import {Icon} from "view-ui-plus";
 import {VideoPlay} from "@element-plus/icons-vue";
+import AddToShelfDialog from "@/components/detail-pages/AddToShelfDialog.vue";
 const route = useRoute();
 const bookData = reactive({
   bookId: route.params.id,
@@ -14,6 +15,11 @@ const bookData = reactive({
   tags:'嘻嘻嘻,不嘻嘻,嘻嘻',
 });
 const packData = ref([]);
+const availablePackList = ref([]);
+//用户选择的资源包id
+const selectedPackId = ref(null);
+//控制选择书单的dialog
+const showAddToShelfDialog = ref(false);
 const flagLike = function(index){
   packData.value[index].liked = true;
 }
@@ -92,11 +98,20 @@ onMounted(() => {
             <el-col :span="8">
               <el-button color="#4825f6" class="bottom-button">开始阅读</el-button>
             </el-col>
-            <el-col :span="8" >
-              <el-button color="#4825f6" class="bottom-button">选择资源包</el-button>
+            <el-col :span="8">
+              <el-button color="#4825f6" class="bottom-button" @click="()=>{
+                showAddToShelfDialog = true;
+              }">添加到书架</el-button>
+              <el-dialog v-model="showAddToShelfDialog" title="选择保存位置" style="width: 400px">
+                <add-to-shelf-dialog/>
+              </el-dialog>
             </el-col>
-            <el-col :span="8" class="bottom-button">
-              <el-button color="#4825f6" class="bottom-button">添加到书架</el-button>
+            <el-col :span="8">
+                <el-select v-model="selectedPackId"
+                           placeholder="选择资源包" size="large"
+                          class="bottom-button">
+                  <el-option v-for="(item,index) in availablePackList" :key="index" :label="item.name" :value="item.id"/>
+                </el-select>
             </el-col>
           </el-row>
         </el-col>
@@ -240,5 +255,19 @@ onMounted(() => {
   line-height: 100%;
   font-size: 18px;
   border-radius: 30px;
+}
+.bottom-button:deep(.el-select__wrapper){
+  height: 100%;
+  border-radius: 30px;
+  box-shadow: none;
+  background: #4825f6;
+  color: #FFFFFF;
+}
+.bottom-button:deep(.el-select__placeholder){
+  font-size: 16px;
+  color: #FFFFFF;
+}
+.bottom-button:deep(.el-select__icon){
+  color: #FFFFFF;
 }
 </style>
