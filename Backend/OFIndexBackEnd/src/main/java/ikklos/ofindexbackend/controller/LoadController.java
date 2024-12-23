@@ -21,14 +21,11 @@ public class LoadController {
 
     private final BookRepository bookRepository;
     private final BookFileFinder bookFileFinder;
-    private final PackRepository packRepository;
 
     public LoadController(@Autowired BookRepository bookRepository,
-                          @Autowired BookFileFinder bookFileFinder,
-                          @Autowired PackRepository packRepository){
+                          @Autowired BookFileFinder bookFileFinder){
         this.bookFileFinder=bookFileFinder;
         this.bookRepository=bookRepository;
-        this.packRepository=packRepository;
     }
 
     @GetMapping("/ebook/{bookid}")

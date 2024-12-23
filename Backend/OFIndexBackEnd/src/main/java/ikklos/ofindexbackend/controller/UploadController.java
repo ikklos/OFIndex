@@ -2,8 +2,6 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.domain.PackModel;
-import ikklos.ofindexbackend.domain.UserModel;
-import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.filesystem.LocalDocumentConfigs;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;

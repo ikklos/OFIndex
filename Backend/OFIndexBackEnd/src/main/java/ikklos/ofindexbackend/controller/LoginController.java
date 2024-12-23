@@ -2,9 +2,9 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
-import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
