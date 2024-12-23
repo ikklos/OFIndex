@@ -1,5 +1,5 @@
 <script setup>
-import {ref,defineProps} from 'vue'
+import {ref, defineProps, onMounted} from 'vue'
 const bookId = ref(0);
 const props = defineProps({
   id: Number,
@@ -21,7 +21,7 @@ const JumpToDetail = function(){
       <el-row style="height: 100%">
         <el-col :span="4">
           <div style="height: 100%; display: flex; align-items: flex-start;">
-            <img :src="coverUrl" alt="封面图" style="height: 100%;width: 5vw;object-fit: contain;">
+            <el-image :src="coverUrl" alt="封面图" fit="cover" style="height: 100%;width: 5vw;"/>
           </div>
         </el-col>
         <el-col :span="20">

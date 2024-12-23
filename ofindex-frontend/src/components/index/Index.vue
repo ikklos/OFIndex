@@ -13,7 +13,8 @@ const RouteName = computed(()=>route.name);
 const userAvatar = ref('https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg');
 const IsAdmin = ref(true);
 const showBackButton = computed(()=>{
-  return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail');
+  return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail'
+  || RouteName.value === 'r-index-messages');
 });
 //提供给Upload组件的响应数据
 const uploadAvatarRawData = ref([]);
@@ -115,7 +116,7 @@ const jumpBack = function () {
   router.back();
 }
 const jumpToMessagePage = function () {
-
+  router.push('/index/detail/messages');
 }
 </script>
 

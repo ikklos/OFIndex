@@ -1,13 +1,13 @@
 <script setup>
 
 import LittleBalls from "@/components/index/LittleBalls.vue";
-import {ref, onMounted, onBeforeUnmount} from 'vue';
+import {ref, onMounted, onBeforeUnmount, reactive} from 'vue';
 import {useRouter} from 'vue-router'
 import {Picture} from "@element-plus/icons-vue";
 
 let router = useRouter();
 const menuItems = ref([
-  {name: "1"}, {name: "2"}, {name: "3"},
+  {name: "历史"}, {name: "书架"}, {name: "回退"},{name: '创建书单'}
 ]);
 //包括书单和书目
 const DataList = ref([
@@ -17,6 +17,17 @@ const DataList = ref([
     type: "list",
   }
 ]);
+const formRef = ref(null);
+const formRules = reactive({
+  name:{
+    required: true,
+    message: '名称不能为空',
+    trigger: 'blur'
+  }
+});
+const formData = reactive({
+  name: ''
+});
 for(let i = 0; i < 80; i++){
   DataList.value.push({
     name: "支柱虾：血本无归",
@@ -25,12 +36,28 @@ for(let i = 0; i < 80; i++){
     type: "book",
   })
 }
+const dialogVisible = ref(false);
 const jumpToDetail = function(bookId, type) {
   if(type==='book'){
     router.push('/index/detail/book-detail/'+bookId);
   }else{
     //请求书单下的列表，覆盖当前的DataList
   }
+}
+const handleLittleBallsClicked = function (index){
+  if(index === 3){
+    dialogVisible.value = true;
+  }
+}
+const submitForm = async (formEl) => {
+  if(!formEl)return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      //submit
+    } else {
+      throw new Error();
+    }
+  })
 }
 </script>
 
@@ -57,9 +84,17 @@ const jumpToDetail = function(bookId, type) {
     </el-main>
     <el-aside style="z-index: 10">
       <div class="full-fix center-layout-row">
-        <LittleBalls :menu-items="menuItems"/>
+        <LittleBalls :menu-items="menuItems" :disperse="1" @item-clicked="handleLittleBallsClicked"/>
       </div>
     </el-aside>
+    <el-dialog v-model="dialogVisible" title="创建书单" width="500">
+      <el-form ref="formRef" :rules="formRules" :model="formData">
+        <el-form-item label="名称" prop="name">
+          <el-input placeholder="请输入书单名称"></el-input>
+        </el-form-item>
+        <el-button color="#3621ef" @click="submitForm(formRef)">创建</el-button>
+      </el-form>
+    </el-dialog>
   </el-container>
 </template>
 
