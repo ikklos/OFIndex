@@ -60,7 +60,7 @@ public class UploadController {
             }
             packModel=packO.get();
 
-            if(!Objects.equals(packModel.getAuthorId(), userid)){
+            if(!Objects.equals(packModel.getOwnerId(), userid)){
                 throw new UniversalBadReqException("Not your pack");
             }
 
@@ -85,9 +85,10 @@ public class UploadController {
                 packModel.setContent(localDocumentConfigs.packContentDefault);
             packModel.setShared(request.shared?1:0);
             packModel.setLikeCount(0);
+            packModel.setAuthorId(userid);
         }
 
-        packModel.setAuthorId(userid);
+        packModel.setOwnerId(userid);
         packModel.setUpdateTime(LocalDateTime.now());
         packRepository.save(packModel);
 

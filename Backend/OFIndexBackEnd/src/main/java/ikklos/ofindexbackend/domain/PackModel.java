@@ -30,6 +30,10 @@ public class PackModel implements Serializable {
     @Setter
     private Integer authorId;
 
+    @Column(name="ownerid")
+    @Setter
+    private Integer ownerId;
+
     @Column(name="name")
     @Setter
     private String name;

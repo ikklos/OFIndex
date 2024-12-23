@@ -3,8 +3,10 @@ package ikklos.ofindexbackend.controller;
 import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.domain.PackModel;
 import ikklos.ofindexbackend.domain.UserModel;
+import ikklos.ofindexbackend.domain.UserPackLikeModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
+import ikklos.ofindexbackend.repository.UserPackLikeRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.PackContentResponse;
@@ -34,17 +36,24 @@ public class PackController {
         public List<UserPackListItem> packs;
     }
 
+    public static class CopyPackResponse extends UniversalResponse{
+        public Integer packId;
+    }
+
     private final PackRepository packRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final UserPackLikeRepository userPackLikeRepository;
 
     @Autowired
     public PackController(PackRepository packRepository,
                           UserRepository userRepository,
-                          BookRepository bookRepository){
+                          BookRepository bookRepository,
+                          UserPackLikeRepository userPackLikeRepository){
         this.packRepository=packRepository;
         this.userRepository=userRepository;
         this.bookRepository=bookRepository;
+        this.userPackLikeRepository=userPackLikeRepository;
     }
 
     @GetMapping("/{packid}")
@@ -60,8 +69,8 @@ public class PackController {
 
         PackModel packModel=packO.get();
 
-        if(packModel.getShared()==0&& !Objects.equals(userid, packModel.getAuthorId())){
-            throw new UniversalBadReqException("Unshared pack and you are not its author");
+        if(packModel.getShared()==0&& !Objects.equals(userid, packModel.getOwnerId())){
+            throw new UniversalBadReqException("Unshared pack and you are not its owner");
         }
 
         var bookO=bookRepository.findById(packModel.getBookId());
@@ -88,7 +97,7 @@ public class PackController {
         }
 
         UserPackListResponse response=new UserPackListResponse();
-        response.packs=packRepository.findAllByAuthorId(userId, Sort.unsorted()).stream().map(packModel -> {
+        response.packs=packRepository.findAllByOwnerId(userId, Sort.unsorted()).stream().map(packModel -> {
             UserPackListResponse.UserPackListItem item=new UserPackListResponse.UserPackListItem();
             item.packName=packModel.getName();
             item.packLikes=packModel.getLikeCount();
@@ -100,4 +109,71 @@ public class PackController {
 
         return response;
     }
+
+    @GetMapping("/copy/{packId}")
+    public CopyPackResponse copyPack(@PathVariable Integer packId,
+                                      @RequestHeader("Authorization") String token) throws UniversalBadReqException {
+        Integer userid= JwtUtils.getUserIdJWT(token);
+
+        var packO=packRepository.findById(packId);
+        if(packO.isEmpty()){
+            throw new UniversalBadReqException("No such pack");
+        }
+        PackModel packModel=packO.get();
+
+        if(packModel.getShared()==0&& !Objects.equals(packModel.getOwnerId(), userid)){
+            throw new UniversalBadReqException("Permission denied");
+        }
+
+        PackModel newPack=new PackModel();
+        newPack.setOwnerId(userid);
+        newPack.setShared(0);
+        newPack.setContent(packModel.getContent());
+        newPack.setName(packModel.getName());
+        newPack.setAuthorId(packModel.getAuthorId());
+        newPack.setDescription(packModel.getDescription());
+        newPack.setUpdateTime(LocalDateTime.now());
+        newPack.setBookId(packModel.getBookId());
+        newPack.setLikeCount(0);
+
+        packRepository.save(newPack);
+
+        CopyPackResponse response=new CopyPackResponse();
+        response.message="copy success";
+        response.packId=newPack.getPackId();
+        return response;
+    }
+
+    @GetMapping("/like/{packId}")
+    public UniversalResponse likePack(@PathVariable Integer packId,
+                                      @RequestHeader("Authorization") String token) throws UniversalBadReqException{
+        Integer userid= JwtUtils.getUserIdJWT(token);
+
+        var packO=packRepository.findById(packId);
+        if(packO.isEmpty()){
+            throw new UniversalBadReqException("No such pack");
+        }
+        PackModel packModel=packO.get();
+
+        if(userPackLikeRepository.existsUserPackLikeModelByUserIdAndPackId(userid,packId)){
+            throw new UniversalBadReqException("Already liked");
+        }
+
+        synchronized (this){
+            packModel.setLikeCount(packModel.getLikeCount()+1);
+
+            UserPackLikeModel userPackLikeModel=new UserPackLikeModel();
+            userPackLikeModel.setUserId(userid);
+            userPackLikeModel.setPackId(packId);
+            userPackLikeModel.setLikeTime(LocalDateTime.now());
+            userPackLikeRepository.save(userPackLikeModel);
+
+            //TODO send forum message to author
+        }
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Liked";
+        return response;
+    }
+
 }

@@ -34,6 +34,7 @@ public class ShelfController {
         public static class ResponseItem{
             public String name;
             public int index;
+            public int shelfId;
             public int count;
             public List<ShelfBook> books;
         }
@@ -81,6 +82,7 @@ public class ShelfController {
 
             var shelfBooks=shelfBookRepository.findShelfBookModelsByShelfId(shelf.getShelfId(),Sort.unsorted());
 
+            respItem.shelfId= shelf.getShelfId();
             respItem.index=shelf.getIndex();
             respItem.name=shelf.getName();
             respItem.books=new ArrayList<>();

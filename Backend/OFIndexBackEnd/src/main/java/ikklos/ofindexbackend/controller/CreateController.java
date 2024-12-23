@@ -1,5 +1,6 @@
 package ikklos.ofindexbackend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookClassRepository;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -24,7 +26,7 @@ public class CreateController {
         public String author;
         public String description;
         public String cover;
-        public String tags;
+        public List<String> tags;
         public String isbn;
         public Integer bookClass;
     }
@@ -52,6 +54,7 @@ public class CreateController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
+        //TODO add privilege level
         if(userId!=0){
             throw new UniversalBadReqException("Not Administrator");
         }
@@ -65,7 +68,8 @@ public class CreateController {
         bookModel.setAuthor(request.author);
         bookModel.setDescription(request.description);
         bookModel.setCover(request.cover);
-        bookModel.setTags(request.tags);
+        ObjectMapper objectMapper=new ObjectMapper();
+        bookModel.setTags(objectMapper.writeValueAsString(request.tags));
         bookModel.setIsbn(request.isbn);
         bookModel.setBookClass(request.bookClass);
 
