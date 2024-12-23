@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/forum",produces = "application/json")
-public class ForumController {
+public class ForumPostController {
 
     public static class PostAddResponse extends UniversalResponse{
         public Integer postId;
@@ -49,8 +49,8 @@ public class ForumController {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public ForumController(@Autowired PostRepository postRepository,
-                           @Autowired UserRepository userRepository){
+    public ForumPostController(@Autowired PostRepository postRepository,
+                               @Autowired UserRepository userRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;

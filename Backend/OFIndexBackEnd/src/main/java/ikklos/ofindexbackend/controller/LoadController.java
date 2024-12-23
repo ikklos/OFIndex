@@ -2,6 +2,7 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookRepository;
+import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -44,12 +45,12 @@ public class LoadController {
         Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
         if (resource.exists() || resource.isReadable()) {
             return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentType(MediaType.APPLICATION_PDF)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
         } else {
             return ResponseEntity.notFound().build();
         }
-
     }
+
 }

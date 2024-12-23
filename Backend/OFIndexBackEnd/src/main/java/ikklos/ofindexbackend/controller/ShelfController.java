@@ -5,9 +5,9 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
+import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
-import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +25,7 @@ public class ShelfController {
 
     public static class ShelfBook{
         public int bookId;
+        public String cover;
         public LocalDateTime addTime;
         public String name;
     }
@@ -33,6 +34,7 @@ public class ShelfController {
         public static class ResponseItem{
             public String name;
             public int index;
+            public int shelfId;
             public int count;
             public List<ShelfBook> books;
         }
@@ -80,6 +82,7 @@ public class ShelfController {
 
             var shelfBooks=shelfBookRepository.findShelfBookModelsByShelfId(shelf.getShelfId(),Sort.unsorted());
 
+            respItem.shelfId= shelf.getShelfId();
             respItem.index=shelf.getIndex();
             respItem.name=shelf.getName();
             respItem.books=new ArrayList<>();
@@ -94,6 +97,7 @@ public class ShelfController {
                 bookItem.bookId=book.getBookId();
                 bookItem.name=bookModel.get().getName();
                 bookItem.addTime=book.getTimeStamp();
+                bookItem.cover=bookModel.get().getCover();
 
                 respItem.books.add(bookItem);
             }
@@ -135,6 +139,7 @@ public class ShelfController {
             sBook.addTime=book.getTimeStamp();
             sBook.bookId=book.getBookId();
             sBook.name=bookModel.get().getName();
+            sBook.cover=bookModel.get().getCover();
 
             return sBook;
         }).filter(Objects::nonNull).toList();

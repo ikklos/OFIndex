@@ -1,5 +1,8 @@
 package ikklos.ofindexbackend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @CrossOrigin
@@ -24,7 +29,7 @@ public class SearchController {
         public String name;
         public Integer authorId;
         public String authorAvatar;
-        public String desctiption;
+        public String description;
     }
 
     public static class SearchPackResponse extends UniversalResponse {
@@ -46,7 +51,7 @@ public class SearchController {
             public String author;
             public String description;
             public String cover;
-            public String tag;
+            public List<String> tags;
         }
         public Integer count;
         public Integer totalResult;
@@ -83,7 +88,14 @@ public class SearchController {
                     item.id=bookModel.getBookId();
                     item.author=bookModel.getAuthor();
                     item.cover=bookModel.getCover();
-                    item.tag=bookModel.getTags();
+                    ObjectMapper objectMapper=new ObjectMapper();
+                    JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
+                    try {
+                        item.tags=objectMapper.readValue(bookModel.getTags(),javaType);
+                    } catch (JsonProcessingException e) {
+                        Logger.getGlobal().log(Level.WARNING,"Book contains illegal tags!bookId:"+bookModel.getBookId());
+                        return null;
+                    }
                     item.name=bookModel.getName();
                     item.description=bookModel.getDescription();
                     return item;
@@ -122,11 +134,12 @@ public class SearchController {
             ret.authorId=pack.getAuthorId();
             ret.name=pack.getName();
             ret.authorAvatar=author.get().getAvatar();
-            ret.desctiption=pack.getDescription();
+            ret.description =pack.getDescription();
             return ret;
         }).filter(Objects::nonNull).toList();
 
         return response;
     }
+
 
 }
