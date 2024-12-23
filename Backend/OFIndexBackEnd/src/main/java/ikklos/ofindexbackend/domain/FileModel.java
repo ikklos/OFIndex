@@ -28,5 +28,8 @@ public class FileModel implements Serializable {
     private String name;
 
     @Column(name="size")
-    private Integer size;
+    private Long size;
+
+    @Column(name="shared")
+    private Integer shared;
 }
