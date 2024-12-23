@@ -25,6 +25,7 @@ public class ShelfController {
 
     public static class ShelfBook{
         public int bookId;
+        public String cover;
         public LocalDateTime addTime;
         public String name;
     }
@@ -94,6 +95,7 @@ public class ShelfController {
                 bookItem.bookId=book.getBookId();
                 bookItem.name=bookModel.get().getName();
                 bookItem.addTime=book.getTimeStamp();
+                bookItem.cover=bookModel.get().getCover();
 
                 respItem.books.add(bookItem);
             }
@@ -135,6 +137,7 @@ public class ShelfController {
             sBook.addTime=book.getTimeStamp();
             sBook.bookId=book.getBookId();
             sBook.name=bookModel.get().getName();
+            sBook.cover=bookModel.get().getCover();
 
             return sBook;
         }).filter(Objects::nonNull).toList();

@@ -19,8 +19,8 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/forum",produces = "application/json")
-public class ForumController {
+@RequestMapping(value = "/forum/post",produces = "application/json")
+public class ForumPostController {
 
     public static class PostAddResponse extends UniversalResponse{
         public Integer postId;
@@ -49,14 +49,14 @@ public class ForumController {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public ForumController(@Autowired PostRepository postRepository,
-                           @Autowired UserRepository userRepository){
+    public ForumPostController(@Autowired PostRepository postRepository,
+                               @Autowired UserRepository userRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;
     }
 
-    @PostMapping("/post/add")
+    @PostMapping("/add")
     public PostAddResponse addPost(@RequestBody PostAddRequest request,
                                      @RequestHeader("Authorization") String token) throws JsonProcessingException {
         Integer userId= JwtUtils.getUserIdJWT(token);
@@ -94,7 +94,7 @@ public class ForumController {
         return response;
     }
 
-    @GetMapping("/post/{postid}")
+    @GetMapping("/{postid}")
     public PostGetResponse getPostContent(@PathVariable("postid") Integer postId) throws JsonProcessingException, UniversalBadReqException {
 
         var postOption=postRepository.findById(postId);
