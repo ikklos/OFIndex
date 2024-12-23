@@ -2,6 +2,7 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookRepository;
+import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -20,11 +21,14 @@ public class LoadController {
 
     private final BookRepository bookRepository;
     private final BookFileFinder bookFileFinder;
+    private final PackRepository packRepository;
 
     public LoadController(@Autowired BookRepository bookRepository,
-                          @Autowired BookFileFinder bookFileFinder){
+                          @Autowired BookFileFinder bookFileFinder,
+                          @Autowired PackRepository packRepository){
         this.bookFileFinder=bookFileFinder;
         this.bookRepository=bookRepository;
+        this.packRepository=packRepository;
     }
 
     @GetMapping("/ebook/{bookid}")
@@ -50,6 +54,6 @@ public class LoadController {
         } else {
             return ResponseEntity.notFound().build();
         }
-
     }
+
 }

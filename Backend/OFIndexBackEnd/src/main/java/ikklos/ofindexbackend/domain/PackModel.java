@@ -3,9 +3,11 @@ package ikklos.ofindexbackend.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -39,5 +41,17 @@ public class PackModel implements Serializable {
     @Column(name="likes")
     @Setter
     private Integer likeCount;
+
+    @Column(name="shared")
+    @Setter
+    private Integer shared;
+
+    @Column(name="content")
+    @Setter
+    private String content;
+
+    @Column(name="updatetime")
+    @Setter
+    private LocalDateTime updateTime;
 
 }

@@ -2,6 +2,7 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UniversalResponse> handleUniversalBadReqException(UniversalBadReqException ex){
         UniversalResponse response=new UniversalResponse();
         response.message="Bad request:"+ex.getMessage();
+        ex.printStackTrace();
         return ResponseEntity.status(ex.getHttpCode()).body(response);
     }
 
-    @ExceptionHandler(value={SignatureException.class, MalformedJwtException.class})
+    @ExceptionHandler(value={SignatureException.class, MalformedJwtException.class, ExpiredJwtException.class})
     public ResponseEntity<UniversalResponse> handleSignatureException(Exception ex){
         UniversalResponse response=new UniversalResponse();
         response.message="Token failed! : "+ex.getClass()+" : "+ex.getMessage();
+        ex.printStackTrace();
         return ResponseEntity.status(601).body(response);
     }
 
@@ -30,6 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UniversalResponse> handleRuntimeException(RuntimeException ex) {
         UniversalResponse response=new UniversalResponse();
         response.message=ex.getClass()+" : "+ex.getMessage();
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
@@ -37,6 +41,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UniversalResponse> handleGenericException(Exception ex) {
         UniversalResponse response=new UniversalResponse();
         response.message="Error: " + ex.getMessage();
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 

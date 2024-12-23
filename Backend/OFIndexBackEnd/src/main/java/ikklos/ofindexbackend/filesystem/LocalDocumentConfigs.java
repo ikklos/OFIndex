@@ -21,4 +21,6 @@ public class LocalDocumentConfigs {
     //@Value("${ikklos.ofindexbackend.localFileUserPack}")
     public String userDocument = "users";
 
+    public String packContentDefault= "{note:[{title: '',pos:{page: 1,x: 200,y: 300,width: 100,height: 100,}}],diagram:{name: 'C++',children:[{name: '1',children:[{name:'1',}]}]},additionFiles:[{name:'',url:''}]}";
+
 }
