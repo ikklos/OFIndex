@@ -5,6 +5,7 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class ShelfController {
     }
 
     public static class ShelfEditRequest{
-        public Integer shelfId;
+        public Integer booklistId;
         public Integer bookId;
     }
 
@@ -62,15 +63,14 @@ public class ShelfController {
         this.bookRepository = bookRepository;
     }
 
-    @PostMapping
+    @GetMapping
     public BookShelfResponse getAllBookShelf(@RequestHeader("Authorization") String token){
         Integer userId= JwtUtils.getUserIdJWT(token);
 
         BookShelfResponse response=new BookShelfResponse();
-        response.result=true;
 
         var bookShelf=shelfRepository.findShelfModelsByUserId(userId, Sort.unsorted());
-        response.items=new ArrayList<>();
+        response.items =new ArrayList<>();
 
         for(var shelf:bookShelf){
 
@@ -105,7 +105,7 @@ public class ShelfController {
         return response;
     }
 
-    @PostMapping("/history")
+    @GetMapping("/history")
     public HistoryShelfResponse getHistoryShelf(@RequestHeader("Authorization") String token){
         Integer userId= JwtUtils.getUserIdJWT(token);
 
@@ -127,7 +127,6 @@ public class ShelfController {
         var shelfBooks=shelfBookRepository.findShelfBookModelsByShelfId(shelfId,Sort.unsorted());
 
         HistoryShelfResponse response=new HistoryShelfResponse();
-        response.result=true;
 
         response.items=shelfBooks.stream().map(book->{
             ShelfBook sBook=new ShelfBook();
@@ -145,7 +144,7 @@ public class ShelfController {
 
     }
 
-    @PostMapping("/history/clear")
+    @DeleteMapping("/history")
     @Transactional
     public UniversalResponse clearHistoryShelf(@RequestHeader("Authorization") String token){
         Integer userId= JwtUtils.getUserIdJWT(token);
@@ -162,46 +161,36 @@ public class ShelfController {
             history.setIndex(0);
             history.setName("history");
             shelfRepository.save(history);
-            response.result=true;
             response.message="No history shelf!";
             return response;
         }else{
             shelfId=historyShelf.get(0).getShelfId();
             shelfBookRepository.removeShelfBookModelsByShelfId(shelfId);
-            response.result=true;
             response.message="history removed!";
             return response;
         }
     }
 
-    private UniversalResponse shelfEditRequestTest(String token,ShelfEditRequest request){
-        UniversalResponse response=new UniversalResponse();
-
+    private UniversalResponse shelfEditRequestTest(String token,ShelfEditRequest request) throws UniversalBadReqException {
         Integer userid=JwtUtils.getUserIdJWT(token);
 
-        var shelf=shelfRepository.findById(request.shelfId);
+        var shelf=shelfRepository.findById(request.booklistId);
         if(shelf.isEmpty()){
-            response.result=false;
-            response.message="No such shelf";
-            return response;
+            throw new UniversalBadReqException("No such shelf");
         }
 
         if(!Objects.equals(shelf.get().getUserId(), userid)){
-            response.result=false;
-            response.message="Not your shelf";
-            return response;
+            throw new UniversalBadReqException("Not your shelf");
         }
 
         if(!bookRepository.existsById(request.bookId)){
-            response.result=false;
-            response.message="No such book";
-            return response;
+            throw new UniversalBadReqException("No such book");
         }
         return null;
     }
 
     @PostMapping("/add")
-    public UniversalResponse addBookToShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request){
+    public UniversalResponse addBookToShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request) throws UniversalBadReqException {
 
 
         UniversalResponse response=shelfEditRequestTest(token,request);
@@ -210,35 +199,46 @@ public class ShelfController {
 
         ShelfBookModel sBook=new ShelfBookModel();
         sBook.setBookId(request.bookId);
-        sBook.setShelfId(request.shelfId);
+        sBook.setShelfId(request.booklistId);
         sBook.setTimeStamp(LocalDateTime.now());
 
         shelfBookRepository.save(sBook);
 
-        response.result=true;
         response.message="Book added";
         return response;
     }
 
-    @PostMapping("/remove")
-    public UniversalResponse removeBookFromShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request){
-
+    @DeleteMapping("/remove")
+    public UniversalResponse removeBookFromShelf(@RequestHeader("Authorization") String token,@RequestBody ShelfEditRequest request) throws UniversalBadReqException {
         UniversalResponse response=shelfEditRequestTest(token, request);
         if(response!=null)return response;
         response=new UniversalResponse();
 
-        var sBooks=shelfBookRepository.findShelfBookModelByShelfIdAndBookId(request.shelfId, request.bookId);
+        if(request.bookId!=null) {
 
-        if(sBooks.isEmpty()){
-            response.result=false;
-            response.message="this book is not in this shelf";
-            return response;
+            var sBooks = shelfBookRepository.findShelfBookModelByShelfIdAndBookId(request.booklistId, request.bookId);
+
+            if (sBooks.isEmpty()) {
+                throw new UniversalBadReqException("this book is not in this shelf");
+            }
+
+            shelfBookRepository.deleteAll(sBooks);
+
+            response.message = "Book removed";
+        }else{
+            var shelfOption=shelfRepository.findById(request.booklistId);
+
+            if(shelfOption.isEmpty()){
+                throw new UniversalBadReqException("shelf not exists");
+            }
+
+            ShelfModel shelfModel=shelfOption.get();
+
+            shelfBookRepository.deleteShelfBookModelsByShelfId(shelfModel.getShelfId());
+            shelfRepository.delete(shelfModel);
+
+            response.message = "Shelf removed";
         }
-
-        shelfBookRepository.deleteAll(sBooks);
-
-        response.result=true;
-        response.message="Book removed";
         return response;
     }
 

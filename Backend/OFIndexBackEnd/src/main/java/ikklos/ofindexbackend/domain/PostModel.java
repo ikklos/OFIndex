@@ -30,6 +30,10 @@ public class PostModel implements Serializable {
     @Setter
     private Integer bookId;
 
+    @Column(name="packid")
+    @Setter
+    private Integer packId;
+
     @Column(name="tags")
     @Setter
     private String tags;

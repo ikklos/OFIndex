@@ -2,6 +2,7 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,51 +34,37 @@ public class LoginController {
     }
 
     @PostMapping
-    public LoginResponse tryLogin(@RequestBody LoginRequest loginRequest){
+    public LoginResponse tryLogin(@RequestBody LoginRequest loginRequest) throws UniversalBadReqException {
         if(loginRequest.userid!=null){
             var data=repository.findById(loginRequest.userid);
             if(data.isPresent()) {
                 if (data.get().checkPassword(loginRequest.passwd)) {
                     LoginResponse response = new LoginResponse();
-                    response.result = true;
                     response.message = "Login success!";
                     response.token=generateLoginJWT(data.get());
                     return response;
                 }else{
-                    LoginResponse response = new LoginResponse();
-                    response.result = false;
-                    response.message = "Wrong password!";
-                    return response;
+                    throw new UniversalBadReqException("Wrong password!");
                 }
             }
         }
-        LoginResponse response=new LoginResponse();
-        response.result=false;
-        response.message="No such user!";
-        return response;
+        throw new UniversalBadReqException("No such user!");
     }
 
     @PostMapping("/phone")
-    public LoginResponse TryPhoneLogin(@RequestBody PhoneLoginRequest loginRequest){
+    public LoginResponse TryPhoneLogin(@RequestBody PhoneLoginRequest loginRequest) throws UniversalBadReqException {
         if(loginRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(loginRequest.phoneNumber)){
             var data=repository.findUserModelByPhonenum(loginRequest.phoneNumber);
                 if(data.checkPassword(loginRequest.passwd)){
                     LoginResponse response=new LoginResponse();
-                    response.result=true;
                     response.message="Login success!";
                     response.token=generateLoginJWT(data);
                     return response;
                 }else{
-                    LoginResponse response = new LoginResponse();
-                    response.result = false;
-                    response.message = "Wrong password!";
-                    return response;
+                    throw new UniversalBadReqException("Wrong password!");
                 }
         }
-        LoginResponse response=new LoginResponse();
-        response.result=false;
-        response.message="No such user!";
-        return response;
+        throw new UniversalBadReqException("No such user!");
     }
 
     private String generateLoginJWT(UserModel userModel){

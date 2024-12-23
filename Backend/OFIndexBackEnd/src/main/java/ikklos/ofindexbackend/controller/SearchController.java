@@ -4,6 +4,7 @@ import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ public class SearchController {
         public String name;
         public Integer authorId;
         public String authorAvatar;
+        public String desctiption;
     }
 
     public static class SearchPackResponse extends UniversalResponse {
@@ -39,6 +41,7 @@ public class SearchController {
 
     public static class SearchBookResponse extends UniversalResponse{
         public static class RespItem{
+            public Integer id;
             public String name;
             public String author;
             public String description;
@@ -77,6 +80,7 @@ public class SearchController {
         response.items=books.stream().map(
                 bookModel -> {
                     SearchBookResponse.RespItem item=new SearchBookResponse.RespItem();
+                    item.id=bookModel.getBookId();
                     item.author=bookModel.getAuthor();
                     item.cover=bookModel.getCover();
                     item.tag=bookModel.getTags();
@@ -94,18 +98,15 @@ public class SearchController {
     }
 
 
-    @PostMapping("/pack/{bookId}")
-    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){
+    @GetMapping("/pack/{bookId}")
+    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId) throws UniversalBadReqException {
 
         SearchPackResponse response=new SearchPackResponse();
 
         if(!bookRepository.existsById(bookId)){
-            response.result=false;
-            response.message="Invalid Book ID";
-            return response;
+            throw new UniversalBadReqException("Invalid Book ID");
         }
 
-        response.result=true;
         response.message="Found Book";
 
         var packs=packRepository.findAllByBookId(bookId);
@@ -121,6 +122,7 @@ public class SearchController {
             ret.authorId=pack.getAuthorId();
             ret.name=pack.getName();
             ret.authorAvatar=author.get().getAvatar();
+            ret.desctiption=pack.getDescription();
             return ret;
         }).filter(Objects::nonNull).toList();
 

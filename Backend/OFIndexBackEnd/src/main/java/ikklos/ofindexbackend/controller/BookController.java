@@ -1,6 +1,7 @@
 package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.repository.BookRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,27 +29,20 @@ public class BookController {
         this.repository=repository;
     }
 
-    @PostMapping("/{bookId}")
-    public BookInfoResponse getBookInfo(@PathVariable("bookId") Integer bookId){
+    @GetMapping("/{bookId}")
+    public BookInfoResponse getBookInfo(@PathVariable("bookId") Integer bookId) throws UniversalBadReqException {
 
         if(bookId==null){
-            BookInfoResponse response=new BookInfoResponse();
-            response.result=false;
-            response.message="Illegal Book ID";
-            return response;
+            throw new UniversalBadReqException(502,"No such book");
         }
 
         var book=repository.findById(bookId);
 
         if(book.isEmpty()){
-            BookInfoResponse response=new BookInfoResponse();
-            response.result=false;
-            response.message="Invalid Book ID";
-            return response;
+            throw new UniversalBadReqException(502,"Invalid book ID");
         }
 
         BookInfoResponse response=new BookInfoResponse();
-        response.result=true;
         response.message="Book found";
 
         response.bookId=book.get().getBookId();
