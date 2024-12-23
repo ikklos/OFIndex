@@ -24,6 +24,7 @@ public class SearchController {
         public String name;
         public Integer authorId;
         public String authorAvatar;
+        public String desctiption;
     }
 
     public static class SearchPackResponse extends UniversalResponse {
@@ -121,6 +122,7 @@ public class SearchController {
             ret.authorId=pack.getAuthorId();
             ret.name=pack.getName();
             ret.authorAvatar=author.get().getAvatar();
+            ret.desctiption=pack.getDescription();
             return ret;
         }).filter(Objects::nonNull).toList();
 

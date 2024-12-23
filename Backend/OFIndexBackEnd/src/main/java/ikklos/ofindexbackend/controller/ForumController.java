@@ -85,7 +85,7 @@ public class ForumController {
             }
         }
         String s = mapper.writeValueAsString(commonTags);
-        postModel.setText(s);
+        postModel.setTags(s);
 
         postRepository.save(postModel);
 
@@ -95,9 +95,9 @@ public class ForumController {
     }
 
     @GetMapping("/post/{postid}")
-    public PostGetResponse getPostContent(@PathVariable Integer postid) throws JsonProcessingException, UniversalBadReqException {
+    public PostGetResponse getPostContent(@PathVariable("postid") Integer postId) throws JsonProcessingException, UniversalBadReqException {
 
-        var postOption=postRepository.findById(postid);
+        var postOption=postRepository.findById(postId);
 
         PostGetResponse response=new PostGetResponse();
 
