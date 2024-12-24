@@ -99,8 +99,11 @@ fun AppNavigation(
             composable(Route.shelf()) {
                 ShelfScreen(shelfViewModel,
                     onNavigateRead = { bookID ->
-                    navController.navigate(Route.read(bookID))
-                })
+                        navController.navigate(Route.read(bookID))
+                    },
+                    onNavigateBookDetail = { bookID ->
+                        navController.navigate(Route.bookDetail(bookID))
+                    })
             }
             composable(Route.forum()) {
                 ForumScreen(forumViewModel)
@@ -132,17 +135,22 @@ fun AppNavigation(
                 )
             }
 
-            composable(Route.read(0)) {
+            composable(Route.read()) {
                 val bookID = it.arguments?.getLong("bookID")
                 if (bookID != null) {
-                    ReadScreen(readViewModel, bookID)
+                    ReadScreen(
+                        readViewModel, bookID,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
                 } else {
                     Toast.makeText(LocalContext.current, "bookID is null", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
 
-            composable(Route.bookDetail(0)) {
+            composable(Route.bookDetail()) {
                 val bookID = it.arguments?.getLong("bookID")
                 if (bookID != null) {
                     BookDetailScreen(bookDetailViewModel, bookID,

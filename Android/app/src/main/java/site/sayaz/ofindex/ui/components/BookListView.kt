@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -26,9 +27,10 @@ import site.sayaz.ofindex.data.model.Book
 fun BookListView(
     books: List<Book>,
     onBookClick: (Long) -> Unit,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit = {}
 ) {
-    val listState = remember { LazyGridState() }
+
+    val listState = rememberLazyGridState()
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -56,7 +58,7 @@ fun BookListView(
         contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        state = listState
+        state = listState,
     ) {
         items(books) { book ->
             BookView(
@@ -65,7 +67,7 @@ fun BookListView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 0.dp, max = Dp.Infinity)
-                    .aspectRatio(2 / 3f)
+                    .aspectRatio(3 / 4f)
             )
         }
     }

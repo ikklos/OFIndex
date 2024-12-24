@@ -14,6 +14,7 @@ import site.sayaz.ofindex.data.remote.request.ShelfAddRequest
 import site.sayaz.ofindex.data.remote.request.ShelfRemoveRequest
 import site.sayaz.ofindex.data.remote.response.BookDetailResponse
 import site.sayaz.ofindex.data.remote.response.ClassListResponse
+import site.sayaz.ofindex.data.remote.response.ForumPostsResponse
 import site.sayaz.ofindex.data.remote.response.LoginResponse
 import site.sayaz.ofindex.data.remote.response.NormalResponse
 import site.sayaz.ofindex.data.remote.response.RegisterResponse
@@ -64,14 +65,9 @@ interface ApiService {
 
     @GET("/load/ebook/{bookid}")
     suspend fun loadBook(@Path("bookid") bookid:Long):Response<ResponseBody>
-//
-//    @POST("/create/book")
-//    suspend fun createBook(): Response<NormalResponse>
-//
-//    @POST("/upload/book")
-//
-//    @POST("/load/ebook/{bookid}")
-//
-//    @POST("/forum/post/add")
+
+    @GET("/forum/posts")
+    suspend fun forumPosts():Response<ForumPostsResponse>
+
 
 }

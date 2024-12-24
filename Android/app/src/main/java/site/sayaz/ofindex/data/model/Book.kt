@@ -11,7 +11,8 @@ data class Book(
     val description: String? = null,
     val tag: List<String> = emptyList(),
     val isbn: String? = null,
-    val bookClass: Long? = null
+    val bookClass: Long? = null,
+    val addTime: String? = null
 )
 
 

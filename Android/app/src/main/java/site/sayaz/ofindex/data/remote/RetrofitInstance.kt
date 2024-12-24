@@ -16,11 +16,21 @@ object RetrofitInstance {
     private val _token = MutableStateFlow<String?>("")
     val token: StateFlow<String?> get() = _token.asStateFlow()
 
+    private val _progress = MutableStateFlow(0f)
+    val progress: StateFlow<Float> get() = _progress.asStateFlow()
+
+
     private val client = OkHttpClient.Builder()
         .addInterceptor(TokenInterceptor(
             { _token.value },
             { _token.value = null }
         ))
+        .addInterceptor(ProgressInterceptor { bytesRead, contentLength, done ->
+            val progress =
+                if (contentLength > 0) bytesRead.toFloat() / contentLength.toFloat() else 0f
+            _progress.value = progress
+        }
+        )
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()

@@ -2,6 +2,12 @@ package site.sayaz.ofindex.viewmodel
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -9,36 +15,59 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import site.sayaz.ofindex.data.repository.DownloadResult
+import okhttp3.ResponseBody
+import okio.Buffer
+import okio.source
 import site.sayaz.ofindex.data.repository.ReadRepository
+import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 
 class ReadViewModel(
     private val readRepository: ReadRepository
-):ViewModel() {
+) : ViewModel() {
     private val _pdfBytes = MutableStateFlow<ByteArray?>(null)
     val pdfBytes: StateFlow<ByteArray?> = _pdfBytes.asStateFlow()
 
-    private val _downloadProgress = MutableStateFlow<Int?>(null)
-    val downloadProgress: StateFlow<Int?> = _downloadProgress.asStateFlow()
+    private val _downloadProgress = MutableStateFlow(0f) // 0 to 1 float
+    val downloadProgress = _downloadProgress.asStateFlow()
+
+    private val _isBottomBarVisible = MutableStateFlow(false)
+    val isBottomBarVisible: StateFlow<Boolean> = _isBottomBarVisible.asStateFlow()
+
+    private val _isTopBarVisible = MutableStateFlow(false)
+    val isTopBarVisible: StateFlow<Boolean> = _isTopBarVisible.asStateFlow()
+
+    private val _selectedTab = MutableStateFlow<Int>(0)
+    val selectedTab: StateFlow<Int> = _selectedTab.asStateFlow()
+
+
+    fun toggleBottomBarVisibility(isBottomBarVisible: Boolean) {
+        _isBottomBarVisible.value = isBottomBarVisible
+    }
+
+    fun toggleTopBarVisibility(isTopBarVisible: Boolean) {
+        _isTopBarVisible.value = isTopBarVisible
+    }
+
+    fun selectTab(index: Int) {
+        _selectedTab.value = index
+    }
 
     fun loadBook(bookId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            // 假设 loadBookWithProgress 是一个返回 Flow<DownloadResult> 的函数
-            readRepository.loadBook(bookId).collect { result ->
-                when (result) {
-                    is DownloadResult.Progress -> {
-                        _downloadProgress.value = result.progress
-                    }
-                    is DownloadResult.Success -> {
-                        _pdfBytes.value = result.data
-                        _downloadProgress.value = null // 下载完成，重置进度
-                    }
-                    is DownloadResult.Failure -> {
-                        Log.e(TAG, "loadBook: ", result.error)
-                        _downloadProgress.value = null // 下载失败，重置进度
-                    }
+            readRepository.loadBook(bookId).onSuccess { response ->
+                val body = response.body()
+                if (body != null) {
+                    _pdfBytes.value = body.bytes()
                 }
+            }.onFailure {
+                // Handle failure, if needed
+                _downloadProgress.value = 0f
             }
         }
+    }
+
+    fun clearBytes(){
+        _pdfBytes.value = null
     }
 }

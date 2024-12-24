@@ -311,6 +311,59 @@ app.get('/load/ebook/:bookId', (req, res) => {
 });
 
 
+// Helper function to generate a random date in the past year
+function randomDate() {
+    const now = new Date();
+    const start = new Date(now.setFullYear(now.getFullYear() - 1));
+    return new Date(start.getTime() + Math.random() * (now.getTime() - start.getTime())).toISOString();
+}
+
+// Generate sample book items
+function generateBooksd(startId, count) {
+    return Array.from({ length: count }, (_, i) => ({
+        bookId: startId + i,
+        addTime: randomDate(),
+        name: `Book ${startId + i}`
+    }));
+}
+
+// Generate four book lists with 4-5 books each and a default list with 4-5 books
+function generateSampleData() {
+    const bookLists = [];
+
+    // Default book list
+    const defaultBooksCount = Mock.Random.integer(4, 5);
+    bookLists.push({
+        name: "Default",
+        index: 1,
+        count: defaultBooksCount,
+        books: generateBooksd(0, defaultBooksCount)
+    });
+
+    // Other book lists
+    for (let i = 2; i <= 5; i++) {
+        const booksCount = Mock.Random.integer(4, 5);
+        bookLists.push({
+            name: `Custom List ${i}`,
+            index: i,
+            count: booksCount,
+            books: generateBooksd((i - 1) * 5, booksCount),
+            cover: `http://via.placeholder/150?text=List${i}`
+        });
+    }
+
+    return { 
+        message:"dsasadsda",
+        count: bookLists.length, items: bookLists 
+    };
+}
+
+// API endpoint to return the generated data
+app.get('/shelf', (req, res) => {
+    res.json(generateSampleData());
+});
+
+
 // 启动服务器
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
