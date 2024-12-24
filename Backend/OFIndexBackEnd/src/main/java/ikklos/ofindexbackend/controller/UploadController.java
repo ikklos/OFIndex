@@ -1,11 +1,10 @@
 package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.BookModel;
+import ikklos.ofindexbackend.domain.ForumMessageModel;
 import ikklos.ofindexbackend.domain.PackModel;
 import ikklos.ofindexbackend.filesystem.LocalDocumentConfigs;
-import ikklos.ofindexbackend.repository.BookRepository;
-import ikklos.ofindexbackend.repository.PackRepository;
-import ikklos.ofindexbackend.repository.UserPackLikeRepository;
+import ikklos.ofindexbackend.repository.*;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.PackContentResponse;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
@@ -20,6 +19,7 @@ import java.util.Objects;
 @RequestMapping(value = "/upload",produces = "application/json")
 public class UploadController {
 
+
     public static class UploadPackRequest {
         public Integer packId;
         public Integer bookId;
@@ -33,16 +33,20 @@ public class UploadController {
     private final BookRepository bookRepository;
     private final LocalDocumentConfigs localDocumentConfigs;
     private final UserPackLikeRepository userPackLikeRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final ForumMessageRepository forumMessageRepository;
 
     @Autowired
     public UploadController(BookRepository bookRepository,
                             LocalDocumentConfigs localDocumentConfigs,
                             PackRepository packRepository,
-                            UserPackLikeRepository userPackLikeRepository){
+                            UserPackLikeRepository userPackLikeRepository, SubscriptionRepository subscriptionRepository, ForumMessageRepository forumMessageRepository){
         this.bookRepository=bookRepository;
         this.packRepository = packRepository;
         this.localDocumentConfigs=localDocumentConfigs;
         this.userPackLikeRepository = userPackLikeRepository;
+        this.subscriptionRepository = subscriptionRepository;
+        this.forumMessageRepository = forumMessageRepository;
     }
 
     @PostMapping("/pack")
@@ -51,7 +55,9 @@ public class UploadController {
         Integer userid= JwtUtils.getUserIdJWT(token);
 
         PackModel packModel;
+        boolean isUpdate;
         if(request.packId!=null){
+            isUpdate = false;
             if(request.bookId!=null&&!bookRepository.existsById(request.bookId)){
                 throw new UniversalBadReqException("No such book");
             }
@@ -76,6 +82,7 @@ public class UploadController {
                 throw new UniversalBadReqException("No such book");
             }
 
+            isUpdate=true;
             packModel=new PackModel();
 
             packModel.setName(request.name);
@@ -92,6 +99,16 @@ public class UploadController {
         packModel.setOwnerId(userid);
         packModel.setUpdateTime(LocalDateTime.now());
         packRepository.save(packModel);
+
+        if(packModel.getShared()!=0)
+            subscriptionRepository.findSubscriptionModelsByFollowingId(userid).forEach(
+                subscriptionModel -> {
+                    ForumMessageModel.addForumMessage(forumMessageRepository,
+                            userid,subscriptionModel.getFollowerId(),0,
+                            (isUpdate?"Updated pack:":"Uploaded new pack:")+packModel.getPackId(),
+                            subscriptionModel.getNotification()!=0);
+                }
+            );
 
         var bookO=bookRepository.findById(packModel.getBookId());
         if(bookO.isEmpty()){

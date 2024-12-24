@@ -27,6 +27,7 @@ public class ForumPostController {
 
 
     private final ForumMessageRepository forumMessageRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public static class PostAddResponse extends UniversalResponse{
         public Integer postId;
@@ -93,12 +94,13 @@ public class ForumPostController {
     @Autowired
     public ForumPostController(PostRepository postRepository,
                                UserRepository userRepository,
-                               UserPostLikeRepository userPostLikeRepository, ForumMessageRepository forumMessageRepository){
+                               UserPostLikeRepository userPostLikeRepository, ForumMessageRepository forumMessageRepository, SubscriptionRepository subscriptionRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;
         this.userPostLikeRepository = userPostLikeRepository;
         this.forumMessageRepository = forumMessageRepository;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     @PostMapping("/post/add")
@@ -132,6 +134,15 @@ public class ForumPostController {
         postModel.setTags(s);
 
         postRepository.save(postModel);
+
+        subscriptionRepository.findSubscriptionModelsByFollowingId(userId).forEach(
+                subscriptionModel -> {
+                    ForumMessageModel.addForumMessage(forumMessageRepository,
+                            userId,subscriptionModel.getFollowerId(),0,
+                            "Posted:"+postModel.getPostId(),
+                            subscriptionModel.getNotification()!=0);
+                }
+        );
 
         response.postId= postModel.getPostId();
         response.message="Post added";

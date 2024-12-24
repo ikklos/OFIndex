@@ -154,6 +154,9 @@ public class PackController {
 
         packRepository.save(newPack);
 
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                userid,packModel.getOwnerId(),0,"Copied your pack:"+packModel.getPackId(),false);
+
         CopyPackResponse response=new CopyPackResponse();
         response.message="copy success";
         response.packId=newPack.getPackId();
