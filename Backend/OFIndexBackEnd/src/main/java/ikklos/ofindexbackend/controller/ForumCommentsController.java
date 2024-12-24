@@ -1,12 +1,20 @@
 package ikklos.ofindexbackend.controller;
 
+import ikklos.ofindexbackend.domain.CommentModel;
+import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.CommentRepository;
 import ikklos.ofindexbackend.repository.PostRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.JwtUtils;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin
@@ -17,16 +25,46 @@ public class ForumCommentsController {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
-    public static class PostCommentItem{
+    public static class CommentItem{
         public Integer commentId;
         public Integer userId;
         public String userName;
         public String userAvatar;
-        //TODO add comments
+        public String text;
+        public Integer likes;
+        public LocalDateTime createTime;
+
+        public CommentItem(CommentModel model, UserModel userModel){
+            commentId=model.getCommentId();
+            userId=model.getUserId();
+            userName=userModel.getUsername();
+            userAvatar=userModel.getAvatar();
+            text=model.getText();
+            likes=model.getLikes();
+            createTime=model.getTimeStamp();
+        }
+    }
+
+    public static class PostCommentItem extends CommentItem{
+        public List<CommentItem> comments;
+        public Integer count;
+        public PostCommentItem(CommentModel model, UserModel userModel) {
+            super(model, userModel);
+            comments=new ArrayList<>();
+        }
     }
 
     public static class PostCommentsResponse{
         public Integer postId;
+        public List<PostCommentItem> comments;
+        public Integer count;
+        public Integer total;
+    }
+
+    public static class AddCommentRequest{
+        public Integer postId;
+        public String text;
+        public Integer parent;
     }
 
     public ForumCommentsController(@Autowired PostRepository postRepository,
@@ -38,8 +76,73 @@ public class ForumCommentsController {
         this.commentRepository=commentRepository;
     }
 
-    //@GetMapping("/{postid}")
-    //public
+    @GetMapping("/{postid}")
+    public PostCommentsResponse getPostComments(@PathVariable Integer postid) throws UniversalBadReqException{
 
+        if(!postRepository.existsById(postid))
+            throw new UniversalBadReqException("No such post");
 
+        List<CommentModel> comments=commentRepository.findCommentModelsByPostId(postid, Sort.by(Sort.Direction.ASC,"timeStamp"));
+
+        PostCommentsResponse response=new PostCommentsResponse();
+        response.postId=postid;
+        response.comments=comments.stream().map(
+            commentModel -> {
+                if(commentModel.getParentComment()!=null)return null;
+
+                var userO=userRepository.findById(commentModel.getUserId());
+                if(userO.isEmpty())return null;
+                UserModel userModel=userO.get();
+
+                PostCommentItem item=new PostCommentItem(commentModel,userModel);
+                item.comments=comments.stream().map(commentModel1 -> {
+                    if(!Objects.equals(commentModel1.getParentComment(), commentModel.getCommentId()))return null;
+
+                    var userO1=userRepository.findById(commentModel1.getUserId());
+                    if(userO1.isEmpty())return null;
+                    UserModel userModel1=userO1.get();
+
+                    return new CommentItem(commentModel1,userModel1);
+                }).filter(Objects::nonNull).toList();
+                item.count =item.comments.size();
+                return item;
+            }
+        ).filter(Objects::nonNull).toList();
+        response.count = response.comments.size();
+        response.total = comments.size();
+        return response;
+    }
+
+    @PostMapping("/add")
+    public CommentItem addComment(@RequestBody AddCommentRequest request,
+                                  @RequestHeader("Authorization") String token) throws UniversalBadReqException {
+        Integer userId = JwtUtils.getUserIdJWT(token);
+
+        if(!postRepository.existsById(request.postId)){
+            throw new UniversalBadReqException("No such post");
+        }
+
+        if (request.parent != null) {
+            var parentO=commentRepository.findById(request.parent);
+            if(parentO.isEmpty())
+                throw new UniversalBadReqException("No such parent comment");
+            else if(parentO.get().getParentComment()!=null)
+                throw new UniversalBadReqException("parent comment is a comment reply");
+        }
+
+        CommentModel commentModel = new CommentModel();
+        commentModel.setUserId(userId);
+        commentModel.setParentComment(request.parent);
+        commentModel.setText(request.text);
+        commentModel.setPostId(request.postId);
+        commentModel.setLikes(0);
+        commentModel.setTimeStamp(LocalDateTime.now());
+
+        commentRepository.save(commentModel);
+
+        var userO = userRepository.findById(userId);
+        if (userO.isEmpty()) throw new UniversalBadReqException("User token illegal");
+
+        return new CommentItem(commentModel, userO.get());
+    }
 }

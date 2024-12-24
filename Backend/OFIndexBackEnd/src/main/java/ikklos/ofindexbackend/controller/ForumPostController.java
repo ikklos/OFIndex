@@ -11,11 +11,13 @@ import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin
@@ -36,6 +38,7 @@ public class ForumPostController {
     public static class PostGetResponse extends UniversalResponse{
         public Integer postId;
         public Integer posterId;
+        public String posterName;
         public String posterAvatar;
         public Integer bookId;
         public Integer packId;
@@ -44,6 +47,33 @@ public class ForumPostController {
         public String images;
         public Integer likes;
         public LocalDateTime createTime;
+
+        public PostGetResponse setByModel(UserModel userModel){
+            posterAvatar= userModel.getAvatar();
+            posterName= userModel.getUsername();
+            return this;
+        }
+
+        public PostGetResponse setByModel(PostModel postModel) throws JsonProcessingException {
+            postId=postModel.getPostId();
+            bookId=postModel.getBookId();
+            packId=postModel.getPackId();
+            posterId=postModel.getUserId();
+            title=postModel.getTitle();
+            likes=postModel.getLikes();
+            createTime =postModel.getTimeStamp();
+            ObjectMapper objectMapper=new ObjectMapper();
+            JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
+            tags= objectMapper.readValue(postModel.getTags(),javaType);
+            images =objectMapper.readValue(postModel.getImageurls(),javaType);
+            return this;
+        }
+    }
+
+    public static class PostListResponse extends UniversalResponse{
+        public Integer count;
+        public Integer total;
+        public List<PostGetResponse> posts;
     }
 
     private final PostRepository postRepository;
@@ -99,34 +129,50 @@ public class ForumPostController {
 
         var postOption=postRepository.findById(postId);
 
-        PostGetResponse response=new PostGetResponse();
-
         if(postOption.isEmpty()){
             throw new UniversalBadReqException("No such post");
         }
 
         PostModel postModel=postOption.get();
 
-        response.postId=postModel.getPostId();
-        response.bookId=postModel.getBookId();
-        response.packId=postModel.getPackId();
-        response.posterId=postModel.getUserId();
-        response.title=postModel.getTitle();
-        response.likes=postModel.getLikes();
-        response.createTime =postModel.getTimeStamp();
-
+        PostGetResponse response=new PostGetResponse().setByModel(postModel);
         var userOption=userRepository.findById(postModel.getUserId());
         if(userOption.isPresent()){
             UserModel userModel=userOption.get();
-            response.posterAvatar=userModel.getAvatar();
+            response.setByModel(userModel);
+        }
+        response.message="Post found";
+        return response;
+    }
+
+    @GetMapping("/posts")
+    public PostListResponse getPostList(@RequestParam Integer page,
+                                        @RequestParam Integer pagesize) throws UniversalBadReqException {
+        List<PostModel> posts=postRepository.findAll(Sort.by(Sort.Direction.ASC,"timeStamp"));
+
+        PostListResponse response=new PostListResponse();
+
+        int from=page*pagesize;
+        int to=from+pagesize;
+
+        if(from>=posts.size()){
+            throw new UniversalBadReqException("No enough post");
         }
 
-        ObjectMapper objectMapper=new ObjectMapper();
-        JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
-        response.tags= objectMapper.readValue(postModel.getTags(),javaType);
-        response.images =objectMapper.readValue(postModel.getImageurls(),javaType);
+        if(to>=posts.size())to=posts.size();
 
-        response.message="Post found";
+        response.posts=posts.subList(from,to).stream().map(postModel -> {
+            try {
+                PostGetResponse item=new PostGetResponse().setByModel(postModel);
+                var userO=userRepository.findById(postModel.getUserId());
+                userO.ifPresent(item::setByModel);
+                return item;
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull).toList();
+        response.count=response.posts.size();
+        response.total=posts.size();
         return response;
     }
 

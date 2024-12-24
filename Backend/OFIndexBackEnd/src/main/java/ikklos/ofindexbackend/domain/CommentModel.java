@@ -29,7 +29,7 @@ public class CommentModel implements Serializable {
     @Setter
     private Integer userId;
 
-    @Column(name="text")
+    @Column(name="text",columnDefinition="TEXT")
     @Setter
     private String text;
 

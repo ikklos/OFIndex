@@ -2,9 +2,11 @@ package ikklos.ofindexbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
+import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.repository.BookRepository;
+import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
@@ -20,6 +22,8 @@ import java.util.List;
 @CrossOrigin
 @RequestMapping(value = "/create",produces = "application/json")
 public class CreateController {
+
+    private final UserRepository userRepository;
 
     public static class CreateBookRequest{
         public String name;
@@ -41,10 +45,11 @@ public class CreateController {
 
     public CreateController(@Autowired BookRepository bookRepository,
                             @Autowired BookClassRepository bookClassRepository,
-                            @Autowired BookFileFinder bookFileFinder){
+                            @Autowired BookFileFinder bookFileFinder, UserRepository userRepository){
         this.bookRepository=bookRepository;
         this.bookClassRepository=bookClassRepository;
         this.bookFileFinder=bookFileFinder;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(value="/book",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -54,8 +59,14 @@ public class CreateController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
+        var userO=userRepository.findById(userId);
+        if(userO.isEmpty()){
+            throw new UniversalBadReqException("No such user");
+        }
+        UserModel userModel=userO.get();
+
         //TODO add privilege level
-        if(userId!=0){
+        if(userModel.getLevel()<5){
             throw new UniversalBadReqException("Not Administrator");
         }
 

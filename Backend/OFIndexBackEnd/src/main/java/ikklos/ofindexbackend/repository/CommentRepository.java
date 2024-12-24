@@ -12,6 +12,6 @@ public interface CommentRepository extends JpaRepository<CommentModel,Integer> {
 
     List<CommentModel> findCommentModelsByUserId(Integer userId);
 
-    List<CommentModel> findCommentModelsByPostIdAndParentCommentOrderByTimeStampDesc(Integer postId, Integer parentComment, Sort sort);
+    List<CommentModel> findCommentModelsByPostIdOrderByTimeStamp(Integer postId);
 
 }

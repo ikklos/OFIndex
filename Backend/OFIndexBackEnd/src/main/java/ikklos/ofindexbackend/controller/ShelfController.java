@@ -42,6 +42,15 @@ public class ShelfController {
         public List<ResponseItem> items;
     }
 
+    public static class SimpleBookShelf extends UniversalResponse{
+        public static class ResponseItem{
+            public String name;
+            public Integer booklistId;
+        }
+        public Integer count;
+        public List<ResponseItem> booklists;
+    }
+
     public static class HistoryShelfResponse extends UniversalResponse{
         public int count;
         public List<ShelfBook> items;
@@ -105,6 +114,24 @@ public class ShelfController {
             response.items.add(respItem);
         }
         response.count=response.items.size();
+
+        return response;
+    }
+
+    @GetMapping("/simple")
+    public SimpleBookShelf getAllBookShelfSimple(@RequestHeader("Authorization") String token){
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        SimpleBookShelf response=new SimpleBookShelf();
+
+        var bookShelf=shelfRepository.findShelfModelsByUserId(userId, Sort.unsorted());
+        response.booklists =bookShelf.stream().map(shelfModel -> {
+            SimpleBookShelf.ResponseItem item=new SimpleBookShelf.ResponseItem();
+            item.booklistId=shelfModel.getShelfId();
+            item.name=shelfModel.getName();
+            return item;
+        }).toList();
+        response.count=response.booklists.size();
 
         return response;
     }

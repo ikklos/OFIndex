@@ -37,7 +37,7 @@ public class PackModel implements Serializable {
     @Setter
     private String name;
 
-    @Column(name="description")
+    @Column(name="description",columnDefinition="TEXT")
     @Setter
     private String description;
 
@@ -49,7 +49,7 @@ public class PackModel implements Serializable {
     @Setter
     private Integer shared;
 
-    @Column(name="content")
+    @Column(name="content",columnDefinition="TEXT")
     @Setter
     private String content;
 
