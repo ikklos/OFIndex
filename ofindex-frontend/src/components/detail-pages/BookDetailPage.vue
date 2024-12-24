@@ -1,41 +1,72 @@
 <script setup>
 
 import {onMounted, reactive, ref} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {Icon} from "view-ui-plus";
 import {VideoPlay} from "@element-plus/icons-vue";
 import AddToShelfDialog from "@/components/detail-pages/AddToShelfDialog.vue";
+import axiosApp from "@/main.js";
+import {ElMessage} from "element-plus";
+import axios from "axios";
 const route = useRoute();
+const router = useRouter();
 const bookData = reactive({
-  bookId: route.params.id,
-  bookName: '可口可乐和百事可乐哪个更好喝',
-  isbn: '114514',
-  description: '冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快，冰镇可乐，喝的，更痛快',
-  coverUrl: 'https://s2.loli.net/2024/12/20/3hNwzHfSvQJTbFM.jpg',
-  tags:'嘻嘻嘻,不嘻嘻,嘻嘻',
+  bookId: route.params.bookId,
+  name: '',
+  author: '',
+  isbn: '',
+  description: '',
+  cover: '',
+  tag:'',
 });
 const packData = ref([]);
 const availablePackList = ref([]);
 //用户选择的资源包id
-const selectedPackId = ref(null);
+const selectedPackId = ref();
 //控制选择书单的dialog
 const showAddToShelfDialog = ref(false);
 const flagLike = function(index){
   packData.value[index].liked = true;
 }
-onMounted(() => {
-  for(let i = 0; i < 40; i++) {
-    packData.value.push({
-      packId: 111,
-      name: '超炫资源包',
-      authorId: 1,
-      description:'哇，好炫',
-      authorAvatar: 'https://s2.loli.net/2024/12/20/3hNwzHfSvQJTbFM.jpg',
-      liked: false,
-    });
+const jumpToReading = function(){
+  if(selectedPackId.value !== undefined){
+    router.push('/reading/'+bookData.bookId + '/'+selectedPackId.value);
+  }else{
+    router.push('/reading/'+bookData.bookId);
   }
+}
+onMounted(() => {
   if(bookData.bookId !== null){
     //发送详情请求，返回数据
+    axiosApp.get('/book/'+bookData.bookId).then((response)=>{
+      if(response.data.message === 'Book found'){
+        bookData.bookId = response.data.bookId;
+        bookData.name = response.data.name;
+        bookData.author = response.data.author;
+        bookData.description = response.data.description;
+        bookData.cover = response.data.cover;
+        bookData.isbn = response.data.isbn;
+      }
+    }).catch(error=>{
+      ElMessage.error('获取书籍详情失败');
+    })
+    //请求资源包列表
+    axiosApp.get('/search/pack/'+bookData.bookId).then((res) => {
+      if(res.data.message === 'Found Book'){
+        for(let i = 0; i < res.data.count; i++){
+          packData.value.push({
+            packId: res.data.items[i].packId,
+            name: res.data.items[i].name,
+            authorId: res.data.items[i].authorId,
+            description: res.data.items[i].description,
+            authorAvatar: res.data.items[i].authorAvatar,
+            liked: false,
+          })
+        }
+      }
+    }).catch((err) => {
+      ElMessage.error('获取资源包列表失败');
+    })
   }
 })
 </script>
@@ -48,12 +79,12 @@ onMounted(() => {
           <div class="book-left-area">
             <el-row class="book-title-area">
               <div class="book-title-text">
-                {{bookData.bookName}}
+                {{bookData.name}}
               </div>
             </el-row>
-            <el-row class="book-cover-area"><el-image :src="bookData.coverUrl" class="book-cover-img" fit="cover"></el-image></el-row>
+            <el-row class="book-cover-area"><el-image :src="bookData.cover" class="book-cover-img" fit="cover"></el-image></el-row>
             <el-row class="book-isbn-area">ISBN:{{bookData.isbn}}</el-row>
-            <el-row class="book-tags-area">tags:{{bookData.tags}}</el-row>
+            <el-row class="book-tags-area">tags:{{bookData.tag}}</el-row>
           </div>
         </el-col>
         <el-col class="book-right-area" :span="16">
@@ -96,7 +127,7 @@ onMounted(() => {
           </el-row>
           <el-row class="buttons-row">
             <el-col :span="8">
-              <el-button color="#4825f6" class="bottom-button">开始阅读</el-button>
+              <el-button color="#4825f6" class="bottom-button" @click="jumpToReading">开始阅读</el-button>
             </el-col>
             <el-col :span="8">
               <el-button color="#4825f6" class="bottom-button" @click="()=>{
@@ -149,8 +180,8 @@ onMounted(() => {
   padding: 10px;
 }
 .book-cover-img{
-  max-width: 28vw;
-  max-height: 68vh;
+  width: 28vw;
+  height: 68vh;
   min-width: 180px;
   min-height: 210px;
   border: 1px solid #e9e7ef;

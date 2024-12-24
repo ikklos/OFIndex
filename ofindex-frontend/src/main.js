@@ -20,10 +20,10 @@ const axiosApp = axios.create({
     timeout: 10000,
 });
 //定义请求拦截器
-axiosApp.interceptors.response.use(config => {
+axiosApp.interceptors.request.use(config => {
     const token = localStorage.getItem('Token');
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `?0`;
     }
     return config;
 }, error => {
