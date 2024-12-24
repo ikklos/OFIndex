@@ -1,13 +1,7 @@
 package ikklos.ofindexbackend.controller;
 
-import ikklos.ofindexbackend.domain.BookModel;
-import ikklos.ofindexbackend.domain.PackModel;
-import ikklos.ofindexbackend.domain.UserModel;
-import ikklos.ofindexbackend.domain.UserPackLikeModel;
-import ikklos.ofindexbackend.repository.BookRepository;
-import ikklos.ofindexbackend.repository.PackRepository;
-import ikklos.ofindexbackend.repository.UserPackLikeRepository;
-import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.domain.*;
+import ikklos.ofindexbackend.repository.*;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.PackContentResponse;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
@@ -24,6 +18,8 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping(value="/pack",produces = "application/json")
 public class PackController {
+
+    private final ForumMessageRepository forumMessageRepository;
 
     public static class UserPackListResponse extends UniversalResponse{
         public static class UserPackListItem{
@@ -49,11 +45,13 @@ public class PackController {
     public PackController(PackRepository packRepository,
                           UserRepository userRepository,
                           BookRepository bookRepository,
-                          UserPackLikeRepository userPackLikeRepository){
+                          UserPackLikeRepository userPackLikeRepository,
+                          ForumMessageRepository forumMessageRepository){
         this.packRepository=packRepository;
         this.userRepository=userRepository;
         this.bookRepository=bookRepository;
         this.userPackLikeRepository=userPackLikeRepository;
+        this.forumMessageRepository = forumMessageRepository;
     }
 
     @GetMapping("/{packid}")
@@ -82,9 +80,9 @@ public class PackController {
         var userO=userRepository.findById(packModel.getAuthorId());
         if(userO.isPresent()) {
             UserModel userModel = userO.get();
-            return new PackContentResponse(packModel,bookModel,userModel);
+            return new PackContentResponse(packModel,bookModel,userModel,userPackLikeRepository);
         }else{
-            return new PackContentResponse(packModel,bookModel,null);
+            return new PackContentResponse(packModel,bookModel,null,userPackLikeRepository);
         }
 
     }
@@ -119,7 +117,7 @@ public class PackController {
         response.packs=packRepository.findAllByOwnerId(userId, Sort.unsorted()).stream().map(packModel -> {
             UserPackListResponse.UserPackListItem item=new UserPackListResponse.UserPackListItem();
             item.packName=packModel.getName();
-            item.packLikes=packModel.getLikeCount();
+            item.packLikes=userPackLikeRepository.countAllByPackId(packModel.getPackId());
             item.packId=packModel.getPackId();
             item.shared=packModel.getShared()!=0;
             return item;
@@ -153,7 +151,6 @@ public class PackController {
         newPack.setDescription(packModel.getDescription());
         newPack.setUpdateTime(LocalDateTime.now());
         newPack.setBookId(packModel.getBookId());
-        newPack.setLikeCount(0);
 
         packRepository.save(newPack);
 
@@ -178,20 +175,33 @@ public class PackController {
             throw new UniversalBadReqException("Already liked");
         }
 
-        synchronized (this){
-            packModel.setLikeCount(packModel.getLikeCount()+1);
+        UserPackLikeModel userPackLikeModel=new UserPackLikeModel();
+        userPackLikeModel.setUserId(userid);
+        userPackLikeModel.setPackId(packId);
+        userPackLikeModel.setLikeTime(LocalDateTime.now());
+        userPackLikeRepository.save(userPackLikeModel);
 
-            UserPackLikeModel userPackLikeModel=new UserPackLikeModel();
-            userPackLikeModel.setUserId(userid);
-            userPackLikeModel.setPackId(packId);
-            userPackLikeModel.setLikeTime(LocalDateTime.now());
-            userPackLikeRepository.save(userPackLikeModel);
-
-            //TODO send forum message to author
-        }
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                userid,packModel.getOwnerId(),1,"Liked your pack:"+packModel.getPackId(),false);
 
         UniversalResponse response=new UniversalResponse();
-        response.message="Liked";
+        response.message="Pack liked";
+        return response;
+    }
+
+    @DeleteMapping("/like/{packId}")
+    public UniversalResponse unlikePack(@RequestHeader("Authorization") String token,
+                                        @PathVariable Integer packId) throws UniversalBadReqException {
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        var likeO=userPackLikeRepository.findUserPackLikeModelByUserIdAndPackId(userId,packId);
+        if(likeO.isEmpty())
+            throw new UniversalBadReqException("Not liked yet");
+
+        userPackLikeRepository.delete(likeO.get());
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Pack unliked";
         return response;
     }
 

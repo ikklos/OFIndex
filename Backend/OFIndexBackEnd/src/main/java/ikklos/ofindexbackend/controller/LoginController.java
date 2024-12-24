@@ -29,7 +29,8 @@ public class LoginController {
 
     private final UserRepository repository;
 
-    public  LoginController(@Autowired UserRepository repository){
+    @Autowired
+    public  LoginController(UserRepository repository){
         this.repository=repository;
     }
 

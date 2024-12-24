@@ -27,8 +27,9 @@ public class RegisterController {
     private final UserRepository userRepository;
     private final ShelfRepository shelfRepository;
 
-    public RegisterController(@Autowired ShelfRepository shelfRepository,
-                              @Autowired UserRepository userRepository){
+    @Autowired
+    public RegisterController(ShelfRepository shelfRepository,
+                              UserRepository userRepository){
         this.userRepository =userRepository;
         this.shelfRepository=shelfRepository;
     }

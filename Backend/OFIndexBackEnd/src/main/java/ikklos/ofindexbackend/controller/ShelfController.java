@@ -65,10 +65,10 @@ public class ShelfController {
     private final ShelfBookRepository shelfBookRepository;
     private final BookRepository bookRepository;
 
-    public ShelfController(
-            @Autowired ShelfRepository shelfRepository,
-            @Autowired ShelfBookRepository shelfBookRepository,
-            @Autowired BookRepository bookRepository){
+    @Autowired
+    public ShelfController(ShelfRepository shelfRepository,
+                           ShelfBookRepository shelfBookRepository,
+                           BookRepository bookRepository){
         this.shelfRepository=shelfRepository;
         this.shelfBookRepository=shelfBookRepository;
         this.bookRepository = bookRepository;

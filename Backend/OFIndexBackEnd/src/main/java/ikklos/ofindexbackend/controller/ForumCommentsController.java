@@ -1,15 +1,10 @@
 package ikklos.ofindexbackend.controller;
 
-import ikklos.ofindexbackend.domain.CommentModel;
-import ikklos.ofindexbackend.domain.ForumMessageModel;
-import ikklos.ofindexbackend.domain.PostModel;
-import ikklos.ofindexbackend.domain.UserModel;
-import ikklos.ofindexbackend.repository.CommentRepository;
-import ikklos.ofindexbackend.repository.ForumMessageRepository;
-import ikklos.ofindexbackend.repository.PostRepository;
-import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.domain.*;
+import ikklos.ofindexbackend.repository.*;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
+import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +23,7 @@ public class ForumCommentsController {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final ForumMessageRepository forumMessageRepository;
+    private final UserCommentLikeRepository userCommentLikeRepository;
 
     public static class CommentItem{
         public Integer commentId;
@@ -38,13 +34,13 @@ public class ForumCommentsController {
         public Integer likes;
         public LocalDateTime createTime;
 
-        public CommentItem(CommentModel model, UserModel userModel){
+        public CommentItem(CommentModel model, UserModel userModel, UserCommentLikeRepository repository){
             commentId=model.getCommentId();
             userId=model.getUserId();
             userName=userModel.getUsername();
             userAvatar=userModel.getAvatar();
             text=model.getText();
-            likes=model.getLikes();
+            likes=repository.countAllByCommentId(commentId);
             createTime=model.getTimeStamp();
         }
     }
@@ -52,8 +48,8 @@ public class ForumCommentsController {
     public static class PostCommentItem extends CommentItem{
         public List<CommentItem> comments;
         public Integer count;
-        public PostCommentItem(CommentModel model, UserModel userModel) {
-            super(model, userModel);
+        public PostCommentItem(CommentModel model, UserModel userModel, UserCommentLikeRepository repository) {
+            super(model, userModel,repository);
             comments=new ArrayList<>();
         }
     }
@@ -71,14 +67,18 @@ public class ForumCommentsController {
         public Integer parent;
     }
 
-    public ForumCommentsController(@Autowired PostRepository postRepository,
-                                   @Autowired UserRepository userRepository,
-                                   @Autowired CommentRepository commentRepository, ForumMessageRepository forumMessageRepository){
+    @Autowired
+    public ForumCommentsController(PostRepository postRepository,
+                                   UserRepository userRepository,
+                                   CommentRepository commentRepository,
+                                   ForumMessageRepository forumMessageRepository,
+                                   UserCommentLikeRepository userCommentLikeRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;
         this.commentRepository=commentRepository;
         this.forumMessageRepository = forumMessageRepository;
+        this.userCommentLikeRepository = userCommentLikeRepository;
     }
 
     @GetMapping("/{postid}")
@@ -99,7 +99,7 @@ public class ForumCommentsController {
                 if(userO.isEmpty())return null;
                 UserModel userModel=userO.get();
 
-                PostCommentItem item=new PostCommentItem(commentModel,userModel);
+                PostCommentItem item=new PostCommentItem(commentModel,userModel,userCommentLikeRepository);
                 item.comments=comments.stream().map(commentModel1 -> {
                     if(!Objects.equals(commentModel1.getParentComment(), commentModel.getCommentId()))return null;
 
@@ -107,7 +107,7 @@ public class ForumCommentsController {
                     if(userO1.isEmpty())return null;
                     UserModel userModel1=userO1.get();
 
-                    return new CommentItem(commentModel1,userModel1);
+                    return new CommentItem(commentModel1,userModel1,userCommentLikeRepository);
                 }).filter(Objects::nonNull).toList();
                 item.count =item.comments.size();
                 return item;
@@ -146,7 +146,6 @@ public class ForumCommentsController {
         commentModel.setParentComment(request.parent);
         commentModel.setText(request.text);
         commentModel.setPostId(request.postId);
-        commentModel.setLikes(0);
         commentModel.setTimeStamp(LocalDateTime.now());
 
         commentRepository.save(commentModel);
@@ -163,6 +162,52 @@ public class ForumCommentsController {
         var userO = userRepository.findById(userId);
         if (userO.isEmpty()) throw new UniversalBadReqException("User token illegal");
 
-        return new CommentItem(commentModel, userO.get());
+        return new CommentItem(commentModel, userO.get(),userCommentLikeRepository);
     }
+
+    @GetMapping("/like/{commentId}")
+    public UniversalResponse likeComment(@PathVariable Integer commentId,
+                                      @RequestHeader("Authorization") String token) throws UniversalBadReqException{
+        Integer userid= JwtUtils.getUserIdJWT(token);
+
+        var commentO=commentRepository.findById(commentId);
+        if(commentO.isEmpty()){
+            throw new UniversalBadReqException("No such comment");
+        }
+        CommentModel commentModel=commentO.get();
+
+        if(userCommentLikeRepository.existsByUserIdAndCommentId(userid,commentId)){
+            throw new UniversalBadReqException("Already liked");
+        }
+
+        UserCommentLikeModel userCommentLikeModel=new UserCommentLikeModel();
+        userCommentLikeModel.setCommentId(commentId);
+        userCommentLikeModel.setUserId(userid);
+        userCommentLikeModel.setLikeTime(LocalDateTime.now());
+        userCommentLikeRepository.save(userCommentLikeModel);
+
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                userid, commentModel.getUserId(), 1,"Liked your Comment:"+commentModel.getCommentId(),false);
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Comment liked";
+        return response;
+    }
+
+    @DeleteMapping("/like/{commentId}")
+    public UniversalResponse unlikeComment(@RequestHeader("Authorization") String token,
+                                        @PathVariable Integer commentId) throws UniversalBadReqException {
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        var likeO=userCommentLikeRepository.findUserPostLikeModelByCommentIdAndUserId(commentId,userId);
+        if(likeO.isEmpty())
+            throw new UniversalBadReqException("Not liked yet");
+
+        userCommentLikeRepository.delete(likeO.get());
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Comment unliked";
+        return response;
+    }
+
 }

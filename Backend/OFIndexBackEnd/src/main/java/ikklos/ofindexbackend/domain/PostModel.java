@@ -50,10 +50,6 @@ public class PostModel implements Serializable {
     @Setter
     private String imageurls;
 
-    @Column(name="likes")
-    @Setter
-    private Integer likes;
-
     @Column(name="timestamp")
     @Setter
     private LocalDateTime timeStamp;

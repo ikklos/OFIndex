@@ -41,8 +41,4 @@ public class CommentModel implements Serializable {
     @Setter
     private LocalDateTime timeStamp;
 
-    @Column(name="likes")
-    @Setter
-    private Integer likes;
-
 }

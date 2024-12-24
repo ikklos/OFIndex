@@ -41,10 +41,6 @@ public class PackModel implements Serializable {
     @Setter
     private String description;
 
-    @Column(name="likes")
-    @Setter
-    private Integer likeCount;
-
     @Column(name="shared")
     @Setter
     private Integer shared;

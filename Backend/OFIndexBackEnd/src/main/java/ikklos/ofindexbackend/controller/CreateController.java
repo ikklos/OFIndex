@@ -43,9 +43,11 @@ public class CreateController {
     private final BookClassRepository bookClassRepository;
     private final BookFileFinder bookFileFinder;
 
-    public CreateController(@Autowired BookRepository bookRepository,
-                            @Autowired BookClassRepository bookClassRepository,
-                            @Autowired BookFileFinder bookFileFinder, UserRepository userRepository){
+    @Autowired
+    public CreateController(BookRepository bookRepository,
+                            BookClassRepository bookClassRepository,
+                            BookFileFinder bookFileFinder,
+                            UserRepository userRepository){
         this.bookRepository=bookRepository;
         this.bookClassRepository=bookClassRepository;
         this.bookFileFinder=bookFileFinder;

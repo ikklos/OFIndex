@@ -27,7 +27,8 @@ public class BookClassController {
 
     private final BookClassRepository bookClassRepository;
 
-    public BookClassController(@Autowired BookClassRepository repository){
+    @Autowired
+    public BookClassController(BookClassRepository repository){
         bookClassRepository=repository;
     }
 

@@ -5,6 +5,7 @@ import ikklos.ofindexbackend.domain.PackModel;
 import ikklos.ofindexbackend.filesystem.LocalDocumentConfigs;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
+import ikklos.ofindexbackend.repository.UserPackLikeRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.PackContentResponse;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
@@ -19,7 +20,6 @@ import java.util.Objects;
 @RequestMapping(value = "/upload",produces = "application/json")
 public class UploadController {
 
-
     public static class UploadPackRequest {
         public Integer packId;
         public Integer bookId;
@@ -32,13 +32,17 @@ public class UploadController {
     private final PackRepository packRepository;
     private final BookRepository bookRepository;
     private final LocalDocumentConfigs localDocumentConfigs;
+    private final UserPackLikeRepository userPackLikeRepository;
 
-    public UploadController(@Autowired BookRepository bookRepository,
-                            @Autowired LocalDocumentConfigs localDocumentConfigs,
-                            @Autowired PackRepository packRepository){
+    @Autowired
+    public UploadController(BookRepository bookRepository,
+                            LocalDocumentConfigs localDocumentConfigs,
+                            PackRepository packRepository,
+                            UserPackLikeRepository userPackLikeRepository){
         this.bookRepository=bookRepository;
         this.packRepository = packRepository;
         this.localDocumentConfigs=localDocumentConfigs;
+        this.userPackLikeRepository = userPackLikeRepository;
     }
 
     @PostMapping("/pack")
@@ -82,7 +86,6 @@ public class UploadController {
             else
                 packModel.setContent(localDocumentConfigs.packContentDefault);
             packModel.setShared(request.shared?1:0);
-            packModel.setLikeCount(0);
             packModel.setAuthorId(userid);
         }
 
@@ -96,7 +99,7 @@ public class UploadController {
         }
         BookModel bookModel=bookO.get();
 
-        return new PackContentResponse(packModel,bookModel,null);
+        return new PackContentResponse(packModel,bookModel,null,userPackLikeRepository);
     }
 
 }

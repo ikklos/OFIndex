@@ -62,7 +62,10 @@ public class SearchController {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    public SearchController(@Autowired PackRepository packRepository,@Autowired UserRepository userRepository,@Autowired BookRepository bookRepository){
+    @Autowired
+    public SearchController(PackRepository packRepository,
+                            UserRepository userRepository,
+                            BookRepository bookRepository){
         this.packRepository=packRepository;
         this.userRepository=userRepository;
         this.bookRepository=bookRepository;

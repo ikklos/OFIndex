@@ -3,10 +3,11 @@ package ikklos.ofindexbackend.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ikklos.ofindexbackend.domain.ForumMessageModel;
 import ikklos.ofindexbackend.domain.PostModel;
 import ikklos.ofindexbackend.domain.UserModel;
-import ikklos.ofindexbackend.repository.PostRepository;
-import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.domain.UserPostLikeModel;
+import ikklos.ofindexbackend.repository.*;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
@@ -23,6 +24,9 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping(value = "/forum",produces = "application/json")
 public class ForumPostController {
+
+
+    private final ForumMessageRepository forumMessageRepository;
 
     public static class PostAddResponse extends UniversalResponse{
         public Integer postId;
@@ -45,7 +49,7 @@ public class ForumPostController {
         public List<String> tags;
         public String title;
         public String text;
-        public String images;
+        public List<String> images;
         public Integer likes;
         public LocalDateTime createTime;
 
@@ -62,12 +66,16 @@ public class ForumPostController {
             posterId=postModel.getUserId();
             title=postModel.getTitle();
             text=postModel.getText();
-            likes=postModel.getLikes();
             createTime =postModel.getTimeStamp();
             ObjectMapper objectMapper=new ObjectMapper();
             JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
             tags= objectMapper.readValue(postModel.getTags(),javaType);
             images =objectMapper.readValue(postModel.getImageurls(),javaType);
+            return this;
+        }
+
+        public PostGetResponse setLikes(UserPostLikeRepository repository){
+            likes=repository.countAllByPostId(postId);
             return this;
         }
     }
@@ -80,12 +88,17 @@ public class ForumPostController {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserPostLikeRepository userPostLikeRepository;
 
-    public ForumPostController(@Autowired PostRepository postRepository,
-                               @Autowired UserRepository userRepository){
+    @Autowired
+    public ForumPostController(PostRepository postRepository,
+                               UserRepository userRepository,
+                               UserPostLikeRepository userPostLikeRepository, ForumMessageRepository forumMessageRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;
+        this.userPostLikeRepository = userPostLikeRepository;
+        this.forumMessageRepository = forumMessageRepository;
     }
 
     @PostMapping("/post/add")
@@ -101,7 +114,6 @@ public class ForumPostController {
         ObjectMapper mapper = new ObjectMapper();
         String s0= mapper.writeValueAsString(request.pictures);
         postModel.setImageurls(s0);
-        postModel.setLikes(0);
         postModel.setTimeStamp(LocalDateTime.now());
 
         List<String> commonTags=new ArrayList<>();
@@ -137,7 +149,7 @@ public class ForumPostController {
 
         PostModel postModel=postOption.get();
 
-        PostGetResponse response=new PostGetResponse().setByModel(postModel);
+        PostGetResponse response=new PostGetResponse().setByModel(postModel).setLikes(userPostLikeRepository);
         var userOption=userRepository.findById(postModel.getUserId());
         if(userOption.isPresent()){
             UserModel userModel=userOption.get();
@@ -175,6 +187,50 @@ public class ForumPostController {
         }).filter(Objects::nonNull).toList();
         response.count=response.posts.size();
         response.total=posts.size();
+        return response;
+    }
+
+    @GetMapping("/post/like/{postId}")
+    public UniversalResponse likePost(@RequestHeader("Authorization") String token,
+                                      @PathVariable Integer postId) throws UniversalBadReqException {
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        var postO=postRepository.findById(postId);
+        if(postO.isEmpty())
+            throw new UniversalBadReqException("No such post");
+        PostModel postModel=postO.get();
+
+        if(userPostLikeRepository.existsByUserIdAndPostId(userId,postId))
+            throw new UniversalBadReqException("Already liked");
+
+        UserPostLikeModel userPostLikeModel=new UserPostLikeModel();
+        userPostLikeModel.setUserId(userId);
+        userPostLikeModel.setPostId(postId);
+        userPostLikeModel.setLikeTime(LocalDateTime.now());
+
+        userPostLikeRepository.save(userPostLikeModel);
+
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                userId,postModel.getUserId(),1,"Liked your post:"+postId,false);
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Post liked";
+        return response;
+    }
+
+    @DeleteMapping("/post/like/{postId}")
+    public UniversalResponse unlikePost(@RequestHeader("Authorization") String token,
+                                      @PathVariable Integer postId) throws UniversalBadReqException {
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        var likeO=userPostLikeRepository.findUserPostLikeModelByPostIdAndUserId(postId,userId);
+        if(likeO.isEmpty())
+            throw new UniversalBadReqException("Not liked yet");
+
+        userPostLikeRepository.delete(likeO.get());
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Post unliked";
         return response;
     }
 
