@@ -35,6 +35,8 @@ class ExploreViewModel(
     private val _classList = MutableStateFlow<List<Class>>(emptyList())
     val classList: StateFlow<List<Class>> = _classList.asStateFlow()
 
+
+
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }

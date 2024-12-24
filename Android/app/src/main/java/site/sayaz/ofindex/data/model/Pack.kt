@@ -8,5 +8,6 @@ data class Pack (
     val authorAvatar: String,
     val authorId: Long,
     val name: String,
-    val packId: Long
+    val packId: Long,
+    val description: String
 )

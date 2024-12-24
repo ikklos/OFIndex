@@ -1,9 +1,10 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const Mock = require('mockjs');
-
+const { RateLimiter } = require('limiter');
 const app = express();
 const port = 8080;
-
 // 解析 JSON 请求体
 app.use(express.json());
 
@@ -13,7 +14,7 @@ const bookTemplate = {
     'author|1': ['Unknown', 'Joshua Bloch', 'Robert C. Martin', 'Erich Gamma', 'Martin Fowler'],
     'description|1-50': 'Trash',
     'cover|1': ['http://via.placeholder/150'],
-    'tag|1': ['CS', 'Programming', 'Software Engineering', 'Web Development', 'Database']
+    'tag|1': [['CS', 'Programming', 'Software Engineering', 'Web Development', 'Database']]
 };
 
 function generateBooks(count) {
@@ -121,7 +122,197 @@ app.get('/class', (req, res) => {
     });
 });
 
+// /book/{id} 接口 返回书籍详情
+app.get('/book/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(req.body);
+    // 验证 ID 是否为数字
+    if (isNaN(id)) {
+        return res.status(400).json({
+            result: false,
+            message: "Invalid 'id' parameter"
+        });
+    }
+
+    // 返回响应
+    res.json({
+        result: true,
+        message: "Book found",
+        bookId: 0,
+        name: "LearnCSharp",
+        author: "Unknown",
+        description: "GarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbage",
+        cover: "https://i0.hdslb.com/bfs/new_dyn/7a4406b34701987f39b4614f23b08e782183230.jpg",
+        tag: ["tag1","tag2"],
+        isbn: "114514",
+        bookClass: 0
+    });
+});
+
+// /search/pack/{bookId}
+app.get('/search/pack/:bookId', (req, res) => {
+    const { bookId } = req.params;
+    console.log(req.body);
+    // 验证 ID 是否为数字
+    if (isNaN(bookId)) {
+        return res.status(400).json({
+            result: false,
+            message: "Invalid 'bookId' parameter"
+        });
+    }
+
+    // 返回响应
+    res.json({
+            message: "null",
+            count: 2,
+            items: [
+                {
+                    packId: 0,
+                    name: "GenshinPack",
+                    authorId: 0,
+                    authorAvatar: "?",
+                    description: "null"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                },
+                {
+                    packId: 1,
+                    name: "WuWaPack",
+                    authorId: 52,
+                    authorAvatar: "null",
+                    description: "thisisadescription"
+                }
+            ]
+        
+    })
+});
+
+///load/ebook/{bookid}
+// 模拟的书籍文件路径（请根据实际情况修改）
+const booksPath = path.join(__dirname, 'books');
+
+// 确保书籍文件夹存在
+if (!fs.existsSync(booksPath)) {
+    fs.mkdirSync(booksPath);
+}
+// 创建限速器（例如：每秒 50 KB）
+const limiter = new RateLimiter(50 * 1024, 'second'); // Limit to 50 KB/s
+
+
+const { Transform } = require('stream');
+
+// 下载电子书的路由
+app.get('/load/ebook/:bookId', (req, res) => {
+    const { bookId } = req.params;
+    console.log(bookId);
+    // 验证 ID 是否为数字
+    if (isNaN(bookId)) {
+        return res.status(400).json({
+            result: false,
+            message: "Invalid 'bookId' parameter",
+        });
+    }
+
+    // 构建文件路径
+    const filePath = path.join(booksPath, `test.pdf`);
+
+    // 检查文件是否存在
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+            result: false,
+            message: "Book not found",
+        });
+    }
+
+    // 获取文件大小
+    const stats = fs.statSync(filePath);
+    const fileSize = stats.size;
+
+    // 设置响应头
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Length', fileSize);
+    res.setHeader('Content-Disposition', `attachment; filename=book_${bookId}.pdf`);
+
+    // 限速器（每秒 50 KB）
+    const speedLimiter = new Transform({
+        transform(chunk, encoding, callback) {
+            setTimeout(() => {
+                callback(null, chunk);
+            }, (chunk.length / (100 * 1024)) * 1000); // 计算延迟时间
+        },
+    });
+
+    // 创建读取流
+    const readStream = fs.createReadStream(filePath);
+
+    // 处理流错误
+    readStream.on('error', (err) => {
+        console.error("File read error:", err);
+        res.status(500).json({
+            result: false,
+            message: "Error reading file",
+        });
+    });
+
+    // 将流通过限速器传递给响应
+    readStream.pipe(speedLimiter).pipe(res);
+
+    // 处理响应完成
+    res.on('finish', () => {
+        console.log(`File sent: book_${bookId}.pdf`);
+    });
+});
+
+
 // 启动服务器
 app.listen(port, () => {
-    console.log(`Mock server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
+

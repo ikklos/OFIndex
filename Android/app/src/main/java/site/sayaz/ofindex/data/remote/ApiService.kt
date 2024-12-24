@@ -1,6 +1,7 @@
 package site.sayaz.ofindex.data.remote
 
 
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,12 +30,12 @@ interface ApiService {
     suspend fun register(@Body registerRequest: RegisterRequest): Response<RegisterResponse>
 
     @GET("/book/{id}")
-    suspend fun getBook(@Path("id") id: Int): Response<BookDetailResponse>
+    suspend fun getBook(@Path("id") id: Long): Response<BookDetailResponse>
 
-    @POST("/search/pack/{bookId}")
-    suspend fun searchPack(@Path("bookId") bookId: Int): Response<SearchPackResponse>
+    @GET("/search/pack/{bookId}")
+    suspend fun searchPack(@Path("bookId") bookId: Long): Response<SearchPackResponse>
 
-    @POST("/shelf")
+    @GET("/shelf")
     suspend fun shelf(): Response<ShelfResponse>
 
     @POST("/shelf/history")
@@ -54,6 +55,15 @@ interface ApiService {
 
     @GET("/class")
     suspend fun classList():Response<ClassListResponse>
+
+    @GET("/pack/copy/{packId}")
+    suspend fun addPack(@Path("packId") packId:Long):Response<NormalResponse>
+
+    @GET("/pack/like/{packId}")
+    suspend fun likePack(@Path("packId") packId: Long):Response<NormalResponse>
+
+    @GET("/load/ebook/{bookid}")
+    suspend fun loadBook(@Path("bookid") bookid:Long):Response<ResponseBody>
 //
 //    @POST("/create/book")
 //    suspend fun createBook(): Response<NormalResponse>

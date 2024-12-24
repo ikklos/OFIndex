@@ -17,13 +17,13 @@ import site.sayaz.ofindex.viewmodel.ShelfViewModel
 @Composable
 fun ShelfScreen(
     viewModel: ShelfViewModel,
-    onNavigateRead: (String) -> Unit
+    onNavigateRead: (Long) -> Unit
 ) {
-    val bookID = "test.pdf"
+
     Box(
 
         modifier = Modifier.fillMaxSize().clickable(onClick = {
-            onNavigateRead(bookID)
+            onNavigateRead(1)
         })
 
     )

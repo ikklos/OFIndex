@@ -46,8 +46,8 @@ fun BookView(
             Image(
                 painter = rememberAsyncImagePainter(
                     model = book.cover,
-                    placeholder = painterResource(id = R.drawable.ic_action_no_image), // 加载中显示的占位符
-                    error = painterResource(id = R.drawable.ic_action_no_image) // 加载失败时显示的图片
+                    placeholder = painterResource(id = R.drawable.ic_action_no_image),
+                    error = painterResource(id = R.drawable.ic_action_no_image)
                 ),
                 contentDescription = book.description,
                 contentScale = ContentScale.Crop,
@@ -80,7 +80,7 @@ fun BookViewPreview() {
         author = "author",
         description = "desp",
         cover = "https://via.placeholder.com/150",
-        tag = "TODO()",
+        tag = emptyList(),
         isbn = "TODO()",
         bookClass = 1,
     )

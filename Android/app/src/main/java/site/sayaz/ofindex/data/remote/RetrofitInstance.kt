@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient
 object RetrofitInstance {
 
     private const val BASE_URL = "http://10.194.189.228:8080"
-    // private const val BASE_URL = "http://175.178.5.83:8080"
+    //private const val BASE_URL = "http://175.178.5.83:8080"
 
     private val _token = MutableStateFlow<String?>("")
     val token: StateFlow<String?> get() = _token.asStateFlow()
@@ -32,6 +32,7 @@ object RetrofitInstance {
     val apiService: ApiService = retrofit.create(ApiService::class.java)
 
     fun setToken(newToken: String?) {
+        println("token:$newToken")
         _token.value = newToken
     }
 

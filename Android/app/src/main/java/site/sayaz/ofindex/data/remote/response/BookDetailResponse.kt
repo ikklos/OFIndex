@@ -21,5 +21,5 @@ data class BookDetailResponse (
     val message: String,
     val name: String,
     val result: Boolean,
-    val tag: String
+    val tag: List<String>
 )

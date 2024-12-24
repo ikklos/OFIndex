@@ -78,6 +78,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
     implementation(libs.okhttp)
+    // https://mvnrepository.com/artifact/com.squareup.okio/okio
+    implementation(libs.okio)
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
     implementation(libs.retrofit)
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-gson
