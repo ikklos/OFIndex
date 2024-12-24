@@ -89,6 +89,25 @@ public class PackController {
 
     }
 
+    @DeleteMapping("/{packid}")
+    public UniversalResponse deletePack(@PathVariable("packid") Integer packId,
+                                        @RequestHeader("Authorization") String token) throws UniversalBadReqException {
+        Integer userid= JwtUtils.getUserIdJWT(token);
+
+        var packO=packRepository.findById(packId);
+        if(packO.isEmpty()){
+            throw new UniversalBadReqException("No such resource pack");
+        }
+
+        if(!Objects.equals(packO.get().getOwnerId(), userid))throw new UniversalBadReqException("Not your resource pack");
+
+        packRepository.delete(packO.get());
+
+        UniversalResponse response=new UniversalResponse();
+        response.message="Removed";
+        return response;
+    }
+
     @GetMapping("/user/{userid}")
     public UserPackListResponse getUserPackList(@PathVariable("userid") Integer userId) throws UniversalBadReqException {
 

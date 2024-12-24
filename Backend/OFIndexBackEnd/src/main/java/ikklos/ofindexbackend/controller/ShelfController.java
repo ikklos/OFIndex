@@ -274,4 +274,27 @@ public class ShelfController {
         return response;
     }
 
+    @GetMapping("/findbook/{bookId}")
+    public SimpleBookShelf findBookInShelf(@RequestHeader("Authorization") String token,
+                                           @PathVariable Integer bookId){
+        Integer userId= JwtUtils.getUserIdJWT(token);
+
+        SimpleBookShelf response=new SimpleBookShelf();
+
+        var bookShelf=shelfRepository.findShelfModelsByUserId(userId, Sort.unsorted());
+        response.booklists =bookShelf.stream().map(shelfModel -> {
+
+            if(shelfBookRepository.findShelfBookModelByShelfIdAndBookId(shelfModel.getShelfId(),bookId).isEmpty())
+                return null;
+
+            SimpleBookShelf.ResponseItem item=new SimpleBookShelf.ResponseItem();
+            item.booklistId=shelfModel.getShelfId();
+            item.name=shelfModel.getName();
+            return item;
+        }).filter(Objects::nonNull).toList();
+        response.count=response.booklists.size();
+
+        return response;
+    }
+
 }

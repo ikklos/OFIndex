@@ -55,7 +55,6 @@ public class BookController {
         response.bookClass=book.get().getBookClass();
 
         return response;
-
     }
 
 }
