@@ -54,10 +54,9 @@ public class ForumPostController {
         public Integer likes;
         public LocalDateTime createTime;
 
-        public PostGetResponse setByModel(UserModel userModel){
+        public void setByModel(UserModel userModel){
             posterAvatar= userModel.getAvatar();
             posterName= userModel.getUsername();
-            return this;
         }
 
         public PostGetResponse setByModel(PostModel postModel) throws JsonProcessingException {
@@ -136,12 +135,10 @@ public class ForumPostController {
         postRepository.save(postModel);
 
         subscriptionRepository.findSubscriptionModelsByFollowingId(userId).forEach(
-                subscriptionModel -> {
-                    ForumMessageModel.addForumMessage(forumMessageRepository,
-                            userId,subscriptionModel.getFollowerId(),0,
-                            "Posted:"+postModel.getPostId(),
-                            subscriptionModel.getNotification()!=0);
-                }
+                subscriptionModel -> ForumMessageModel.addForumMessage(forumMessageRepository,
+                        userId,subscriptionModel.getFollowerId(),0,
+                        "Posted:"+postModel.getPostId(),
+                        subscriptionModel.getNotification()!=0)
         );
 
         response.postId= postModel.getPostId();

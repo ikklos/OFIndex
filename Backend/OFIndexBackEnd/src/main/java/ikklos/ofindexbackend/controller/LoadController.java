@@ -42,15 +42,16 @@ public class LoadController {
         //TODO history stuff
 
         Path filePath = bookFileFinder.getBookDocumentPath(booko.get());
-        Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
-        if (resource.exists() || resource.isReadable()) {
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
-        } else {
-            return ResponseEntity.notFound().build();
+        if(filePath!=null) {
+            Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            }
         }
+        return ResponseEntity.notFound().build();
     }
 
 }

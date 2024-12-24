@@ -102,12 +102,10 @@ public class UploadController {
 
         if(packModel.getShared()!=0)
             subscriptionRepository.findSubscriptionModelsByFollowingId(userid).forEach(
-                subscriptionModel -> {
-                    ForumMessageModel.addForumMessage(forumMessageRepository,
-                            userid,subscriptionModel.getFollowerId(),0,
-                            (isUpdate?"Updated pack:":"Uploaded new pack:")+packModel.getPackId(),
-                            subscriptionModel.getNotification()!=0);
-                }
+                subscriptionModel -> ForumMessageModel.addForumMessage(forumMessageRepository,
+                        userid,subscriptionModel.getFollowerId(),0,
+                        (isUpdate?"Updated pack:":"Uploaded new pack:")+packModel.getPackId(),
+                        subscriptionModel.getNotification()!=0)
             );
 
         var bookO=bookRepository.findById(packModel.getBookId());
