@@ -44,6 +44,7 @@ public class ForumPostController {
         public Integer packId;
         public List<String> tags;
         public String title;
+        public String text;
         public String images;
         public Integer likes;
         public LocalDateTime createTime;
@@ -60,6 +61,7 @@ public class ForumPostController {
             packId=postModel.getPackId();
             posterId=postModel.getUserId();
             title=postModel.getTitle();
+            text=postModel.getText();
             likes=postModel.getLikes();
             createTime =postModel.getTimeStamp();
             ObjectMapper objectMapper=new ObjectMapper();
