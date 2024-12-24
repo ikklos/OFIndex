@@ -17,6 +17,7 @@ public class UserController {
         public Integer userId;
         public String userName;
         public String avatar;
+        public Integer level;
     }
 
     public static class ModifyUserInfoRequest{
@@ -84,6 +85,7 @@ public class UserController {
         response.avatar=userModel.getAvatar();
         response.userId=userModel.getUserid();
         response.userName=userModel.getUsername();
+        response.level=userModel.getLevel();
         return response;
     }
 

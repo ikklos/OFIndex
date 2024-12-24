@@ -149,6 +149,9 @@ public class ForumController {
         model.setTimeStamp(LocalDateTime.now());
         subscriptionRepository.save(model);
 
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                followerId,followingId,2,"Subscribed you",false);
+
         UniversalResponse response=new UniversalResponse();
         response.message="subscribed";
         return response;

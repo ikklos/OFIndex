@@ -1,8 +1,11 @@
 package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.CommentModel;
+import ikklos.ofindexbackend.domain.ForumMessageModel;
+import ikklos.ofindexbackend.domain.PostModel;
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.CommentRepository;
+import ikklos.ofindexbackend.repository.ForumMessageRepository;
 import ikklos.ofindexbackend.repository.PostRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
@@ -24,6 +27,7 @@ public class ForumCommentsController {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ForumMessageRepository forumMessageRepository;
 
     public static class CommentItem{
         public Integer commentId;
@@ -69,11 +73,12 @@ public class ForumCommentsController {
 
     public ForumCommentsController(@Autowired PostRepository postRepository,
                                    @Autowired UserRepository userRepository,
-                                   @Autowired CommentRepository commentRepository){
+                                   @Autowired CommentRepository commentRepository, ForumMessageRepository forumMessageRepository){
 
         this.postRepository=postRepository;
         this.userRepository=userRepository;
         this.commentRepository=commentRepository;
+        this.forumMessageRepository = forumMessageRepository;
     }
 
     @GetMapping("/{postid}")
@@ -118,9 +123,13 @@ public class ForumCommentsController {
                                   @RequestHeader("Authorization") String token) throws UniversalBadReqException {
         Integer userId = JwtUtils.getUserIdJWT(token);
 
-        if(!postRepository.existsById(request.postId)){
+        var postO=postRepository.findById(request.postId);
+        if(postO.isEmpty()){
             throw new UniversalBadReqException("No such post");
         }
+        PostModel postModel=postO.get();
+
+        CommentModel parentModel=null;
 
         if (request.parent != null) {
             var parentO=commentRepository.findById(request.parent);
@@ -128,6 +137,8 @@ public class ForumCommentsController {
                 throw new UniversalBadReqException("No such parent comment");
             else if(parentO.get().getParentComment()!=null)
                 throw new UniversalBadReqException("parent comment is a comment reply");
+            else
+                parentModel=parentO.get();
         }
 
         CommentModel commentModel = new CommentModel();
@@ -139,6 +150,15 @@ public class ForumCommentsController {
         commentModel.setTimeStamp(LocalDateTime.now());
 
         commentRepository.save(commentModel);
+
+        ForumMessageModel.addForumMessage(forumMessageRepository,
+                userId,postModel.getUserId(),3,
+                "Made comment to you post:"+postModel.getPostId(),false);
+        if(parentModel!=null){
+            ForumMessageModel.addForumMessage(forumMessageRepository,
+                    userId, parentModel.getUserId(), 3,
+                    "Made comment to you comment:"+parentModel.getCommentId(),false);
+        }
 
         var userO = userRepository.findById(userId);
         if (userO.isEmpty()) throw new UniversalBadReqException("User token illegal");
