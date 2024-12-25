@@ -218,7 +218,7 @@ public class ShelfController {
         }
 
         if(!Objects.equals(shelf.get().getUserId(), userid)
-            && !UserPermissions.isPermissionEnough(userRepository,userid,5)){
+            && UserPermissions.noPermission(userRepository, userid, 5)){
             throw new UniversalBadReqException("Permission denied");
         }
 

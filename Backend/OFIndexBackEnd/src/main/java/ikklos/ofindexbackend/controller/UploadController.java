@@ -60,6 +60,7 @@ public class UploadController {
 
         PackModel packModel;
         boolean isUpdate;
+        boolean byAdmin=false;
         if(request.packId!=null){
             isUpdate = false;
             if(request.bookId!=null&&!bookRepository.existsById(request.bookId)){
@@ -72,9 +73,11 @@ public class UploadController {
             }
             packModel=packO.get();
 
-            if(!Objects.equals(packModel.getOwnerId(), userid)
-                && !UserPermissions.isPermissionEnough(userRepository,userid,5)){
-                throw new UniversalBadReqException("Permission denied");
+            if(!Objects.equals(packModel.getOwnerId(), userid)){
+                if(UserPermissions.noPermission(userRepository, userid, 5))
+                    throw new UniversalBadReqException("Permission denied");
+                else
+                    byAdmin=true;
             }
 
             if(request.name!=null)packModel.setName(request.name);
@@ -101,11 +104,12 @@ public class UploadController {
             packModel.setAuthorId(userid);
         }
 
-        packModel.setOwnerId(userid);
+        if(!byAdmin)
+            packModel.setOwnerId(userid);
         packModel.setUpdateTime(LocalDateTime.now());
         packRepository.save(packModel);
 
-        if(packModel.getShared()!=0)
+        if(packModel.getShared()!=0&&!byAdmin)
             subscriptionRepository.findSubscriptionModelsByFollowingId(userid).forEach(
                 subscriptionModel -> ForumMessageModel.addForumMessage(forumMessageRepository,
                         userid,subscriptionModel.getFollowerId(),0,

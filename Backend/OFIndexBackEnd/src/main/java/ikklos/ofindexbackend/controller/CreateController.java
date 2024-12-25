@@ -2,7 +2,6 @@ package ikklos.ofindexbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
-import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.repository.BookRepository;
@@ -62,7 +61,7 @@ public class CreateController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
-        if(!UserPermissions.isPermissionEnough(userRepository,userId,6)){
+        if(UserPermissions.noPermission(userRepository, userId, 6)){
             throw new UniversalBadReqException("Permission denied");
         }
 

@@ -123,7 +123,7 @@ public class ForumController {
         ForumMessageModel forumMessageModel= messageO.get();
 
         if(!Objects.equals(forumMessageModel.getReceiverId(), userId)
-            && !UserPermissions.isPermissionEnough(userRepository,userId,5))
+            && UserPermissions.noPermission(userRepository, userId, 5))
             throw new UniversalBadReqException("Permission denied");
 
         forumMessageModel.setIsRead(1);

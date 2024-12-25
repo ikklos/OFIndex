@@ -78,7 +78,7 @@ public class FileController {
 
         FileModel fileModel=fileO.get();
         if(fileModel.getShared()==0&&!Objects.equals(userId,fileModel.getUserId())
-            && !UserPermissions.isPermissionEnough(userRepository,userId,5)){
+            && UserPermissions.noPermission(userRepository, userId, 5)){
             throw new UniversalBadReqException("Permission denied");
         }
 

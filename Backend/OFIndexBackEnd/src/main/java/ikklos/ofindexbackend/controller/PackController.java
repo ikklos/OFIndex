@@ -104,7 +104,7 @@ public class PackController {
         }
 
         if(!Objects.equals(packO.get().getOwnerId(), userid)
-            && !UserPermissions.isPermissionEnough(userRepository,userid,5))
+            && UserPermissions.noPermission(userRepository, userid, 5))
             throw new UniversalBadReqException("Not your resource pack");
 
         packRepository.delete(packO.get());
