@@ -19,10 +19,12 @@ public class PackContentResponse extends UniversalResponse{
     public String name;
     public String description;
     public Integer likes;
+    public Boolean liked;
     public LocalDateTime updateTime;
     public String content;
 
-    public PackContentResponse(PackModel packModel, BookModel bookModel, @Nullable UserModel userModel,
+    public PackContentResponse(PackModel packModel, BookModel bookModel,
+                               @Nullable UserModel userModel,
                                UserPackLikeRepository repository){
         packId=packModel.getPackId();
         bookId=packModel.getBookId();
@@ -31,6 +33,7 @@ public class PackContentResponse extends UniversalResponse{
         name=packModel.getName();
         description=packModel.getDescription();
         likes=repository.countAllByPackId(packId);
+        liked=userModel != null&&repository.existsUserPackLikeModelByUserIdAndPackId(userModel.getUserid(),packId);
         updateTime=packModel.getUpdateTime();
         content=packModel.getContent();
         if(userModel!=null) {

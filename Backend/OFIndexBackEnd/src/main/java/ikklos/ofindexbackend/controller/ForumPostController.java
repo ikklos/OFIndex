@@ -52,6 +52,7 @@ public class ForumPostController {
         public String text;
         public List<String> images;
         public Integer likes;
+        public Boolean liked;
         public LocalDateTime createTime;
 
         public void setByModel(UserModel userModel){
@@ -74,8 +75,9 @@ public class ForumPostController {
             return this;
         }
 
-        public PostGetResponse setLikes(UserPostLikeRepository repository){
+        public PostGetResponse setLikes(UserPostLikeRepository repository,Integer userId){
             likes=repository.countAllByPostId(postId);
+            liked=userId!=null&&repository.existsByUserIdAndPostId(userId,postId);
             return this;
         }
     }
@@ -147,7 +149,10 @@ public class ForumPostController {
     }
 
     @GetMapping("/post/{postid}")
-    public PostGetResponse getPostContent(@PathVariable("postid") Integer postId) throws JsonProcessingException, UniversalBadReqException {
+    public PostGetResponse getPostContent(@PathVariable("postid") Integer postId,
+                                          @RequestHeader(value = "Authorization",required = false) String token)throws JsonProcessingException, UniversalBadReqException {
+
+        Integer userId=token!=null?JwtUtils.getUserIdJWT(token):null;
 
         var postOption=postRepository.findById(postId);
 
@@ -157,7 +162,7 @@ public class ForumPostController {
 
         PostModel postModel=postOption.get();
 
-        PostGetResponse response=new PostGetResponse().setByModel(postModel).setLikes(userPostLikeRepository);
+        PostGetResponse response=new PostGetResponse().setByModel(postModel).setLikes(userPostLikeRepository,userId);
         var userOption=userRepository.findById(postModel.getUserId());
         if(userOption.isPresent()){
             UserModel userModel=userOption.get();
@@ -187,7 +192,10 @@ public class ForumPostController {
             try {
                 PostGetResponse item=new PostGetResponse().setByModel(postModel);
                 var userO=userRepository.findById(postModel.getUserId());
-                userO.ifPresent(item::setByModel);
+                if(userO.isPresent()){
+                    item.setByModel(userO.get());
+                    item.setLikes(userPostLikeRepository,userO.get().getUserid());
+                }
                 return item;
             } catch (JsonProcessingException e) {
                 return null;

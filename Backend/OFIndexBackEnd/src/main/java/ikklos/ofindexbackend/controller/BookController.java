@@ -1,10 +1,18 @@
 package ikklos.ofindexbackend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @CrossOrigin
@@ -18,7 +26,7 @@ public class BookController {
         public String author;
         public String description;
         public String cover;
-        public String tag;
+        public List<String> tag;
         public String isbn;
         public Integer bookClass;
     }
@@ -51,9 +59,18 @@ public class BookController {
         response.author=book.get().getAuthor();
         response.description=book.get().getDescription();
         response.isbn=book.get().getIsbn();
-        response.tag=book.get().getTags();
         response.cover=book.get().getCover();
         response.bookClass=book.get().getBookClass();
+
+        ObjectMapper objectMapper=new ObjectMapper();
+        JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
+        try {
+            response.tag= objectMapper.readValue(book.get().getTags(),javaType);
+        } catch (JsonProcessingException e) {
+            response.tag= new ArrayList<>();
+            Logger.getGlobal().log(Level.WARNING,"Book contains illegal tags!bookId:"+book.get().getBookId());
+            return null;
+        }
 
         return response;
     }

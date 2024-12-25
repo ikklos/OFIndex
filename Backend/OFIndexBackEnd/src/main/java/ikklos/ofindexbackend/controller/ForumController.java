@@ -127,6 +127,7 @@ public class ForumController {
             throw new UniversalBadReqException("Permission denied");
 
         forumMessageModel.setIsRead(1);
+        forumMessageRepository.save(forumMessageModel);
 
         UniversalResponse response=new UniversalResponse();
         response.message="Message read";

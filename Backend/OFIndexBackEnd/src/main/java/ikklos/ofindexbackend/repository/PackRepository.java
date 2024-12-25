@@ -14,5 +14,7 @@ public interface PackRepository extends JpaRepository<PackModel,Integer> {
 
     List<PackModel> findAllByOwnerId(Integer ownerId, Sort sort);
 
+    List<PackModel> findAllByOwnerIdAndBookId(Integer ownerId, Integer bookId);
+
 }
 

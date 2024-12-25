@@ -16,7 +16,7 @@ public class JwtUtils {
 
     public static final String Claims_UserID="USER_ID";
 
-    public static final long KeyDuration = 24*60*1000;
+    public static final long KeyDuration = 24*60*60*1000;
 
     private static String secretKey0;
 

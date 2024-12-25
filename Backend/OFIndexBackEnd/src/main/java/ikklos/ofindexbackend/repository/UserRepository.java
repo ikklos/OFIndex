@@ -9,6 +9,4 @@ public interface UserRepository extends JpaRepository<UserModel,Integer> {
 
     boolean existsUserModelByPhonenum(String phonenum);
 
-
-
 }

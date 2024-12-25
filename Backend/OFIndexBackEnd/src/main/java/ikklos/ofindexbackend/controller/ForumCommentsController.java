@@ -32,6 +32,7 @@ public class ForumCommentsController {
         public String userAvatar;
         public String text;
         public Integer likes;
+        public Boolean liked;
         public LocalDateTime createTime;
 
         public CommentItem(CommentModel model, UserModel userModel, UserCommentLikeRepository repository){
@@ -41,6 +42,7 @@ public class ForumCommentsController {
             userAvatar=userModel.getAvatar();
             text=model.getText();
             likes=repository.countAllByCommentId(commentId);
+            liked=repository.existsByUserIdAndCommentId(userId,commentId);
             createTime=model.getTimeStamp();
         }
     }

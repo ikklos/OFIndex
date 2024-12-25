@@ -21,9 +21,18 @@ public class PackController {
     public static class UserPackListResponse extends UniversalResponse{
         public static class UserPackListItem{
             public Integer packId;
+            public Integer bookId;
             public String packName;
             public Integer packLikes;
+            public Boolean liked;
             public Boolean shared;
+
+            public UserPackListItem(PackModel packModel){
+                packName=packModel.getName();
+                packId=packModel.getPackId();
+                bookId=packModel.getBookId();
+                shared=packModel.getShared()!=0;
+            }
         }
         public Integer count;
         public List<UserPackListItem> packs;
@@ -114,11 +123,29 @@ public class PackController {
 
         UserPackListResponse response=new UserPackListResponse();
         response.packs=packRepository.findAllByOwnerId(userId, Sort.unsorted()).stream().map(packModel -> {
-            UserPackListResponse.UserPackListItem item=new UserPackListResponse.UserPackListItem();
-            item.packName=packModel.getName();
+            UserPackListResponse.UserPackListItem item=new UserPackListResponse.UserPackListItem(packModel);
             item.packLikes=userPackLikeRepository.countAllByPackId(packModel.getPackId());
-            item.packId=packModel.getPackId();
-            item.shared=packModel.getShared()!=0;
+            item.liked=userPackLikeRepository.existsUserPackLikeModelByUserIdAndPackId(userId,packModel.getPackId());
+            return item;
+        }).toList();
+        response.count=response.packs.size();
+
+        return response;
+    }
+
+    @GetMapping("/user/{userid}/{bookid}")
+    public UserPackListResponse getUserPackListByBook(@PathVariable("userid") Integer userId,
+                                                      @PathVariable("bookid") Integer bookId) throws UniversalBadReqException {
+
+        if(!userRepository.existsById(userId)) throw new UniversalBadReqException("No such user");
+
+        if(!bookRepository.existsById(bookId)) throw new UniversalBadReqException("No such book");
+
+        UserPackListResponse response=new UserPackListResponse();
+        response.packs=packRepository.findAllByOwnerIdAndBookId(userId,bookId).stream().map(packModel -> {
+            UserPackListResponse.UserPackListItem item=new UserPackListResponse.UserPackListItem(packModel);
+            item.packLikes=userPackLikeRepository.countAllByPackId(packModel.getPackId());
+            item.liked=userPackLikeRepository.existsUserPackLikeModelByUserIdAndPackId(userId,packModel.getPackId());
             return item;
         }).toList();
         response.count=response.packs.size();
