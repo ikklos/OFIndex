@@ -16,7 +16,7 @@ public class BookModel implements Serializable {
     private static final long serialVersionUID=1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="bookid")
     private Integer bookId;
 
@@ -47,5 +47,4 @@ public class BookModel implements Serializable {
     @Column(name="class")
     @Setter
     private Integer bookClass;
-
 }

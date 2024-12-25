@@ -20,7 +20,7 @@ public class ForumMessageModel implements Serializable {
     private static final long serialVersionUID=1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="messageid")
     private Integer messageId;
 

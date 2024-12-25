@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -98,38 +99,43 @@ public class SearchController {
         String searchText="%"+request.text+"%";
         if(request.bookClass==null){
             books=bookRepository.findBookModelsByNameLike(searchText);
+            books.addAll(bookRepository.findBookModelsByTagsLike(searchText));
+            books.addAll(bookRepository.findBookModelsByDescriptionLike(searchText));
         }else{
             books=bookRepository.findBookModelsByBookClassAndNameLike(request.bookClass, searchText);
+            books.addAll(bookRepository.findBookModelsByBookClassAndTagsLike(request.bookClass, searchText));
+            books.addAll(bookRepository.findBookModelsByBookClassAndDescriptionLike(request.bookClass, searchText));
         }
-        books.addAll(bookRepository.findBookModelsByTagsLike(searchText));
-        books.addAll(bookRepository.findBookModelsByDescriptionLike(searchText));
+        books=books.stream().distinct().toList();
 
         int from=request.page*request.count;
         int to=from+request.count;
 
-        if(from>=books.size()) throw new UniversalBadReqException("No enough book");
+        if(from<books.size()) {
 
-        if(to>=books.size())to=books.size();
+            if (to >= books.size()) to = books.size();
 
-        response.items=books.subList(from,to).stream().map(
-                bookModel -> {
-                    SearchBookResponse.RespItem item=new SearchBookResponse.RespItem();
-                    item.id=bookModel.getBookId();
-                    item.author=bookModel.getAuthor();
-                    item.cover=bookModel.getCover();
-                    ObjectMapper objectMapper=new ObjectMapper();
-                    JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
-                    try {
-                        item.tags=objectMapper.readValue(bookModel.getTags(),javaType);
-                    } catch (JsonProcessingException e) {
-                        Logger.getGlobal().log(Level.WARNING,"Book contains illegal tags!bookId:"+bookModel.getBookId());
-                        return null;
+            response.items = books.subList(from, to).stream().map(
+                    bookModel -> {
+                        SearchBookResponse.RespItem item = new SearchBookResponse.RespItem();
+                        item.id = bookModel.getBookId();
+                        item.author = bookModel.getAuthor();
+                        item.cover = bookModel.getCover();
+                        ObjectMapper objectMapper = new ObjectMapper();
+                        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
+                        try {
+                            item.tags = objectMapper.readValue(bookModel.getTags(), javaType);
+                        } catch (JsonProcessingException e) {
+                            Logger.getGlobal().log(Level.WARNING, "Book contains illegal tags!bookId:" + bookModel.getBookId());
+                            return null;
+                        }
+                        item.name = bookModel.getName();
+                        item.description = bookModel.getDescription();
+                        return item;
                     }
-                    item.name=bookModel.getName();
-                    item.description=bookModel.getDescription();
-                    return item;
-                }
-        ).toList();
+            ).toList();
+        }else
+            response.items = new ArrayList<>();
 
         response.message="Result found";
         response.count=response.items.size();

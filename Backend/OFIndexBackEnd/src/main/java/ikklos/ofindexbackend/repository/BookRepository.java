@@ -13,7 +13,10 @@ public interface BookRepository extends JpaRepository<BookModel,Integer> {
 
     List<BookModel> findBookModelsByNameLike(String name);
 
+    List<BookModel> findBookModelsByBookClassAndTagsLike(Integer bookClass, String tags);
     List<BookModel> findBookModelsByTagsLike(String tags);
+
+    List<BookModel> findBookModelsByBookClassAndDescriptionLike(Integer bookClass, String description);
     List<BookModel> findBookModelsByDescriptionLike(String description);
 
 }

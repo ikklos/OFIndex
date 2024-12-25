@@ -72,6 +72,7 @@ public class ForumPostController {
             JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
             tags= objectMapper.readValue(postModel.getTags(),javaType);
             images =objectMapper.readValue(postModel.getImageurls(),javaType);
+            if(images==null)images=new ArrayList<>();
             return this;
         }
 
@@ -182,25 +183,24 @@ public class ForumPostController {
         int from=page*pagesize;
         int to=from+pagesize;
 
-        if(from>=posts.size()){
-            throw new UniversalBadReqException("No enough post");
-        }
+        if(from<posts.size()){
+            if(to>=posts.size())to=posts.size();
 
-        if(to>=posts.size())to=posts.size();
-
-        response.posts=posts.subList(from,to).stream().map(postModel -> {
-            try {
-                PostGetResponse item=new PostGetResponse().setByModel(postModel);
-                var userO=userRepository.findById(postModel.getUserId());
-                if(userO.isPresent()){
-                    item.setByModel(userO.get());
-                    item.setLikes(userPostLikeRepository,userO.get().getUserid());
+            response.posts=posts.subList(from,to).stream().map(postModel -> {
+                try {
+                    PostGetResponse item=new PostGetResponse().setByModel(postModel);
+                    var userO=userRepository.findById(postModel.getUserId());
+                    if(userO.isPresent()){
+                        item.setByModel(userO.get());
+                        item.setLikes(userPostLikeRepository,userO.get().getUserid());
+                    }
+                    return item;
+                } catch (JsonProcessingException e) {
+                    return null;
                 }
-                return item;
-            } catch (JsonProcessingException e) {
-                return null;
-            }
-        }).filter(Objects::nonNull).toList();
+            }).filter(Objects::nonNull).toList();
+        }else
+            response.posts=new ArrayList<>();
         response.count=response.posts.size();
         response.total=posts.size();
         return response;

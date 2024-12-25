@@ -7,6 +7,7 @@ import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -48,19 +49,24 @@ public class RegisterController {
 
         userRepository.save(user);
         Integer id=user.getUserid();
+        try{
 
-        ShelfModel history=new ShelfModel();
-        history.setUserId(id);
-        history.setIndex(0);
-        history.setName("history");
+            ShelfModel history=new ShelfModel();
+            history.setUserId(id);
+            history.setIndex(0);
+            history.setName("history");
 
-        ShelfModel defaultShelf=new ShelfModel();
-        defaultShelf.setUserId(id);
-        defaultShelf.setIndex(1);
-        defaultShelf.setName("Default");
+            ShelfModel defaultShelf=new ShelfModel();
+            defaultShelf.setUserId(id);
+            defaultShelf.setIndex(1);
+            defaultShelf.setName("Default");
 
-        shelfRepository.save(history);
-        shelfRepository.save(defaultShelf);
+            shelfRepository.save(history);
+            shelfRepository.save(defaultShelf);
+        }catch (DataIntegrityViolationException ex){
+            userRepository.delete(user);
+            throw ex;
+        }
 
         RegisterResponse response=new RegisterResponse();
         response.message="Register success";
