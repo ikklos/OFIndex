@@ -21,7 +21,8 @@ const showDialog = ref(false);
 const newName = ref('');
 const needRect = ref(false);
 let emit = defineEmits([
-    'updateData'
+    'updateData',
+    'jumpToPage',
 ]);
 const goDeep = function (id) {
   for(let i = 0; i < reactiveData.value.length; i++) {
@@ -75,6 +76,9 @@ const handleCreateLinkedNote = ()=>{
 }
 const handleUpdate = ()=>{
   emit('updateData',innerData.value);
+}
+const jumpPage = (option)=>{
+  emit('jumpToPage',option)
 }
 watch(props.data, (value) => {
   if(value){
@@ -131,16 +135,29 @@ onMounted(()=>{
               回到上一级<el-icon @click="goBack" class="clickable back-icon"><CaretLeft/></el-icon>
             </div>
           </div>
-          <div v-for="(item,index) in reactiveData" @click="goDeep(item.id)" class="item-div clickable">
-            <div class="item-inner" style="font-size: large; color: #1a1a1a">
-              {{item.name}}
-            </div>
+          <div v-for="(item,index) in reactiveData" class="item-div">
+            <el-row>
+              <el-col :span="20">
+                <div class="item-inner clickable" @click="goDeep(item.id)" style="font-size: large; color: #1a1a1a">
+                  {{item.name}}
+                </div>
+              </el-col>
+              <el-col :span="4">
+                <el-button icon="Search" color="#3621ef" v-if="item.rect!==null" @click="jumpPage(item.rect)" size="small"></el-button>
+              </el-col>
+            </el-row>
           </div>
           <div class="item-div">
-            <div class="item-inner">
-              <el-button color="#3621ef" icon="Plus" @click="()=>{showDialog=true}"></el-button>
-              按P键可框选区域创建关联式笔记
-            </div>
+            <el-row>
+              <el-col :span="20">
+                <div class="item-inner">
+                  按P键可框选区域创建关联式笔记
+                </div>
+              </el-col>
+              <el-col :span="4">
+                <el-button color="#3621ef" icon="Plus" @click="()=>{showDialog=true}" size="small"></el-button>
+              </el-col>
+            </el-row>
           </div>
         </el-scrollbar>
         <el-dialog v-model="showDialog" @closed="()=>{newName='';}" title="输入笔记内容" width="500">
@@ -165,7 +182,11 @@ onMounted(()=>{
   padding: 5px;
 }
 .item-inner{
+  box-sizing: border-box;
+  height: 100%;
   background: #f7f6bf;
+  border-radius: 5px;
+  padding: 0 5px 0 5px;
 }
 .clickable{
   cursor: pointer;

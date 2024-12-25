@@ -5,7 +5,7 @@ import {useRoute,useRouter} from "vue-router";
 import axiosApp from "@/main.js";
 import VuePdfEmbed from 'vue-pdf-embed'
 import {ElMessage, ElCollapseTransition} from "element-plus";
-import {EditPen, Minus, Plus} from "@element-plus/icons-vue";
+import {CaretLeft, EditPen, Minus, Plus} from "@element-plus/icons-vue";
 import axios from "axios";
 import NoteSideBar from "@/components/reading-pages/NoteSideBar.vue";
 import DiagramSideBar from "@/components/reading-pages/DiagramSideBar.vue";
@@ -50,6 +50,7 @@ const showAddPackDialog = ref(false);
 const showSideBar = ref(false);
 const showMask = ref(false);
 const showLightMask = ref(false);
+const showYLMask = ref(false);
 const loading = ref(false);
 
 const tabPaneName = ref('side-note');
@@ -70,9 +71,6 @@ const packCount = computed(()=>{
   return packList.value.length;
 });
 
-const handleLoaded = function ({numPages}){
-  maxPage.value = numPages;
-}
 
 const fillWidth = function () {
   const main = document.getElementById("read-index-main");
@@ -91,6 +89,7 @@ const fillHeight = function () {
     pdfWidth.value = null;
   }
 }
+
 const loadPack = (id) => {
   if(id !== undefined && id !== null){
     axiosApp.get('/pack/'+id).then(res=>{
@@ -106,6 +105,7 @@ const loadPack = (id) => {
     })
   }
 }
+
 const loadPackList = ()=>{
   axiosApp.get('/user').then(res=>{
     axiosApp.get('/pack/user/'+res.data.userId).then(response=>{
@@ -126,6 +126,7 @@ const loadPackList = ()=>{
     }
   })
 }
+
 const createPack = ()=>{
   if(newPackName.value.length > 0){
     let data = {
@@ -160,6 +161,7 @@ const createPack = ()=>{
     ElMessage.error('资源包名字不能为空')
   }
 }
+
 //完成content和packData的装载，上传
 const updatePack = ()=>{
   console.log('packContent:',packContent.value);
@@ -228,11 +230,13 @@ const onResizingMouseDown = function (event) {
   addEventListener('mousemove',onResizingMouseMove);
   addEventListener('mouseup',onResizingMouseUp);
 }
+
 const onResizingMouseUp = function (event) {
   dragging.value = false;
   removeEventListener('mousemove',onResizingMouseMove);
   removeEventListener('mouseup',onResizingMouseUp);
 }
+
 const onResizingMouseMove = function (event) {
   if (!dragging.value) return;
   let axisX = event.clientX;
@@ -245,6 +249,7 @@ const onResizingMouseMove = function (event) {
     }
   }
 }
+
 const handleMouseDown = (event) => {
   let elementPdfArea = document.getElementById('pdf-area');
   let rect = null;
@@ -274,6 +279,7 @@ const handleMouseDown = (event) => {
   addEventListener('mousemove',handleMouseMove);
   addEventListener('mouseup',handleMouseUp);
 }
+
 const handleMouseUp = (event) => {
   noteBarRef.value.handleCreateLinkedNote(true);
   let elementLightMask = document.getElementById('light-mask');
@@ -289,6 +295,7 @@ const handleMouseUp = (event) => {
   removeEventListener('mousemove',handleMouseMove);
   removeEventListener('mouseup',handleMouseUp);
 }
+
 const handleMouseMove = (event) => {
   let elementPdfArea = document.getElementById('pdf-area');
   let rect = null;
@@ -313,15 +320,22 @@ const handleMouseMove = (event) => {
     }
   }
 }
-const handleCreateLinkNote = () => {
-  showMask.value = true;
-  addEventListener('mousedown',handleMouseDown);
-}
+
 const handleKeyPressP = (event) => {
   if(event.key === 'p' || event.key === 'P'){
     handleCreateLinkNote();
   }
 }
+
+const handleCreateLinkNote = () => {
+  showMask.value = true;
+  addEventListener('mousedown',handleMouseDown);
+}
+
+const handleLoaded = function ({numPages}){
+  maxPage.value = numPages;
+}
+
 const handleTabChange = (name)=>{
   if(name === 'side-note'){
     addEventListener('keypress',handleKeyPressP);
@@ -341,6 +355,7 @@ const handleTabChange = (name)=>{
     fn().finally(() => (loading.value = false))
   }
 }
+
 const handleSwitchShowSideBar = ()=>{
   showSideBar.value = !showSideBar.value
   if(showSideBar.value){
@@ -351,6 +366,74 @@ const handleSwitchShowSideBar = ()=>{
     removeEventListener('keypress',handleKeyPressP);
   }
 }
+
+const handleJumpToPage = (option)=>{
+  try{
+    const pdf = document.getElementById("pdf-area");
+    if(!pdf){
+      throw new Error('获取pdf区域失败');
+    }
+    else {
+      let rect = pdf.getBoundingClientRect();
+      if(rect.width > rect.height){
+        fillWidth();
+      }else{
+        fillHeight();
+      }
+      if(option.page <= maxPage.value && option.page >= 1){
+        currentPage.value = option.page;
+        const fn = async () => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              showYellowLightMask(option);
+            },500);
+          })
+        }
+        fn();
+      }else {
+        throw new Error('跳转失败，找不到页码');
+      }
+    }
+  }catch(e){
+    ElMessage.error('跳转失败'+ e );
+    console.log(e);
+  }
+}
+
+const showYellowLightMask = (option)=>{
+  let mask = document.getElementById('yellow-light-mask');
+  let pdfArea = document.getElementById('pdf-area');
+  if(mask && pdfArea){
+    let pdfRect = pdfArea.getBoundingClientRect();
+    let x = pdfRect.left + pdfRect.width * option.x;
+    let y = pdfRect.top + pdfRect.height * option.y;
+    let width = pdfRect.width * option.width;
+    let height = pdfRect.height * option.height;
+    mask.style.left = x+'px';
+    mask.style.top = y+'px';
+    mask.style.width = width+'px';
+    mask.style.height = height+'px';
+    const func = async () => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          showYLMask.value = false;
+        },800)
+      })
+    }
+    showYLMask.value = true;
+    func().finally(() => {
+      mask.style.left = '0';
+      mask.style.top = '0';
+      mask.style.width = '0';
+      mask.style.height = '0';
+    });
+  }
+}
+
+const jumpBack = () => {
+  router.back();
+}
+
 watch(currentPage,(newVal, oldVal)=>{
   draggingRect.page = newVal;
 });
@@ -381,6 +464,11 @@ watch(currentPage,(newVal, oldVal)=>{
                         @click="handleSwitchShowSideBar">
               <el-icon>
                 <EditPen/>
+              </el-icon>
+            </el-button>
+            <el-button style="height: 40px; width: 40px; font-size: 20px;" @click="jumpBack" color="#3621ef" circle>
+              <el-icon>
+                <CaretLeft></CaretLeft>
               </el-icon>
             </el-button>
           </div>
@@ -416,10 +504,12 @@ watch(currentPage,(newVal, oldVal)=>{
             <el-main v-if="packCount > 0">
               <el-tabs v-model="tabPaneName" tab-position="bottom" style="height: 100%; width: 100%;" @tab-change="handleTabChange">
                 <el-tab-pane label="笔记" name="side-note">
-                  <note-side-bar ref="noteBarRef" :data="packContent" :rect="draggingRect" @update-data="(newData)=>{
-                    packContent.note = JSON.parse(JSON.stringify(newData));
-                    updatePack();
-                  }">
+                  <note-side-bar ref="noteBarRef" :data="packContent" :rect="draggingRect"
+                                 @update-data="(newData)=>{
+                                    packContent.note = JSON.parse(JSON.stringify(newData));
+                                    updatePack();
+                                 }"
+                                 @jump-to-page="handleJumpToPage">
                   </note-side-bar>
                 </el-tab-pane>
                 <el-tab-pane label="思维导图" name="side-mind-map">
@@ -454,6 +544,9 @@ watch(currentPage,(newVal, oldVal)=>{
   </el-container>
   <div class="dark-mask" v-show="showMask"></div>
   <div class="light-mask" id="light-mask" v-show="showLightMask"></div>
+  <transition name="el-fade-in">
+    <div class="yellow-light-mask" id="yellow-light-mask" v-show="showYLMask"></div>
+  </transition>
 </template>
 
 <style scoped>
@@ -537,5 +630,16 @@ watch(currentPage,(newVal, oldVal)=>{
   width: 0;
   height: 0;
   background: rgba(256,256,256,0.2);
+}
+.yellow-light-mask{
+  z-index: 200;
+  position: absolute;
+  top:0;
+  left:0;
+  width: 0;
+  height: 0;
+  border-radius: 20px;
+  background: rgba(231,226,15,0.5);
+  transition: all 0.2s ease-in-out;
 }
 </style>
