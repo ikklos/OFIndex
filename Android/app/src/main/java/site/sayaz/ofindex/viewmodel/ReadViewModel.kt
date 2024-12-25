@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import okio.Buffer
 import okio.source
+import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.data.repository.ReadRepository
 import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
@@ -40,6 +41,9 @@ class ReadViewModel(
     private val _selectedTab = MutableStateFlow<Int>(0)
     val selectedTab: StateFlow<Int> = _selectedTab.asStateFlow()
 
+    private val _pack = MutableStateFlow<Pack?>(null)
+    val pack: StateFlow<Pack?> = _pack.asStateFlow()
+
 
     fun toggleBottomBarVisibility(isBottomBarVisible: Boolean) {
         _isBottomBarVisible.value = isBottomBarVisible
@@ -54,6 +58,9 @@ class ReadViewModel(
     }
 
     fun loadBook(bookId: Long) {
+        _downloadProgress.value = 0f
+        _pdfBytes.value = null
+
         viewModelScope.launch(Dispatchers.IO) {
             readRepository.loadBook(bookId).onSuccess { response ->
                 val body = response.body()
@@ -67,7 +74,18 @@ class ReadViewModel(
         }
     }
 
-    fun clearBytes(){
-        _pdfBytes.value = null
+
+    fun loadPack(packID: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            readRepository.loadPack(packID).onSuccess { response ->
+                val body = response.body()
+                if (body != null) {
+                    _pack.value = body
+                    Log.d(TAG, "loadPack: $body")
+                }
+            }.onFailure {
+                Log.e(TAG, "loadPack: $it")
+            }
+        }
     }
 }

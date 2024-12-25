@@ -9,6 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.data.model.Post
 import site.sayaz.ofindex.data.remote.request.AddPostRequest
 import site.sayaz.ofindex.data.remote.request.LoginRequest
@@ -99,6 +100,9 @@ interface ApiService {
 
     @GET("/user")
     suspend fun user():Response<UserInfoResponse>
+
+    @GET("/pack/{packid}")
+    suspend fun packDetail(@Path("packid") packid:Long):Response<Pack>
 
 
 }

@@ -10,4 +10,7 @@ data class Pack (
     val name: String? = " ",
     val packId: Long? = -1,
     val description: String? = " ",
+    val likes: Long? = 0,
+    val content: String? = "",
 )
+

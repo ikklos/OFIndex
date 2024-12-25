@@ -155,7 +155,8 @@ fun AppNavigation(
                         readViewModel, bookID.toLong(),
                         onNavigateBack = {
                             navController.popBackStack()
-                        }
+                        },
+                        packID = it.arguments?.getString("packID")?.toLong()
                     )
                 } else {
                     Toast.makeText(LocalContext.current, "bookID is null", Toast.LENGTH_SHORT)

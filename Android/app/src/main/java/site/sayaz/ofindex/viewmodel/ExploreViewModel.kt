@@ -80,22 +80,24 @@ class ExploreViewModel(
                     val searchResponse = response.body()
                     if (searchResponse != null) {
                         val newResults = searchResponse.items
-                        if (newResults.isEmpty()) {
-                            hasMore = false
-                        } else {
-                            _searchResults.update { currentList ->
-                                currentList + newResults.map {
-                                    Book(
-                                        bookId = it.id,
-                                        name = it.name,
-                                        author = it.author,
-                                        description = it.description,
-                                        cover = it.cover,
-                                        tag = it.tags
-                                    )
-                                }.distinctBy { it.bookId }
+                        if (newResults != null) {
+                            if (newResults.isEmpty()) {
+                                hasMore = false
+                            } else {
+                                _searchResults.update { currentList ->
+                                    currentList + newResults.map {
+                                        Book(
+                                            bookId = it.id?:0,
+                                            name = it.name?:"",
+                                            author = it.author?:"",
+                                            description = it.description?:"",
+                                            cover = it.cover?:"",
+                                            tag = it.tags?: emptyList()
+                                        )
+                                    }.distinctBy { it.bookId }
+                                }
+                                currentPage++
                             }
-                            currentPage++
                         }
                     } else {
                         Log.e(TAG, "search: ${response.code()}")

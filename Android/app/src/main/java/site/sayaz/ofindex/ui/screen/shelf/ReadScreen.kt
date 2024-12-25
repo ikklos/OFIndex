@@ -1,5 +1,6 @@
 package site.sayaz.ofindex.ui.screen.shelf
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import site.sayaz.ofindex.R
+import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.data.remote.RetrofitInstance
 import site.sayaz.ofindex.ui.components.PDFView
 import site.sayaz.ofindex.ui.components.Loading
@@ -30,18 +32,28 @@ import site.sayaz.ofindex.viewmodel.ReadViewModel
 fun ReadScreen(
     readViewModel: ReadViewModel,
     bookID: Long,
+    packID: Long?,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val pdfBytes by readViewModel.pdfBytes.collectAsState()
     val downloadProgress by RetrofitInstance.progress.collectAsState()
     val isBottomBarVisible by readViewModel.isBottomBarVisible.collectAsState()
     val isTopBarVisible by readViewModel.isTopBarVisible.collectAsState()
     val selectedTab by readViewModel.selectedTab.collectAsState()
+    val pack by readViewModel.pack.collectAsState()
     var pageCount by remember { mutableIntStateOf(1) }
     val pagerState = rememberPagerState(pageCount = { pageCount })
 
+
     LaunchedEffect(bookID) {
         readViewModel.loadBook(bookID)
+    }
+    LaunchedEffect(packID) {
+        if (packID != null) {
+            readViewModel.loadPack(packID)
+        }
     }
 
     Scaffold(
@@ -53,7 +65,12 @@ fun ReadScreen(
             ) {
                 ReadTopBar(
                     onNavigateBack = onNavigateBack,
-                    onToggleBottomBar = {visible ->
+                    onToggleBottomBar = { visible ->
+                        if (pack == null) {
+                            Toast.makeText(context, "haven't choose pack", Toast.LENGTH_SHORT)
+                                .show()
+                            return@ReadTopBar
+                        }
                         readViewModel.toggleBottomBarVisibility(visible)
                     }
                 )
@@ -69,13 +86,13 @@ fun ReadScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black)
-                .clickable (
+                .clickable(
                     indication = null, // 禁用默认的点击指示
                     interactionSource = remember { MutableInteractionSource() } // 禁用交互源
-                ){ readViewModel.toggleTopBarVisibility(!isTopBarVisible) }, // 点击屏幕切换顶部栏可见性
+                ) { readViewModel.toggleTopBarVisibility(!isTopBarVisible) }, // 点击屏幕切换顶部栏可见性
             contentAlignment = Alignment.Center,
 
-        ) {
+            ) {
             if (pdfBytes != null) {
                 HorizontalPager(state = pagerState) { page ->
                     PDFView(
@@ -95,7 +112,7 @@ fun ReadScreen(
                 )
             }
         }
-        if(isBottomBarVisible){
+        if (isBottomBarVisible) {
             ReadBottomSheet(
                 selectedTab = selectedTab,
                 onDismissRequest = {
@@ -103,7 +120,8 @@ fun ReadScreen(
                 },
                 onTabSelected = {
                     readViewModel.selectTab(it)
-                }
+                },
+                pack = pack?: Pack()
             )
         }
 
