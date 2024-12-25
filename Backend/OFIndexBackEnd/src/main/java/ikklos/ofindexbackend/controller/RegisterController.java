@@ -42,6 +42,7 @@ public class RegisterController {
         UserModel user=new UserModel();
         user.setPasswd(registerRequest.passwd);
         user.setUsername(registerRequest.username);
+        user.setLevel(0);
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
 
