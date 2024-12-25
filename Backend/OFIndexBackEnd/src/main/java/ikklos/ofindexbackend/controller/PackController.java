@@ -2,10 +2,7 @@ package ikklos.ofindexbackend.controller;
 
 import ikklos.ofindexbackend.domain.*;
 import ikklos.ofindexbackend.repository.*;
-import ikklos.ofindexbackend.utils.JwtUtils;
-import ikklos.ofindexbackend.utils.PackContentResponse;
-import ikklos.ofindexbackend.utils.UniversalBadReqException;
-import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -97,7 +94,9 @@ public class PackController {
             throw new UniversalBadReqException("No such resource pack");
         }
 
-        if(!Objects.equals(packO.get().getOwnerId(), userid))throw new UniversalBadReqException("Not your resource pack");
+        if(!Objects.equals(packO.get().getOwnerId(), userid)
+            && !UserPermissions.isPermissionEnough(userRepository,userid,5))
+            throw new UniversalBadReqException("Not your resource pack");
 
         packRepository.delete(packO.get());
 

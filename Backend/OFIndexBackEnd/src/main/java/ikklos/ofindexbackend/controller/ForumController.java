@@ -9,6 +9,7 @@ import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -121,8 +122,9 @@ public class ForumController {
         if(messageO.isEmpty())throw new UniversalBadReqException("No such message");
         ForumMessageModel forumMessageModel= messageO.get();
 
-        if(!Objects.equals(forumMessageModel.getReceiverId(), userId))
-            throw new UniversalBadReqException("Not your message");
+        if(!Objects.equals(forumMessageModel.getReceiverId(), userId)
+            && !UserPermissions.isPermissionEnough(userRepository,userId,5))
+            throw new UniversalBadReqException("Permission denied");
 
         forumMessageModel.setIsRead(1);
 

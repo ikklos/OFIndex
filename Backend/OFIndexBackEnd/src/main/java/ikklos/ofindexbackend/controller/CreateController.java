@@ -10,6 +10,7 @@ import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -61,15 +62,8 @@ public class CreateController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
-        var userO=userRepository.findById(userId);
-        if(userO.isEmpty()){
-            throw new UniversalBadReqException("No such user");
-        }
-        UserModel userModel=userO.get();
-
-        //TODO add privilege level
-        if(userModel.getLevel()<5){
-            throw new UniversalBadReqException("Not Administrator");
+        if(!UserPermissions.isPermissionEnough(userRepository,userId,6)){
+            throw new UniversalBadReqException("Permission denied");
         }
 
         if(!bookClassRepository.existsById(request.bookClass)){

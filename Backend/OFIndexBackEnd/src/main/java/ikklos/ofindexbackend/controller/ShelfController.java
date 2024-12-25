@@ -5,9 +5,11 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.ShelfBookRepository;
 import ikklos.ofindexbackend.repository.ShelfRepository;
+import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping(value = "/shelf",produces = "application/json")
 public class ShelfController {
+
 
     public static class ShelfBook{
         public int bookId;
@@ -64,14 +67,17 @@ public class ShelfController {
     private final ShelfRepository shelfRepository;
     private final ShelfBookRepository shelfBookRepository;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public ShelfController(ShelfRepository shelfRepository,
                            ShelfBookRepository shelfBookRepository,
-                           BookRepository bookRepository){
+                           BookRepository bookRepository,
+                           UserRepository userRepository){
         this.shelfRepository=shelfRepository;
         this.shelfBookRepository=shelfBookRepository;
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -211,8 +217,9 @@ public class ShelfController {
             throw new UniversalBadReqException("No such shelf");
         }
 
-        if(!Objects.equals(shelf.get().getUserId(), userid)){
-            throw new UniversalBadReqException("Not your shelf");
+        if(!Objects.equals(shelf.get().getUserId(), userid)
+            && !UserPermissions.isPermissionEnough(userRepository,userid,5)){
+            throw new UniversalBadReqException("Permission denied");
         }
 
         if(!bookRepository.existsById(request.bookId)){
