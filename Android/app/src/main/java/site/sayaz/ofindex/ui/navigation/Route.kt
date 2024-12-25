@@ -10,9 +10,12 @@ object Route {
     fun register() = "register"
 
     fun read() = "reader/{bookID}"
-    fun read(bookID: Long) = "reader/$bookID"
+    fun read(bookID: String) = "reader/$bookID"
     fun bookDetail() = "bookDetail/{bookID}"
-    fun bookDetail(bookID: Long) = "bookDetail/$bookID"
+    fun bookDetail(bookID: String) = "bookDetail/$bookID"
+    fun forumDetail() = "forumDetail/{postID}"
+    fun forumDetail(postID: String) = "forumDetail/$postID"
+    fun addPost() = "addPost"
 
 
 

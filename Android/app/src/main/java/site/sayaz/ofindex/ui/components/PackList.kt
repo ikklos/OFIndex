@@ -65,14 +65,14 @@ fun PackView(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = pack.name,
+                text = pack.name?:"",
                 style = Typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = pack.description,
+                text = pack.description?:"",
                 style = Typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,

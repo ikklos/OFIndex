@@ -3,6 +3,9 @@ package site.sayaz.ofindex.ui.screen.bookDetail
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -18,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import site.sayaz.ofindex.R
+import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.ui.components.BookView
 import site.sayaz.ofindex.ui.components.ButtonWithLabel
 import site.sayaz.ofindex.ui.components.PackView
@@ -34,14 +38,28 @@ fun BookDetailScreen(
 ) {
     val book by bookDetailViewModel.bookDetail.collectAsState()
     val packList by bookDetailViewModel.packList.collectAsState()
-    LaunchedEffect(Unit) {
+    val isLiked by bookDetailViewModel.isLiked.collectAsState()
+    val shelfList by bookDetailViewModel.shelfList.collectAsState()
+    val bookInShelfList by bookDetailViewModel.bookInShelfList.collectAsState()
+    val userPackList by bookDetailViewModel.userPackList.collectAsState()
+    val chosenPack by bookDetailViewModel.chosenPack.collectAsState()
+
+
+    val likeListExpanded = remember { mutableStateOf(false) }
+    val unLikeListExpanded = remember { mutableStateOf(false) }
+    val packListExpanded = remember { mutableStateOf(false) }
+
+    LaunchedEffect(bookId) {
         bookDetailViewModel.getBookDetail(bookId)
         bookDetailViewModel.getPackList(bookId)
+        bookDetailViewModel.findBook(bookId)
+        bookDetailViewModel.getUserPackList(bookId)
     }
+    LaunchedEffect(Unit) { bookDetailViewModel.getSimpleShelf() }
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},//no title
+                title = { book.name },
                 navigationIcon = {
                     IconButton(onClick = {
                         onNavigateBack()
@@ -74,29 +92,96 @@ fun BookDetailScreen(
                     .padding(0.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ButtonWithLabel(
-                    iconResId = R.drawable.baseline_favorite_border_24,
-                    label = "add to shelf",
-                    onClick = { /* Handle add to shelf click */ }
-                )
-                ButtonWithLabel(
-                    iconResId = R.drawable.package_2_24px,
-                    label = "choose pack",
-                    onClick = { /* Handle choose pack click */ }
-                )
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                    ButtonWithLabel(
+                        iconResId = R.drawable.baseline_favorite_border_24,
+                        label = "add to shelf",
+                        onClick = { likeListExpanded.value = true }
+                    )
+                    DropdownMenu(
+                        expanded = likeListExpanded.value,
+                        onDismissRequest = { likeListExpanded.value = false }) {
+                        shelfList.forEach { shelf ->
+                            DropdownMenuItem(
+                                text = { Text(shelf.name) },
+                                onClick = {
+                                    bookDetailViewModel.addBook(bookId, shelf.booklistID)
+                                    likeListExpanded.value = false
+                                    unLikeListExpanded.value = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                    ButtonWithLabel(
+                        iconResId = R.drawable.baseline_favorite_24,
+                        label = "remove from shelf",
+                        onClick = { unLikeListExpanded.value = true }
+                    )
+                    DropdownMenu(
+                        expanded = unLikeListExpanded.value,
+                        onDismissRequest = { unLikeListExpanded.value = false }) {
+                        bookInShelfList.forEach { shelf ->
+                            DropdownMenuItem(
+                                text = { Text(shelf.name) },
+                                onClick = {
+                                    bookDetailViewModel.removeBook(bookId, shelf.booklistID)
+                                    likeListExpanded.value = false
+                                    unLikeListExpanded.value = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
+                    ButtonWithLabel(
+                        iconResId = R.drawable.package_2_24px,
+                        label = if (chosenPack == null) "choose pack" else chosenPack!!.name
+                            ?: "choose pack",
+                        onClick = { packListExpanded.value = true }
+                    )
+                    DropdownMenu(
+                        expanded = packListExpanded.value,
+                        onDismissRequest = { packListExpanded.value = false }) {
+                        userPackList.forEach { pack ->
+                            DropdownMenuItem(
+                                text = { Text(pack.packName ?: "packname") },
+                                onClick = {
+                                    bookDetailViewModel.choosePack(
+                                        Pack(
+                                            packId = pack.packID,
+                                            name = pack.packName
+                                        )
+                                    )
+                                    packListExpanded.value = false
+                                }
+                            )
+                        }
+
+
+                    }
+
+
+                }
+
+
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn {
-                items(packList.size) { index ->
-                    PackView(packList[index],
-                        onLikeClick = {
-                            bookDetailViewModel.likePack(packList[index].packId)
-                        },
-                        onAddClick = {
-                            bookDetailViewModel.addPack(packList[index].packId)
-                        })
+            if (packList.isNotEmpty()) {
+                LazyColumn {
+                    items(packList) { pack ->
+                        PackView(pack,
+                            onLikeClick = {
+                                bookDetailViewModel.likePack(pack.packId ?: -1)
+                            },
+                            onAddClick = {
+                                bookDetailViewModel.addPack(pack.packId ?: -1)
+                            })
+                    }
                 }
             }
+
         }
     }
 

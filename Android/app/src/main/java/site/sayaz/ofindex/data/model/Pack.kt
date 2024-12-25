@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Pack (
-    val authorAvatar: String,
-    val authorId: Long,
-    val name: String,
-    val packId: Long,
-    val description: String
+    val authorAvatar: String? = " ",
+    val authorId: Long? = -1,
+    val name: String? = " ",
+    val packId: Long? = -1,
+    val description: String? = " ",
 )

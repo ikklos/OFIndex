@@ -8,10 +8,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import site.sayaz.ofindex.data.model.Book
 import site.sayaz.ofindex.data.model.Class
 import site.sayaz.ofindex.data.remote.request.SearchRequest
+import site.sayaz.ofindex.data.remote.response.SearchBookItem
 import site.sayaz.ofindex.data.repository.ExploreRepository
 
 class ExploreViewModel(
@@ -30,11 +32,10 @@ class ExploreViewModel(
     val currentClass: StateFlow<Long> = _currentClass.asStateFlow()
 
     private val _showBottomSheet = MutableStateFlow(false)
-    val showBottomSheet:StateFlow<Boolean> = _showBottomSheet.asStateFlow()
+    val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
 
     private val _classList = MutableStateFlow<List<Class>>(emptyList())
     val classList: StateFlow<List<Class>> = _classList.asStateFlow()
-
 
 
     fun updateSearchQuery(query: String) {
@@ -51,7 +52,7 @@ class ExploreViewModel(
         search(searchQuery.value, bookClass, true)
     }
 
-    fun toggleBottomSheet(show:Boolean){
+    fun toggleBottomSheet(show: Boolean) {
         _showBottomSheet.value = show
     }
 
@@ -82,14 +83,25 @@ class ExploreViewModel(
                         if (newResults.isEmpty()) {
                             hasMore = false
                         } else {
-                            _searchResults.value += newResults
+                            _searchResults.update { currentList ->
+                                currentList + newResults.map {
+                                    Book(
+                                        bookId = it.id,
+                                        name = it.name,
+                                        author = it.author,
+                                        description = it.description,
+                                        cover = it.cover,
+                                        tag = it.tags
+                                    )
+                                }.distinctBy { it.bookId }
+                            }
                             currentPage++
                         }
-                    }else{
+                    } else {
                         Log.e(TAG, "search: ${response.code()}")
                     }
                 }
-                .onFailure { e->
+                .onFailure { e ->
                     Log.e(TAG, "search: $e")
                 }
             isLoading = false
@@ -97,19 +109,19 @@ class ExploreViewModel(
         }
     }
 
-    fun getClassList(){
-        viewModelScope.launch(Dispatchers.IO){
+    fun getClassList() {
+        viewModelScope.launch(Dispatchers.IO) {
             val result = exploreRepository.getClassList()
             result
                 .onSuccess { response ->
                     val classListResponse = response.body()
                     if (classListResponse != null) {
                         _classList.value = classListResponse.items
-                    }else{
+                    } else {
                         Log.e(TAG, "getClassList: ${response.code()}")
                     }
                 }
-                .onFailure { e->
+                .onFailure { e ->
                     Log.e(TAG, "getClassList: $e")
                 }
         }

@@ -23,6 +23,16 @@ function generateBooks(count) {
     }).books;
 }
 
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    console.log(req.body);
+        return res.json({
+            result: true,
+            message: "Login success",
+            token: "1234567890"
+        });
+});
+
 
 // 模拟搜索接口
 app.post('/search', (req, res) => {
@@ -30,7 +40,7 @@ app.post('/search', (req, res) => {
     //print body
     console.log(req.body);
     // 验证请求参数
-    
+
 
     if (typeof bookClass !== 'number' || bookClass < 0) {
         console.log("inv bookclass")
@@ -87,8 +97,8 @@ app.post('/search', (req, res) => {
 // 定义硬编码的图书类别
 const bookClasses = [
     {
-        id:0,
-        name:'全部'
+        id: 0,
+        name: '全部'
     },
     {
         id: 1,
@@ -143,7 +153,7 @@ app.get('/book/:id', (req, res) => {
         author: "Unknown",
         description: "GarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbageGarbage",
         cover: "https://i0.hdslb.com/bfs/new_dyn/7a4406b34701987f39b4614f23b08e782183230.jpg",
-        tag: ["tag1","tag2"],
+        tag: ["tag1", "tag2"],
         isbn: "114514",
         bookClass: 0
     });
@@ -163,74 +173,74 @@ app.get('/search/pack/:bookId', (req, res) => {
 
     // 返回响应
     res.json({
-            message: "null",
-            count: 2,
-            items: [
-                {
-                    packId: 0,
-                    name: "GenshinPack",
-                    authorId: 0,
-                    authorAvatar: "?",
-                    description: "null"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                },
-                {
-                    packId: 1,
-                    name: "WuWaPack",
-                    authorId: 52,
-                    authorAvatar: "null",
-                    description: "thisisadescription"
-                }
-            ]
-        
+        message: "null",
+        count: 2,
+        items: [
+            {
+                packId: 0,
+                name: "GenshinPack",
+                authorId: 0,
+                authorAvatar: "?",
+                description: "null"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            },
+            {
+                packId: 1,
+                name: "WuWaPack",
+                authorId: 52,
+                authorAvatar: "null",
+                description: "thisisadescription"
+            }
+        ]
+
     })
 });
 
@@ -352,15 +362,73 @@ function generateSampleData() {
         });
     }
 
-    return { 
-        message:"dsasadsda",
-        count: bookLists.length, items: bookLists 
+    return {
+        message: "dsasadsda",
+        count: bookLists.length, items: bookLists
     };
 }
 
 // API endpoint to return the generated data
 app.get('/shelf', (req, res) => {
     res.json(generateSampleData());
+});
+
+app.get('/forum/posts', (req, res) => {
+    res.json({
+        message: null,
+        count: 1,
+        total: 1,
+        posts: [
+            {
+                message: "sdasd",
+                postId: 152,
+                posterId: 52,
+                posterName: "督娟",
+                posterAvatar: "https://avatars.githubusercontent.com/u/61472523",
+                bookId: 0,
+                packId: 0,
+                tags: [
+                    "Mihoyo"
+                ],
+                title: "撑举没啃熟练甚至地址发型哼但是",
+                images: ["", ""],
+                likes: 0,
+                createTime: "2024-12-23T16:15:02"
+            },
+            {
+                message: "sdasd",
+                postId: 152,
+                posterId: 52,
+                posterName: "督娟",
+                posterAvatar: "https://avatars.githubusercontent.com/u/61472523",
+                bookId: 0,
+                packId: 0,
+                tags: [
+                    "Mihoyo"
+                ],
+                title: "撑举没啃熟练甚至地址发型哼但是",
+                images: ["", ""],
+                likes: 0,
+                createTime: "2024-12-23T16:15:02"
+            },
+            {
+                message: "sdasd",
+                postId: 152,
+                posterId: 52,
+                posterName: "督娟",
+                posterAvatar: "https://avatars.githubusercontent.com/u/61472523",
+                bookId: 0,
+                packId: 0,
+                tags: [
+                    "Mihoyo"
+                ],
+                title: "撑举没啃熟练甚至地址发型哼但是",
+                images: ["", ""],
+                likes: 0,
+                createTime: "2024-12-23T16:15:02"
+            },
+        ]
+    })
 });
 
 

@@ -83,6 +83,7 @@ fun BookViewPreview() {
         tag = emptyList(),
         isbn = "TODO()",
         bookClass = 1,
+        addTime = "TODO()",
     )
     Column {
         BookView(

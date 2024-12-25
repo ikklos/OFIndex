@@ -124,7 +124,7 @@ fun BookIntroduction(
         // Tags
         FlowRow {
             book.tag.forEach{tag ->
-                TagView(tag)
+                TagView(tag?:"tag")
             }
         }
     }

@@ -10,17 +10,26 @@ import site.sayaz.ofindex.viewmodel.ForumViewModel
 
 @Composable
 fun ForumTopBar(
-    forumViewModel: ForumViewModel
+    forumViewModel: ForumViewModel,
+    onNavigateAddPost: () -> Unit
 ){
     BaseTopBar(
         title = "Forum",
         actions = {
             IconButton(onClick = {
-
+                forumViewModel.refreshForumPosts()
             }) {
                 Icon(
                     painterResource(R.drawable.baseline_refresh_24),
                     contentDescription = "Refresh"
+                )
+            }
+            IconButton(onClick = {
+                onNavigateAddPost()
+            }) {
+                Icon(
+                    painterResource(R.drawable.baseline_add_24),
+                    contentDescription = "add post"
                 )
             }
         }
