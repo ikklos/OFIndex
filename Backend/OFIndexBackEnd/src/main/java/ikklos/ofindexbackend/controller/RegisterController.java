@@ -4,6 +4,7 @@ import ikklos.ofindexbackend.domain.ShelfModel;
 import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.repository.ShelfRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,21 +24,20 @@ public class RegisterController {
         public String id;
     }
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final ShelfRepository shelfRepository;
 
-    public RegisterController(@Autowired UserRepository repository,@Autowired ShelfRepository shelfRepository){
-        this.repository=repository;
+    @Autowired
+    public RegisterController(ShelfRepository shelfRepository,
+                              UserRepository userRepository){
+        this.userRepository =userRepository;
         this.shelfRepository=shelfRepository;
     }
 
     @PostMapping
-    public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest){
-        if(registerRequest.phoneNumber!=null&&repository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
-            RegisterResponse response = new RegisterResponse();
-            response.result = false;
-            response.message = "Exist Phone Number";
-            return response;
+    public RegisterResponse tryRegister(@RequestBody RegisterRequest registerRequest) throws UniversalBadReqException {
+        if(registerRequest.phoneNumber!=null&& userRepository.existsUserModelByPhonenum(registerRequest.phoneNumber)) {
+            throw new UniversalBadReqException("Exist Phone Number");
         }
         UserModel user=new UserModel();
         user.setPasswd(registerRequest.passwd);
@@ -45,7 +45,7 @@ public class RegisterController {
         if(registerRequest.phoneNumber!=null)
             user.setPhonenum(registerRequest.phoneNumber);
 
-        repository.save(user);
+        userRepository.save(user);
         Integer id=user.getUserid();
 
         ShelfModel history=new ShelfModel();
@@ -62,7 +62,6 @@ public class RegisterController {
         shelfRepository.save(defaultShelf);
 
         RegisterResponse response=new RegisterResponse();
-        response.result=true;
         response.message="Register success";
         response.id=id.toString();
         return response;

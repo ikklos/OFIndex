@@ -1,9 +1,13 @@
 package ikklos.ofindexbackend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
 import ikklos.ofindexbackend.repository.BookRepository;
 import ikklos.ofindexbackend.repository.PackRepository;
 import ikklos.ofindexbackend.repository.UserRepository;
+import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @CrossOrigin
@@ -23,6 +29,7 @@ public class SearchController {
         public String name;
         public Integer authorId;
         public String authorAvatar;
+        public String description;
     }
 
     public static class SearchPackResponse extends UniversalResponse {
@@ -39,11 +46,12 @@ public class SearchController {
 
     public static class SearchBookResponse extends UniversalResponse{
         public static class RespItem{
+            public Integer id;
             public String name;
             public String author;
             public String description;
             public String cover;
-            public String tag;
+            public List<String> tags;
         }
         public Integer count;
         public Integer totalResult;
@@ -54,7 +62,10 @@ public class SearchController {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    public SearchController(@Autowired PackRepository packRepository,@Autowired UserRepository userRepository,@Autowired BookRepository bookRepository){
+    @Autowired
+    public SearchController(PackRepository packRepository,
+                            UserRepository userRepository,
+                            BookRepository bookRepository){
         this.packRepository=packRepository;
         this.userRepository=userRepository;
         this.bookRepository=bookRepository;
@@ -77,9 +88,17 @@ public class SearchController {
         response.items=books.stream().map(
                 bookModel -> {
                     SearchBookResponse.RespItem item=new SearchBookResponse.RespItem();
+                    item.id=bookModel.getBookId();
                     item.author=bookModel.getAuthor();
                     item.cover=bookModel.getCover();
-                    item.tag=bookModel.getTags();
+                    ObjectMapper objectMapper=new ObjectMapper();
+                    JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
+                    try {
+                        item.tags=objectMapper.readValue(bookModel.getTags(),javaType);
+                    } catch (JsonProcessingException e) {
+                        Logger.getGlobal().log(Level.WARNING,"Book contains illegal tags!bookId:"+bookModel.getBookId());
+                        return null;
+                    }
                     item.name=bookModel.getName();
                     item.description=bookModel.getDescription();
                     return item;
@@ -94,18 +113,15 @@ public class SearchController {
     }
 
 
-    @PostMapping("/pack/{bookId}")
-    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId){
+    @GetMapping("/pack/{bookId}")
+    public SearchPackResponse searchPackByBook(@PathVariable("bookId") Integer bookId) throws UniversalBadReqException {
 
         SearchPackResponse response=new SearchPackResponse();
 
         if(!bookRepository.existsById(bookId)){
-            response.result=false;
-            response.message="Invalid Book ID";
-            return response;
+            throw new UniversalBadReqException("Invalid Book ID");
         }
 
-        response.result=true;
         response.message="Found Book";
 
         var packs=packRepository.findAllByBookId(bookId);
@@ -121,10 +137,12 @@ public class SearchController {
             ret.authorId=pack.getAuthorId();
             ret.name=pack.getName();
             ret.authorAvatar=author.get().getAvatar();
+            ret.description =pack.getDescription();
             return ret;
         }).filter(Objects::nonNull).toList();
 
         return response;
     }
+
 
 }

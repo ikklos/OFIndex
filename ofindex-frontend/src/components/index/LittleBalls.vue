@@ -56,19 +56,31 @@ const foldItems = function(){
     fold.value = true;
   }, 200);
 }
+//触发点击事件
+const emit = defineEmits([
+    'itemClicked'
+]);
+const handleClick = function (index){
+  emit('itemClicked',index);
+}
 </script>
 
 <template>
   <div class="circle" id="balls-root" @mouseover="showItems" @mouseleave="foldItems">
+    展开
   </div>
   <transition-group name="el-fade-in-linear">
-    <div v-for="(item,index) in menuItems" :key="index" :style="calPosition(index)" class="items" v-if ="!fold" @mouseover="showItems" @mouseleave="foldItems"></div>
+    <div v-for="(item,index) in menuItems" :key="index" :style="calPosition(index)" class="items" v-if ="!fold"
+         @mouseover="showItems" @mouseleave="foldItems" @click="handleClick(index)">
+      {{item.name}}
+    </div>
   </transition-group>
 
 </template>
 
 <style scoped>
 .circle{
+  display: flex;
   width: 3vw;
   height: 3vw;
   border-radius: 50%;
@@ -76,6 +88,9 @@ const foldItems = function(){
   transition:all 0.3s ease;
   min-width: 40px;
   min-height: 40px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 .circle:hover{
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -84,6 +99,7 @@ const foldItems = function(){
   transition: all 0.3s ease;
 }
 .items{
+  display: flex;
   position: absolute;
   height: 3vw;
   width: 3vw;
@@ -91,6 +107,9 @@ const foldItems = function(){
   border: 1px solid darkgray;
   min-width: 40px;
   min-height: 40px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 .items:hover{
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);

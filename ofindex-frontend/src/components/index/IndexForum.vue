@@ -5,7 +5,7 @@ import PostItem from "@/components/index/PostItem.vue";
 import PostEditPage from "@/components/index/PostEditPage.vue";
 
 let router = useRouter();
-const additionReqSize = 40;
+const additionReqSize = 10;
 //帖子列表
 const CommunityPostList = ref([]);
 const ReqForMore = function () {
@@ -25,7 +25,6 @@ const ReqForMore = function () {
       ]
     });
   }
-  console.log(CommunityPostList.value.length);
 }
 const jumpToDetail = function (id) {
   router.push('/index/detail/post-detail/' + id);
@@ -35,14 +34,16 @@ const jumpToDetail = function (id) {
 <template>
   <el-container>
     <el-main class="forum-main">
-      <el-scrollbar>
-        <div class="post-edit-out"><post-edit-page></post-edit-page></div>
-        <ul v-infinite-scroll="ReqForMore" class="post-list">
+      <div class="post-area">
+        <div class="post-edit-out">
+          <post-edit-page></post-edit-page>
+        </div>
+        <ul v-infinite-scroll="ReqForMore" class="post-list" :infinite-scroll-distance="20">
           <li v-for="(item,index) in CommunityPostList" :key="index" class="post-item">
             <post-item :post-data="item" @jump-to-detail="jumpToDetail"></post-item>
           </li>
         </ul>
-      </el-scrollbar>
+      </div>
     </el-main>
   </el-container>
 </template>
@@ -55,9 +56,6 @@ const jumpToDetail = function (id) {
   box-sizing: border-box;
 }
 
-.el-scrollbar {
-  height: calc(100vh - max(8vh, 60px));
-}
 .post-edit-out{
   display: flex;
   width: 100%;
@@ -65,6 +63,12 @@ const jumpToDetail = function (id) {
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
+}
+.post-area{
+  height: calc(100vh - max(8vh, 60px));
+}
+.post-edit-out{
+  display: flex;
 }
 .post-list {
   list-style-type: none;
@@ -80,4 +84,25 @@ const jumpToDetail = function (id) {
   align-items: center;
   justify-content: center;
 }
+.forum-main::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+  /**/
+}
+.forum-main::-webkit-scrollbar-track{
+  background: #FFFFFF;
+  border-radius:2px;
+}
+.forum-main::-webkit-scrollbar-thumb{
+  background: #b198fa;
+  border-radius:10px;
+}
+.forum-main::-webkit-scrollbar-thumb:hover{
+  background: #0012e2;
+  cursor: pointer;
+}
+.forum-main::-webkit-scrollbar-corner{
+  background: #179a16;
+}
+
 </style>

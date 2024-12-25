@@ -40,6 +40,10 @@ public class UserModel implements Serializable {
     @Setter
     private String avatar;
 
+    @Column(name="level")
+    @Setter
+    private Integer level;
+
 
     public boolean checkPassword(String password){
         return passwd.equals(password);

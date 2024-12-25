@@ -14,6 +14,8 @@ import IndexShelf from "@/components/index/IndexShelf.vue";
 import IndexForum from "@/components/index/IndexForum.vue";
 import BookDetailPage from "@/components/detail-pages/BookDetailPage.vue";
 import PostDetailPage from "@/components/detail-pages/PostDetailPage.vue";
+import MessagePage from "@/components/detail-pages/MessagePage.vue";
+import ReadIndex from "@/components/reading-pages/ReadIndex.vue";
 
 const routes = [
     {
@@ -79,8 +81,16 @@ const routes = [
                 path:"detail/post-detail/:postId",
                 name:"r-index-post-detail",
                 component: PostDetailPage,
+            },{
+                path:"detail/messages",
+                name:"r-index-messages",
+                component: MessagePage,
             }
         ]
+    },{
+        path: '/reading/:bookId/:packId?',
+        name: "r-reading",
+        component: ReadIndex,
     }
 ];
 const router = createRouter({

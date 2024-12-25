@@ -1,8 +1,10 @@
 <script setup>
-import {ref,computed} from 'vue'
+import {ref, computed, reactive} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import UserAccountDetailsMenu from "@/components/detail-pages/UserAccountDetailsMenu.vue";
-import {CaretLeft} from "@element-plus/icons-vue";
+import {CaretLeft, Plus} from "@element-plus/icons-vue";
+import {ElMessage} from "element-plus";
+import axios from "axios";
 
 const HelloText = ref('hello');
 const route = useRoute();
@@ -11,21 +13,64 @@ const RouteName = computed(()=>route.name);
 const userAvatar = ref('https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg');
 const IsAdmin = ref(true);
 const showBackButton = computed(()=>{
-  return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail');
+  return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail'
+  || RouteName.value === 'r-index-messages');
 });
+//提供给Upload组件的响应数据
+const uploadAvatarRawData = ref([]);
+
+//表单控制
+const nameFormRef = ref(null);
+const nameFormRules = reactive({
+  name:{
+    required: true,
+    message: '名字不能为空',
+    trigger: 'blur',
+  },
+})
+
 //控制账号设置目录折叠
 const Fold = ref(true);
 const Timeout = ref(null);
 
-//跳转页面函数
-const jumpToExplore = function () {
-  router.push('/index/explore');
+//控制对话框的出现消失
+const showAvatarUploadPage = ref(false);
+const showEditNamePage = ref(false);
+
+//修改用户信息的结构体
+const editInfoData = reactive({
+  name:'',
+  avatar:'',
+  password:'',
+});
+
+//上传头像
+const handleUploadAvatarSuccess = function (response,uploadFile,uploadFiles) {
+
 }
-const jumpToShelf = function () {
-  router.push('/index/shelf');
+const handleUploadAvatarRemove = function (response,uploadFile) {
+
 }
-const jumpToForum = function () {
-  router.push('/index/forum');
+const uploadAvatar = function (options) {
+  let data = {
+    smfile:options,
+    format: "json",
+  }
+  axios.post('/api/upload',data,
+      {headers:{"Content-Type":"multipart/form-data", "Authorization": 'WQe6xnSzY6sbQlH0YMmEdFIxTvx7PxzE'}}
+  ).then(response => {
+    if(response.status === 200){
+      if(response.data.success === true || response.data.code === 'image_repeated'){
+
+      }else{
+        throw new Error('上传失败，疑似图片太大或格式不符');
+      }
+    }else{
+      throw new Error('请求错误，疑似网络问题');
+    }
+  }).catch(error => {
+
+  })
 }
 //折叠展开目录函数
 const foldMenu = function () {
@@ -39,11 +84,39 @@ const unfoldMenu = function () {
   }
   Fold.value = false;
 }
+//表单控制函数
+const submitForm = async (formEl) => {
+  if(!formEl)return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      //submit
+    } else {
+      throw new Error();
+    }
+  })
+}
+const resetForm = (formEl) => {
+  if(!formEl)return
+  formEl.resetFields()
+}
+//跳转页面函数
+const jumpToExplore = function () {
+  router.push('/index/explore');
+}
+const jumpToShelf = function () {
+  router.push('/index/shelf');
+}
+const jumpToForum = function () {
+  router.push('/index/forum');
+}
 const jumpToUpload = function () {
   router.push('/index/upload-book');
 }
 const jumpBack = function () {
   router.back();
+}
+const jumpToMessagePage = function () {
+  router.push('/index/detail/messages');
 }
 </script>
 
@@ -59,7 +132,10 @@ const jumpBack = function () {
               </el-avatar>
             </div>
             <transition name="el-fade-in-linear">
-              <user-account-details-menu v-if="!Fold" @mouseover="unfoldMenu" @mouseleave="foldMenu" class=""/>
+              <user-account-details-menu v-if="!Fold" @mouseover="unfoldMenu" @mouseleave="foldMenu"
+                                         @change-avatar="()=>{showAvatarUploadPage = true}"
+                                         @edit-name="()=>{showEditNamePage = true}"
+                                         @show-message-page="jumpToMessagePage"/>
             </transition>
           </el-col>
           <el-col :span="4" :offset="8" style="font-size: 25px">
@@ -104,6 +180,33 @@ const jumpBack = function () {
           </el-col>
         </el-row>
       </el-header>
+      <el-dialog v-model="showAvatarUploadPage" title="上传新头像" width="500" @closed="()=>{
+        uploadAvatarRawData.splice(0,uploadAvatarRawData.length);
+      }">
+        <el-upload ref="uploadAvatarRef"
+        v-model:file-list="uploadAvatarRawData"
+        :limit="1"
+        :on-success="handleUploadAvatarSuccess"
+        :on-remove="handleUploadAvatarRemove"
+        :on-exceed="()=>{ElMessage.warning('只能上传一张头像=(')}"
+        :http-request="uploadAvatar"
+        list-type="picture-card">
+          <el-icon><Plus/></el-icon>
+        </el-upload>
+        <div style="padding: 10px 0 10px 0">
+          <el-button icon="Upload" color="#3621ef">更改头像</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog v-model="showEditNamePage" title="修改昵称" width="500" @closed="()=>{
+        resetForm(nameFormRef);
+      }">
+        <el-form ref="nameFormRef" :model="editInfoData" :rules="nameFormRules">
+          <el-form-item label="新昵称" prop="name">
+            <el-input v-model="editInfoData.name"></el-input>
+          </el-form-item>
+          <el-button color="#3621ef" @click="submitForm(nameFormRef)">修改昵称</el-button>
+        </el-form>
+      </el-dialog>
       <RouterView></RouterView>
     </el-container>
   </div>

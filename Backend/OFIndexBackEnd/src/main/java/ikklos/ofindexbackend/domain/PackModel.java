@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -28,16 +29,28 @@ public class PackModel implements Serializable {
     @Setter
     private Integer authorId;
 
+    @Column(name="ownerid")
+    @Setter
+    private Integer ownerId;
+
     @Column(name="name")
     @Setter
     private String name;
 
-    @Column(name="description")
+    @Column(name="description",columnDefinition="TEXT")
     @Setter
     private String description;
 
-    @Column(name="like")
+    @Column(name="shared")
     @Setter
-    private Integer likeCount;
+    private Integer shared;
+
+    @Column(name="content",columnDefinition="TEXT")
+    @Setter
+    private String content;
+
+    @Column(name="updatetime")
+    @Setter
+    private LocalDateTime updateTime;
 
 }

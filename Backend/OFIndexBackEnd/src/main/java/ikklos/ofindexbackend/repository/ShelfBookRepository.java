@@ -13,5 +13,6 @@ public interface ShelfBookRepository extends JpaRepository<ShelfBookModel,Intege
     void removeShelfBookModelsByShelfId(Integer shelfId);
     
     List<ShelfBookModel> findShelfBookModelByShelfIdAndBookId(Integer shelfId, Integer bookId);
-    
+
+    void deleteShelfBookModelsByShelfId(Integer shelfId);
 }

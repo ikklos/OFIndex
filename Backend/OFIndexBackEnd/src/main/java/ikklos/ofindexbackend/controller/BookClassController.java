@@ -4,7 +4,7 @@ import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.utils.UniversalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,11 +27,12 @@ public class BookClassController {
 
     private final BookClassRepository bookClassRepository;
 
-    public BookClassController(@Autowired BookClassRepository repository){
+    @Autowired
+    public BookClassController(BookClassRepository repository){
         bookClassRepository=repository;
     }
 
-    @PostMapping
+    @GetMapping
     public BookClassResponse getBookClass(){
         BookClassResponse response=new BookClassResponse();
         response.items=bookClassRepository.findAll().stream().map(
@@ -43,7 +44,6 @@ public class BookClassController {
                 }
         ).toList();
         response.count=response.items.size();
-        response.result=true;
         response.message="BookClass Found";
         return response;
     }

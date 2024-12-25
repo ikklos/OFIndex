@@ -28,7 +28,7 @@ public class BookModel implements Serializable {
     @Setter
     private String author;
 
-    @Column(name="description")
+    @Column(name="description",columnDefinition="TEXT")
     @Setter
     private String description;
 

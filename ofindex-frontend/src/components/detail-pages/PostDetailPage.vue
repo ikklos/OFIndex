@@ -1,10 +1,11 @@
 <script setup>
 import{useRoute} from "vue-router";
-import {reactive, onMounted} from "vue";
+import {reactive, onMounted, ref} from "vue";
 import CommentItem from "@/components/index/CommentItem.vue";
 import PostItem from "@/components/index/PostItem.vue";
 
 let route = useRoute();
+const editingComment = ref('');
 const PageData = reactive({
   postId: route.params.postId,
   postData: {
@@ -43,6 +44,12 @@ const PageData = reactive({
 onMounted(() => {
   //请求帖子详细信息
 })
+const submitComment = function (){
+
+  //发送评论
+
+
+}
 </script>
 
 <template>
@@ -53,6 +60,15 @@ onMounted(() => {
           <div class="post-inner">
             <el-row class="post-area" >
               <post-item :post-data="PageData.postData" :is-detail="true"></post-item>
+            </el-row>
+            <el-row class="edit-comment-row">
+              <el-input v-model="editingComment" type="textarea"
+                        placeholder="我要锐评@v@" class="comment-input"
+                        :autosize="{minRows:4,maxRows:8}">
+              </el-input>
+            </el-row>
+            <el-row class="button-row">
+              <el-button color="#3621ef" @click="submitComment">发布评论</el-button>
             </el-row>
             <el-row class="comment-area">
               <div class="comment-area-inner">
@@ -98,6 +114,20 @@ onMounted(() => {
 .post-area{
   width: 100%;
 }
+.edit-comment-row{
+  box-sizing: border-box;
+  padding: 10px;
+}
+.comment-input:deep(.el-textarea__inner){
+  background: #f2f5c6;
+}
+.button-row{
+  box-sizing: border-box;
+  padding: 10px;
+  align-items: center;
+  justify-items: flex-end;
+  justify-content: flex-end;
+}
 .comment-area{
   box-sizing: border-box;
   padding: 20px 0 20px 0;
@@ -120,6 +150,7 @@ onMounted(() => {
   border-top:none;
   background: #f2f5c6;
   border-bottom-color:#d7b83c;
+  color: #3c5cd7;
 }
 .comment-collapse-item :deep(.el-collapse-item__wrap){
   border:none;

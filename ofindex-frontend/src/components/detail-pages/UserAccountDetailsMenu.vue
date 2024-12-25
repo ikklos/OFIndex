@@ -14,15 +14,18 @@ const calcPenPos = function(){
     top: `${rect.top + 50}px`,
   };
 }
+const emit = defineEmits(['changeAvatar','editName','showMessagePage'])
 </script>
 
 <template>
   <div class="menu-container" id="avatar-menu-container">
-    <el-button icon="EditPen" link :style="calcPenPos()" class="edit-pen"></el-button>
+    <el-button icon="EditPen" link :style="calcPenPos()" class="edit-pen" @click="()=>{emit('changeAvatar')}" ></el-button>
     <el-row style="height:50px" class="name-row">
-      <el-col style="font-size:30px; border: 1px solid rgba(0,0,0,0.2); border-radius: 30px" :span="20" :offset="2">{{name}}</el-col>
+      <el-col style="font-size:30px; border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 30px" :span="20" :offset="2" class="name-area"
+      @click="()=>{emit('editName')}">{{name}}</el-col>
     </el-row>
-    <el-button icon="Message" link class="message-button"></el-button>
+    <el-button icon="Message" link class="message-button" @click="()=>{emit('showMessagePage')}"></el-button>
   </div>
 </template>
 
@@ -49,6 +52,9 @@ const calcPenPos = function(){
 .name-row{
   position: relative;
   top: 90px;
+}
+.name-area:hover{
+  cursor: pointer;
 }
 .message-button{
   position: absolute;

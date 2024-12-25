@@ -29,7 +29,7 @@ public class CommentModel implements Serializable {
     @Setter
     private Integer userId;
 
-    @Column(name="text")
+    @Column(name="text",columnDefinition="TEXT")
     @Setter
     private String text;
 
@@ -40,9 +40,5 @@ public class CommentModel implements Serializable {
     @Column(name="timestamp")
     @Setter
     private LocalDateTime timeStamp;
-
-    @Column(name="likes")
-    @Setter
-    private Integer likes;
 
 }
