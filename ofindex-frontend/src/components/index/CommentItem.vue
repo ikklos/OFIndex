@@ -1,8 +1,21 @@
 <script setup>
 
-import {ref} from "vue";
+import {ref, watch} from "vue";
+import {Icon} from "view-ui-plus";
 
 const props = defineProps({
+  type: {
+    type: String,
+  },
+  id: {
+    type: Number,
+  },
+  liked:{
+    type: Boolean,
+  },
+  likes:{
+    type: Number,
+  },
   avatar:{
     type: String,
     default: '',
@@ -16,7 +29,20 @@ const props = defineProps({
     default: null,
   },
 });
+const emit = defineEmits(['addComment','flagLike']);
 const commentText = ref('');
+const handleClick = ()=>{
+  emit('addComment',commentText.value,props.id);
+}
+const handleAddComment = (text,id)=>{
+  emit('addComment',text,id);
+}
+const flagLike = (id)=>{
+  emit('flagLike',id, !props.liked);
+}
+const handleFlagLike = (id, option)=>{
+  emit('flagLike',id,option);
+}
 </script>
 
 <template>
@@ -29,17 +55,27 @@ const commentText = ref('');
         <el-row>
           {{content}}
         </el-row>
+        <el-row>
+          <Icon type="ios-heart-outline" class="like-icon" @click="flagLike(props.id)" v-if="!props.liked"/>
+          <Icon type="ios-heart" class="like-icon" @click="flagLike(props.id)" v-if="props.liked"/>
+          {{props.likes}}
+        </el-row>
         <el-row class="collapse-row">
           <el-collapse class="comment-collapse">
-            <el-collapse-item title="展开回复" class="comment-collapse-item">
+            <el-collapse-item v-if="props.type !== 'commentReply'"  title="展开回复" class="comment-collapse-item">
               <el-input type="textarea" v-model="commentText" :autosize="{minRows:3,maxRows:5}" class="text-input"></el-input>
               <el-row class="button-row">
-                <el-button color="#3621ef">回复</el-button>
+                <el-button color="#3621ef" @click="handleClick">回复</el-button>
               </el-row>
               <CommentItem v-for="(child,index) in children_list" :key="index"
                           :avatar="child.userAvatar"
-                          :children_list="child.children_array"
-                          :content="child.text"></CommentItem>
+                          :children_list="child.comments"
+                          :content="child.text"
+                          :id="child.commentId" :type="'commentReply'"
+                           :liked = child.liked
+                           :likes = child.likes
+                           @flag-like = 'handleFlagLike'
+              @add-comment="handleAddComment"></CommentItem>
             </el-collapse-item>
           </el-collapse>
         </el-row>
@@ -78,5 +114,11 @@ const commentText = ref('');
   .button-row{
     width: 100%;
     justify-content: flex-end;
+  }
+  .like-icon{
+    font-size:20px;
+  }
+  .like-icon:hover{
+    cursor: pointer;
   }
 </style>

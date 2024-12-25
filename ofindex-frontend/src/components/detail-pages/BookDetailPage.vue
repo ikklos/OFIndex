@@ -17,7 +17,7 @@ const bookData = reactive({
   isbn: '',
   description: '',
   cover: '',
-  tag:'',
+  tag: [],
 });
 const packData = ref([]);
 const availablePackList = ref([]);
@@ -25,8 +25,61 @@ const availablePackList = ref([]);
 const selectedPackId = ref();
 //控制选择书单的dialog
 const showAddToShelfDialog = ref(false);
+
+const loadingCopy = ref(false);
+const loadingPackList = ref(false);
+
+const reloadAvailablePackList = () => {
+  availablePackList.value.splice(0,availablePackList.value.length);
+  axiosApp.get('/user').then(res => {
+    axiosApp.get('/pack/user/'+res.data.userId +'/'+bookData.bookId).then(response=>{
+      for(let i=0; i < response.data.count; i++){
+        availablePackList.value.push({
+          name: response.data.packs[i].packName,
+          id: response.data.packs[i].packId,
+        })
+      }
+    }).catch((error)=>{
+      ElMessage.error('获取资源包列表失败');
+    })
+  }).catch((err)=>{
+    ElMessage.error('获取登录信息失败');
+    if(err.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
+}
 const flagLike = function(index){
-  packData.value[index].liked = true;
+  let id = packData.value[index].packId;
+  console.log(packData.value[index].liked);
+  if(packData.value[index].liked === false){
+    axiosApp.get('/pack/like/'+id).then(res=>{
+      if(res.status === 200){
+        ElMessage.success('点赞成功，感谢您的认可');
+        packData.value[index].liked = !packData.value[index].liked;
+        packData.value[index].likeCount += 1;
+      }
+    }).catch(error => {
+      ElMessage.error('操作失败');
+      if(error.response.status === 601){
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
+  }else{
+    axiosApp.delete('/pack/like/'+id).then(res=>{
+      ElMessage.success('取消点赞成功');
+      packData.value[index].liked = !packData.value[index].liked;
+      packData.value[index].likeCount -= 1;
+    }).catch(err=>{
+      ElMessage.error('操作失败');
+      if(err.response.status === 601){
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
+  }
 }
 const jumpToReading = function(){
   if(selectedPackId.value !== undefined){
@@ -34,6 +87,23 @@ const jumpToReading = function(){
   }else{
     router.push('/reading/'+bookData.bookId);
   }
+}
+const copyPack = (index)=>{
+  let id = packData.value[index].packId;
+  loadingCopy.value = true;
+  axiosApp.get('/pack/copy/'+id).then(res=>{
+    if(res.status === 200){
+      ElMessage.success('成功添加资源包');
+    }
+    loadingCopy.value = false;
+  }).catch(err=>{
+    loadingCopy.value = false;
+    ElMessage.error('添加资源包失败');
+    if(err.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
 }
 onMounted(() => {
   if(bookData.bookId !== null){
@@ -46,11 +116,13 @@ onMounted(() => {
         bookData.description = response.data.description;
         bookData.cover = response.data.cover;
         bookData.isbn = response.data.isbn;
+        bookData.tag = response.data.tag;
       }
     }).catch(error=>{
       ElMessage.error('获取书籍详情失败');
     })
     //请求资源包列表
+    loadingPackList.value = true;
     axiosApp.get('/search/pack/'+bookData.bookId).then((res) => {
       if(res.data.message === 'Found Book'){
         for(let i = 0; i < res.data.count; i++){
@@ -60,13 +132,17 @@ onMounted(() => {
             authorId: res.data.items[i].authorId,
             description: res.data.items[i].description,
             authorAvatar: res.data.items[i].authorAvatar,
-            liked: false,
+            liked: res.data.items[i].liked,
+            likeCount: res.data.items[i].likeCount,
           })
         }
       }
+      loadingPackList.value = false;
     }).catch((err) => {
       ElMessage.error('获取资源包列表失败');
-    })
+      loadingPackList.value = false;
+    });
+    reloadAvailablePackList();
   }
 })
 </script>
@@ -84,7 +160,7 @@ onMounted(() => {
             </el-row>
             <el-row class="book-cover-area"><el-image :src="bookData.cover" class="book-cover-img" fit="cover"></el-image></el-row>
             <el-row class="book-isbn-area">ISBN:{{bookData.isbn}}</el-row>
-            <el-row class="book-tags-area">tags:{{bookData.tag}}</el-row>
+            <el-row class="book-tags-area">tags:<el-tag v-for="(item,index) in bookData.tag">{{item}}</el-tag></el-row>
           </div>
         </el-col>
         <el-col class="book-right-area" :span="16">
@@ -98,7 +174,7 @@ onMounted(() => {
           <el-row class="packs-area">
             <div class="packs-area-inner">
               <el-scrollbar>
-                <div class="packs-list">
+                <div class="packs-list" v-loading="loadingCopy || loadingPackList">
                   <div v-for="(item,index) in packData" :key="index" class="pack-item">
                     <el-row class="pack-item-inner">
                       <el-col :span="5" class="pack-avatar">
@@ -110,9 +186,10 @@ onMounted(() => {
                             {{item.name}}
                           </el-col>
                           <el-col :span="16">
+                            {{item.likeCount}}
                             <Icon type="ios-heart-outline" class="like-icon" @click="flagLike(index)" v-if="!item.liked"/>
-                            <Icon type="ios-heart" class="like-icon" v-if="item.liked"/>
-                            <el-button color="#4825f6" style="border-radius: 20px">添加此资源包</el-button>
+                            <Icon type="ios-heart" class="like-icon" @click="flagLike(index)" v-if="item.liked"/>
+                            <el-button color="#4825f6" style="border-radius: 20px" @click="copyPack(index)">添加此资源包</el-button>
                           </el-col>
                         </el-row>
                         <el-row class="pack-description-row">

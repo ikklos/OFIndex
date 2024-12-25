@@ -1,6 +1,7 @@
 <script setup>
 
 import {ref} from "vue";
+import {Icon} from "view-ui-plus";
 
 const isHovered = ref(false);
 const props = defineProps({
@@ -11,15 +12,19 @@ const props = defineProps({
   }
 });
 const emit = defineEmits([
-    'jumpToDetail'
+    'jumpToDetail',
+    'flagLike',
 ]);
 const jumpDetail = function(id){
   emit('jumpToDetail',id);
 }
+const handleFlagLike = (id) => {
+  emit('flagLike',id, !props.postData.liked);
+}
 </script>
 
 <template>
-  <div class="item-inner" :class="{'half-width':!isDetail}">
+  <div class="item-inner" :class="{'half-width':!isDetail}" >
     <el-row class="title-row">
       <div class="avatar-area">
         <el-avatar size="large" :src="postData.avatar" fit="cover"></el-avatar>
@@ -38,6 +43,11 @@ const jumpDetail = function(id){
         </el-image>
       </div>
     </el-row>
+    <el-row style="padding: 20px">
+      <Icon type="ios-heart-outline" class="like-icon" @click="handleFlagLike(props.postData.postId)" v-if="!props.postData.liked"/>
+      <Icon type="ios-heart" class="like-icon" @click="handleFlagLike(props.postData.postId)" v-if="props.postData.liked"/>
+      {{props.postData.likes}}
+    </el-row>
   </div>
 </template>
 
@@ -46,6 +56,7 @@ const jumpDetail = function(id){
   width: 50%;
 }
 .item-inner{
+  width: 100%;
   min-width: 600px;
   border: 1px solid #3c5cd7;
   border-radius: 24px;
@@ -96,5 +107,11 @@ const jumpDetail = function(id){
 }
 .post-picture:hover{
   cursor: zoom-in;
+}
+.like-icon{
+  font-size:20px;
+}
+.like-icon:hover{
+  cursor: pointer;
 }
 </style>

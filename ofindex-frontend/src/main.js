@@ -24,7 +24,7 @@ const axiosApp = axios.create({
 axiosApp.interceptors.request.use(config => {
     const token = localStorage.getItem('Token');
     if (token) {
-        config.headers.Authorization = `?0`;
+        config.headers.Authorization = `${token}`;
     }
     return config;
 }, error => {

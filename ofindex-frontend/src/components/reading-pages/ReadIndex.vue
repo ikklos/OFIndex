@@ -4,7 +4,7 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useRoute,useRouter} from "vue-router";
 import axiosApp from "@/main.js";
 import VuePdfEmbed from 'vue-pdf-embed'
-import {ElMessage, ElCollapseTransition} from "element-plus";
+import {ElMessage, ElCollapseTransition, ElMessageBox} from "element-plus";
 import {CaretLeft, EditPen, Minus, Plus} from "@element-plus/icons-vue";
 import axios from "axios";
 import NoteSideBar from "@/components/reading-pages/NoteSideBar.vue";
@@ -16,7 +16,7 @@ const router = useRouter();
 const currentPack = ref(-1);
 const packData = reactive({
   bookId: parseInt(route.params.bookId),
-  packId: (route.params.packId)?parseInt(route.params.packId):null,
+  packId: null,
   name: null,
   description: null,
   content: null,
@@ -52,6 +52,8 @@ const showMask = ref(false);
 const showLightMask = ref(false);
 const showYLMask = ref(false);
 const loading = ref(false);
+const pdfLoading = ref(false);
+const showEditPackDialog = ref(false);
 
 const tabPaneName = ref('side-note');
 
@@ -107,14 +109,18 @@ const loadPack = (id) => {
 }
 
 const loadPackList = ()=>{
+  loading.value = true;
+  packList.value.splice(0,packList.value.length);
+  packData.packId = 0;
   axiosApp.get('/user').then(res=>{
-    axiosApp.get('/pack/user/'+res.data.userId).then(response=>{
+    axiosApp.get('/pack/user/'+res.data.userId + '/' + packData.bookId).then(response=>{
       packList.value.splice(0,packList.value.length);
       for(let i=0; i < response.data.count; i++){
         packList.value.push(response.data.packs[i]);
       }
       if(response.data.count > 0 && currentPack.value === -1){
         currentPack.value= packList.value[0].packId;
+        packData.packId = currentPack.value;
       }
     }).catch((err)=>{
       ElMessage.error('获取资源包列表失败');
@@ -125,6 +131,7 @@ const loadPackList = ()=>{
       router.push('/account/login');
     }
   })
+  loading.value = false;
 }
 
 const createPack = ()=>{
@@ -166,7 +173,7 @@ const createPack = ()=>{
 const updatePack = ()=>{
   console.log('packContent:',packContent.value);
   packData.content = JSON.stringify(packContent.value);
-  packData.shareId = false;
+  packData.shared = false;
   axiosApp.post('/upload/pack',packData).then(response => {
     if(response.status === 200){
       ElMessage.success('保存成功');
@@ -198,6 +205,7 @@ watch(currentPack, (newVal, oldVal) => {
   }
 })
 onMounted(()=>{
+  pdfLoading.value = true;
   axiosApp.get('/load/ebook/'+packData.bookId,{
     responseType: 'blob',
   }).then((response)=>{
@@ -206,8 +214,13 @@ onMounted(()=>{
     ebookUrl.value = localUrl;
   }).catch((err)=>{
     ElMessage.error('加载电子书失败');
+    router.back();
   });
   loadPackList();
+  if(route.params.packId){
+    currentPack.value = parseInt(route.params.packId);
+    packData.bookId = parseInt(route.params.bookId);
+  }
   if(currentPack.value !== -1){
     loadPack(currentPack.value);
   }
@@ -333,6 +346,7 @@ const handleCreateLinkNote = () => {
 }
 
 const handleLoaded = function ({numPages}){
+  pdfLoading.value = false;
   maxPage.value = numPages;
 }
 
@@ -429,7 +443,54 @@ const showYellowLightMask = (option)=>{
     });
   }
 }
-
+const shareCurrentPack = ()=>{
+  if(packData.packId < 0)return;
+  ElMessageBox.confirm(`你要分享名为>${packData.name}<的资源包吗？`).then(()=>{
+    if(packData.packId >= 0){
+      packData.shared = true;
+      axiosApp.post('/upload/pack', packData).then((response)=>{
+        if(response.status === 200){
+          ElMessage.success('分享成功');
+        }
+        packData.shared = false;
+      }).catch((error)=>{
+        packData.shared = false;
+        ElMessage.error('分享失败');
+        if(error.response.status === 601){
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
+    }
+  }).catch((err)=>{});
+}
+const modifyPackName = () => {
+  if(newPackName.value === ''){
+    ElMessage.error('资源包名称不能为空');
+    showEditPackDialog.value = false;
+  }else{
+    let data = JSON.parse(JSON.stringify(packData));
+    data.name = newPackName.value;
+    axiosApp.post('/upload/pack',data).then((response)=>{
+      if(response.status === 200){
+        packData.name = newPackName.value;
+        ElMessage.success('修改成功');
+        showEditPackDialog.value = false;
+        loadPackList();
+      }
+    }).catch((error)=>{
+      ElMessage.error('修改失败');
+      showEditPackDialog.value = false;
+      if(error.response.status === 601){
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
+  }
+}
+const editCurrentPack = () => {
+  showEditPackDialog.value = true;
+}
 const jumpBack = () => {
   router.back();
 }
@@ -490,13 +551,14 @@ watch(currentPage,(newVal, oldVal)=>{
             </div>
             <el-header v-if="packCount > 0">
               <el-row>
-                <el-col :span="16">
+                <el-col :span="12">
                   <el-select v-model="currentPack">
                     <el-option v-for="(item,index) in packList" :label="item.packName" :value="item.packId">
                     </el-option>
                   </el-select>
                 </el-col>
-                <el-col :span="8" style="display: flex; align-items: center; justify-content: flex-end;">
+                <el-col :span="12" style="display: flex; align-items: center; justify-content: flex-end;">
+                  <el-button color="#3621ef" @click="editCurrentPack">编辑资源包</el-button>
                   <el-button color="#3621ef" icon="Plus" @click="()=>{showAddPackDialog=true;}"></el-button>
                 </el-col>
               </el-row>
@@ -537,7 +599,7 @@ watch(currentPage,(newVal, oldVal)=>{
         </el-container>
       </el-aside>
       <!--pdf显示区域-->
-      <el-main class="reading-page-main" id="read-index-main">
+      <el-main class="reading-page-main" id="read-index-main" v-loading.fullscreen.lock="pdfLoading">
         <vue-pdf-embed id='pdf-area' :source="ebookUrl" :height="pdfHeight" :width="pdfWidth" :page="currentPage" @loaded="handleLoaded"/>
       </el-main>
     </el-container>
@@ -547,6 +609,15 @@ watch(currentPage,(newVal, oldVal)=>{
   <transition name="el-fade-in">
     <div class="yellow-light-mask" id="yellow-light-mask" v-show="showYLMask"></div>
   </transition>
+  <el-dialog v-model="showEditPackDialog" title="编辑资源包" width="500" @closed="()=>{
+    newPackName = '';
+  }">
+    <el-input placeholder="输入新名称" v-model="newPackName"></el-input>
+    <el-row style="padding: 10px">
+      <el-button color="#3621ef" @click="modifyPackName">更改名称</el-button>
+      <el-button color="#3621ef" @click="shareCurrentPack">分享资源包</el-button>
+    </el-row>
+  </el-dialog>
 </template>
 
 <style scoped>

@@ -1,17 +1,21 @@
 <script setup>
-import {ref, computed, reactive} from 'vue'
+import {ref, computed, reactive, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import UserAccountDetailsMenu from "@/components/detail-pages/UserAccountDetailsMenu.vue";
 import {CaretLeft, Plus} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
 import axios from "axios";
+import axiosApp from "@/main.js";
 
 const HelloText = ref('hello');
 const route = useRoute();
 const router = useRouter();
 const RouteName = computed(()=>route.name);
-const userAvatar = ref('https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg');
-const IsAdmin = ref(true);
+const userInfo = reactive({
+  userAvatar: '',
+  userName: '',
+  IsAdmin: false,
+})
 const showBackButton = computed(()=>{
   return (RouteName.value === 'r-index-book-detail' || RouteName.value === 'r-index-post-detail'
   || RouteName.value === 'r-index-messages');
@@ -22,11 +26,11 @@ const uploadAvatarRawData = ref([]);
 //表单控制
 const nameFormRef = ref(null);
 const nameFormRules = reactive({
-  name:{
+  name:[{
     required: true,
     message: '名字不能为空',
     trigger: 'blur',
-  },
+  }],
 })
 
 //控制账号设置目录折叠
@@ -36,32 +40,154 @@ const Timeout = ref(null);
 //控制对话框的出现消失
 const showAvatarUploadPage = ref(false);
 const showEditNamePage = ref(false);
-
+const showChangePasswordPage = ref(false);
+const avatarUploading = ref(false);
 //修改用户信息的结构体
 const editInfoData = reactive({
   name:'',
   avatar:'',
-  password:'',
 });
-
+const resetPasswordFormData = reactive({
+  oldPassword:'',
+  newPassword:'',
+  repeatNewPassword:'',
+});
+const confirmOldPass = (rule, value, callback) => {
+  if(value === ''){
+    callback(new Error('请输入旧密码'));
+  }else{
+    callback();
+  }
+}
+const confirmPass = (rule, value, callback) => {
+  if(value === ''){
+    callback(new Error('请输入新密码'));
+  }else{
+    let allowed = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+    if(allowed.test(value)){
+      callback();
+    }else{
+      callback(new Error('新密码中含有非法字符（例如空格）'));
+    }
+  }
+}
+const confirmRepeatPass = (rule, value, callback) => {
+  if(value === ''){
+    callback(new Error('请确认密码'));
+  }else{
+    if(value !== resetPasswordFormData.newPassword){
+      callback(new Error('两次输入密码不一样'));
+    }else{
+      callback();
+    }
+  }
+}
+const resetPassFormRules = reactive({
+  oldPassword:[
+    {
+      validator:confirmOldPass,
+      trigger:"blur",
+    }
+  ],
+  newPassword:[
+    {
+      validator:confirmPass,
+      trigger:"blur",
+    }
+  ],
+  repeatNewPassword:[
+    {
+      validator:confirmRepeatPass,
+      trigger:"blur",
+    }
+  ]
+})
+const resetPasswordForm = ref(null);
+const handleResetPass = async (formEl)=>{
+  if(!formEl) return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      axiosApp.get('/user').then(res=>{
+        axiosApp.post('/login',{
+          userid: res.data.userId,
+          passwd: resetPasswordFormData.oldPassword
+        }).then(response=>{
+          if(response.status === 200){
+            axiosApp.post('/user/modify',{
+              name: null,
+              avatar: null,
+              password: resetPasswordFormData.newPassword,
+              phoneNum: null
+            }).then(finRes=>{
+              if(finRes.status === 200){
+                ElMessage.success('修改成功');
+                formEl.resetFields();
+                showChangePasswordPage.value = false;
+              }
+            }).catch(finError=>{
+              ElMessage.error('修改密码失败'+finError.message);
+            })
+          }
+        }).catch(err=>{
+          ElMessage.error('旧密码验证失败');
+        })
+      }).catch(error=>{
+        ElMessage.error('登录信息过期:'+error.message);
+        if(error.response.status === 601){
+          router.push('/account/login');
+        }
+      })
+    }else{
+      throw new Error();
+    }
+  })
+}
 //上传头像
 const handleUploadAvatarSuccess = function (response,uploadFile,uploadFiles) {
-
+  if(response.data.success === true){
+    editInfoData.avatar = response.data.data.url;
+  }else editInfoData.avatar = response.data.images;
+  avatarUploading.value = false;
 }
 const handleUploadAvatarRemove = function (response,uploadFile) {
-
+  editInfoData.avatar = '';
+  avatarUploading.value = false;
+}
+const handleResetAvatar = function () {
+  if(editInfoData.avatar === ''){
+    ElMessage.error('头像还没上传呢');
+  }else{
+    axiosApp.post('/user/modify',{
+      name: null,
+      avatar: editInfoData.avatar,
+      password: null,
+      phoneNum: null,
+    }).then(res=>{
+      if(res.status === 200){
+        ElMessage.success('上传成功');
+        userInfo.userAvatar = editInfoData.avatar;
+        showAvatarUploadPage.value = false;
+      }
+    }).catch(error=>{
+      if(error.response.status === 601){
+        ElMessage('登录已过期');
+        router.push('/account/login');
+      }
+    })
+  }
 }
 const uploadAvatar = function (options) {
   let data = {
     smfile:options,
     format: "json",
   }
+  avatarUploading.value = true;
   axios.post('/api/upload',data,
       {headers:{"Content-Type":"multipart/form-data", "Authorization": 'WQe6xnSzY6sbQlH0YMmEdFIxTvx7PxzE'}}
   ).then(response => {
     if(response.status === 200){
       if(response.data.success === true || response.data.code === 'image_repeated'){
-
+        options.onSuccess(response);
       }else{
         throw new Error('上传失败，疑似图片太大或格式不符');
       }
@@ -69,7 +195,8 @@ const uploadAvatar = function (options) {
       throw new Error('请求错误，疑似网络问题');
     }
   }).catch(error => {
-
+    options.onError(error);
+    ElMessage.error(error.message);
   })
 }
 //折叠展开目录函数
@@ -90,6 +217,27 @@ const submitForm = async (formEl) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       //submit
+      axiosApp.post('/user/modify',{
+        name: editInfoData.name,
+        avatar: null,
+        password: null,
+        phoneNum: null,
+      }).then(res=>{
+        if(res.status === 200){
+          ElMessage.success('更改成功！');
+          userInfo.userName = editInfoData.name;
+          console.log(userInfo.userName);
+          showEditNamePage.value = false;
+          formEl.resetFields();
+        }
+      }).catch(err=>{
+        if(err.response.status === 601){
+          ElMessage.error('登录已过期');
+          router.push('/account/login');
+        }else{
+          ElMessage.error('更改失败'+ err.message);
+        }
+      })
     } else {
       throw new Error();
     }
@@ -99,6 +247,20 @@ const resetForm = (formEl) => {
   if(!formEl)return
   formEl.resetFields()
 }
+onMounted(()=>{
+  //获取用户信息
+  axiosApp.get('/user').then(res=>{
+     userInfo.userName = res.data.userName;
+     userInfo.userAvatar = (res.data.avatar === null)?'':res.data.avatar;
+     userInfo.isAdmin = (res.data.level > 0);
+  }).catch(error=>{
+    ElMessage.error('获取个人信息失败');
+    if(error.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
+})
 //跳转页面函数
 const jumpToExplore = function () {
   router.push('/index/explore');
@@ -128,14 +290,15 @@ const jumpToMessagePage = function () {
           <el-col :span="2">
             <div class="avatar-left full-fix">
               <el-avatar id="user-avatar" class="user-avatar" size="large"  :class="{hovered:!Fold}"
-                         @mouseover="unfoldMenu" @mouseleave="foldMenu" :src="userAvatar" fit="cover">
+                         @mouseover="unfoldMenu" @mouseleave="foldMenu" :src="userInfo.userAvatar" fit="cover">
               </el-avatar>
             </div>
             <transition name="el-fade-in-linear">
-              <user-account-details-menu v-if="!Fold" @mouseover="unfoldMenu" @mouseleave="foldMenu"
+              <user-account-details-menu v-show="!Fold" :user-info="userInfo" @mouseover="unfoldMenu" @mouseleave="foldMenu"
                                          @change-avatar="()=>{showAvatarUploadPage = true}"
                                          @edit-name="()=>{showEditNamePage = true}"
-                                         @show-message-page="jumpToMessagePage"/>
+                                         @show-message-page="jumpToMessagePage"
+                                         @change-password="()=>{showChangePasswordPage = true}"/>
             </transition>
           </el-col>
           <el-col :span="4" :offset="8" style="font-size: 25px">
@@ -143,7 +306,7 @@ const jumpToMessagePage = function () {
           </el-col>
           <el-col :span="2" :offset="2">
             <div class="button-area center-layout-row">
-              <el-button class="shift-button" icon="Upload" type="primary" v-if="IsAdmin && (!showBackButton)"
+              <el-button class="shift-button" icon="Upload" type="primary" v-if="userInfo.isAdmin && (!showBackButton)"
                          :disabled="RouteName === 'r-index-upload-book'" @click="jumpToUpload" color="#3621ef">
                 上传
               </el-button>
@@ -182,6 +345,7 @@ const jumpToMessagePage = function () {
       </el-header>
       <el-dialog v-model="showAvatarUploadPage" title="上传新头像" width="500" @closed="()=>{
         uploadAvatarRawData.splice(0,uploadAvatarRawData.length);
+        editInfoData.avatar = '';
       }">
         <el-upload ref="uploadAvatarRef"
         v-model:file-list="uploadAvatarRawData"
@@ -194,17 +358,31 @@ const jumpToMessagePage = function () {
           <el-icon><Plus/></el-icon>
         </el-upload>
         <div style="padding: 10px 0 10px 0">
-          <el-button icon="Upload" color="#3621ef">更改头像</el-button>
+          <el-button v-loading.fullscreen.lock="avatarUploading" icon="Upload" color="#3621ef" @click="handleResetAvatar">更改头像</el-button>
         </div>
       </el-dialog>
       <el-dialog v-model="showEditNamePage" title="修改昵称" width="500" @closed="()=>{
         resetForm(nameFormRef);
       }">
-        <el-form ref="nameFormRef" :model="editInfoData" :rules="nameFormRules">
+        <el-form ref="nameFormRef" :model="editInfoData" :rules="nameFormRules" @submit.native.prevent>
           <el-form-item label="新昵称" prop="name">
-            <el-input v-model="editInfoData.name"></el-input>
+            <el-input v-model="editInfoData.name" placeholder="请输入新昵称" @keyup.enter="()=>{}"></el-input>
           </el-form-item>
           <el-button color="#3621ef" @click="submitForm(nameFormRef)">修改昵称</el-button>
+        </el-form>
+      </el-dialog>
+      <el-dialog v-model="showChangePasswordPage"  title="修改密码" width="600">
+        <el-form ref="resetPasswordForm" :model="resetPasswordFormData" :rules="resetPassFormRules">
+          <el-form-item label="旧密码" prop="oldPassword">
+            <el-input placeholder="请输入旧密码" v-model="resetPasswordFormData.oldPassword" type="password" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPassword">
+            <el-input placeholder="请输入新密码" v-model="resetPasswordFormData.newPassword" type="password" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="再次输入新密码" prop="repeatNewPassword">
+            <el-input placeholder="确认新密码" v-model="resetPasswordFormData.repeatNewPassword" type="password" show-password></el-input>
+          </el-form-item>
+          <el-button @click="handleResetPass(resetPasswordForm)" class="3621ef">更改密码</el-button>
         </el-form>
       </el-dialog>
       <RouterView></RouterView>
