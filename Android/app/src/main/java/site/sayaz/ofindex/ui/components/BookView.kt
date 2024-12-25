@@ -1,6 +1,7 @@
 package site.sayaz.ofindex.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,11 +12,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +41,8 @@ fun BookView(
     onBookClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
+    var boxHeight by remember { mutableStateOf(0) }
     Card(
         modifier = modifier.padding(4.dp),
         shape = RoundedCornerShape(8.dp),
@@ -41,17 +52,34 @@ fun BookView(
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(8.dp))
+                .onSizeChanged { size ->
+                    boxHeight = size.height
+                }
         ) {
             // 书封面
             Image(
                 painter = rememberAsyncImagePainter(
                     model = book.cover,
-                    placeholder = painterResource(id = R.drawable.ic_action_no_image), // 加载中显示的占位符
-                    error = painterResource(id = R.drawable.ic_action_no_image) // 加载失败时显示的图片
+                    placeholder = painterResource(id = R.drawable.ic_action_no_image),
+                    error = painterResource(id = R.drawable.ic_action_no_image)
                 ),
                 contentDescription = book.description,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
+            )
+
+            // 渐变层
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Black, Color.Transparent),
+                            startY = with(density) { (boxHeight / 3 * 60).toDp().value },
+                            endY = 0f
+                        )
+                    )
+                    .alpha(1f) // 可以调整透明度
             )
 
             // 书名，在封面的左下角
@@ -71,7 +99,7 @@ fun BookView(
 }
 
 
-@Preview
+@Preview(backgroundColor = 0xFFFFFF, showBackground = true)
 @Composable
 fun BookViewPreview() {
     val book = Book(
@@ -80,8 +108,7 @@ fun BookViewPreview() {
         author = "author",
         description = "desp",
         cover = "https://via.placeholder.com/150",
-        tag = "TODO()",
-        isbn = "TODO()",
+        tag = emptyList(),
         bookClass = 1,
     )
     Column {

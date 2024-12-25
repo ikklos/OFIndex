@@ -12,14 +12,13 @@ import kotlinx.serialization.encoding.*
 
 @Serializable
 data class BookDetailResponse (
-    val author: String,
-    val bookClass: Long,
-    val bookId: Long,
-    val cover: String,
-    val description: String,
-    val isbn: String,
-    val message: String,
-    val name: String,
-    val result: Boolean,
-    val tag: String
+    val author: String? = null,
+    val bookClass: Long? = null,
+    val bookId: Long? = null,
+    val cover: String? = null,
+    val description: String? = null,
+    val isbn: String? = null,
+    val message: String? = null,
+    val name: String? = null,
+    val tag: List<String?>? = null
 )

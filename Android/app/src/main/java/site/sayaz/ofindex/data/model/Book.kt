@@ -4,13 +4,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Book(
-    val bookId: Long,
-    val name: String? = null,
-    val cover: String? = null,
-    val author: String? = null,
-    val description: String? = null,
-    val tag: String? = null,
-    val isbn: String? = null,
-    val bookClass: Long? = null
+    val bookId: Long = 0,
+    val name: String = " ",
+    val cover: String = " ",
+    val author: String = " ",
+    val description: String = " ",
+    val tag: List<String> = emptyList(),
+    val isbn: String = " ",
+    val bookClass: Long = 0,
+    val addTime: String? = " "
 )
+
 

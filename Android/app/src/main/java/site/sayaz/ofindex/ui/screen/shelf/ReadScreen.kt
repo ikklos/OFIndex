@@ -1,52 +1,112 @@
 package site.sayaz.ofindex.ui.screen.shelf
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import site.sayaz.ofindex.R
+import site.sayaz.ofindex.data.remote.RetrofitInstance
 import site.sayaz.ofindex.ui.components.PDFView
-import site.sayaz.ofindex.viewmodel.ShelfViewModel
 import site.sayaz.ofindex.ui.components.Loading
+import site.sayaz.ofindex.viewmodel.ReadViewModel
+
 
 @Composable
 fun ReadScreen(
-    viewModel: ShelfViewModel,
-    bookID: String
+    readViewModel: ReadViewModel,
+    bookID: Long,
+    onNavigateBack: () -> Unit
 ) {
-    val context = LocalContext.current
-    val pdfBytes = viewModel.pdfBytes.collectAsState(initial = null).value
-    val pagerState = rememberPagerState (pageCount = {3})
+    val pdfBytes by readViewModel.pdfBytes.collectAsState()
+    val downloadProgress by RetrofitInstance.progress.collectAsState()
+    val isBottomBarVisible by readViewModel.isBottomBarVisible.collectAsState()
+    val isTopBarVisible by readViewModel.isTopBarVisible.collectAsState()
+    val selectedTab by readViewModel.selectedTab.collectAsState()
+    var pageCount by remember { mutableIntStateOf(1) }
+    val pagerState = rememberPagerState(pageCount = { pageCount })
 
-    LaunchedEffect(Unit) {
-        viewModel.loadPdf(context,bookID)
+    LaunchedEffect(bookID) {
+        readViewModel.loadBook(bookID)
     }
-    Box(Modifier
-        .fillMaxSize()
-    ){
-        if (pdfBytes != null) {
-            HorizontalPager(pagerState) {page->
-                PDFView(
-                    modifier = Modifier.fillMaxWidth(),
-                    pdfBytes = pdfBytes,
-                    page = page
+
+    Scaffold(
+        topBar = {
+            AnimatedVisibility(
+                visible = isTopBarVisible,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                ReadTopBar(
+                    onNavigateBack = onNavigateBack,
+                    onToggleBottomBar = {visible ->
+                        readViewModel.toggleBottomBarVisibility(visible)
+                    }
                 )
             }
-        } else {
-            // 显示加载状态
-            Loading()
         }
-    }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {}
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .clickable (
+                    indication = null, // 禁用默认的点击指示
+                    interactionSource = remember { MutableInteractionSource() } // 禁用交互源
+                ){ readViewModel.toggleTopBarVisibility(!isTopBarVisible) }, // 点击屏幕切换顶部栏可见性
+            contentAlignment = Alignment.Center,
 
+        ) {
+            if (pdfBytes != null) {
+                HorizontalPager(state = pagerState) { page ->
+                    PDFView(
+                        modifier = Modifier.fillMaxSize(),
+                        pdfBytes = pdfBytes!!,
+                        page = page,
+                        setPageCount = {
+                            pageCount = it
+                        }
+                    )
+                }
+            } else {
+                CircularProgressIndicator(
+                    progress = { downloadProgress.div(1f) },
+                    modifier = Modifier.size(50.dp),
+                    trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                )
+            }
+        }
+        if(isBottomBarVisible){
+            ReadBottomSheet(
+                selectedTab = selectedTab,
+                onDismissRequest = {
+                    readViewModel.toggleBottomBarVisibility(false)
+                },
+                onTabSelected = {
+                    readViewModel.selectTab(it)
+                }
+            )
+        }
+
+    }
 }
+

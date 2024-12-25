@@ -5,6 +5,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import site.sayaz.ofindex.R
+import site.sayaz.ofindex.ui.components.BaseTopBar
 import site.sayaz.ofindex.viewmodel.ShelfViewModel
 
 @Composable

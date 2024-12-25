@@ -12,18 +12,18 @@ data class BottomItem (
 object BottomItems{
     private val explore = BottomItem(
         "Explore",
-        R.drawable.ic_android_black_24dp,
-        R.drawable.ic_android_black_24dp,
+        R.drawable.baseline_explore_24,
+        R.drawable.outline_explore_24,
         "Explore")
     private val shelf = BottomItem(
         "Shelf",
-        R.drawable.ic_android_black_24dp,
-        R.drawable.ic_android_black_24dp,
+        R.drawable.baseline_collections_bookmark_24,
+        R.drawable.outline_collections_bookmark_24,
         "Shelf")
     private val forum = BottomItem(
         "Forum",
-        R.drawable.ic_android_black_24dp,
-        R.drawable.ic_android_black_24dp,
+        R.drawable.baseline_forum_24,
+        R.drawable.outline_forum_24,
         "Forum")
     private val more = BottomItem(
         "More",
@@ -32,6 +32,6 @@ object BottomItems{
         "More")
 
     fun getList(): List<BottomItem> {
-        return listOf(explore, shelf, forum, more)
+        return listOf(explore, shelf, forum)
     }
 }
