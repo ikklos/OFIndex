@@ -176,7 +176,7 @@ public class ForumPostController {
     @GetMapping("/posts")
     public PostListResponse getPostList(@RequestParam Integer page,
                                         @RequestParam Integer pagesize) throws UniversalBadReqException {
-        List<PostModel> posts=postRepository.findAll(Sort.by(Sort.Direction.ASC,"timeStamp"));
+        List<PostModel> posts=postRepository.findAll(Sort.by(Sort.Direction.DESC,"timeStamp"));
 
         PostListResponse response=new PostListResponse();
 

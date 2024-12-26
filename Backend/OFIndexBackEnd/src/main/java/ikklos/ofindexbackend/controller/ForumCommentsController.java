@@ -89,7 +89,7 @@ public class ForumCommentsController {
         if(!postRepository.existsById(postid))
             throw new UniversalBadReqException("No such post");
 
-        List<CommentModel> comments=commentRepository.findCommentModelsByPostId(postid, Sort.by(Sort.Direction.ASC,"timeStamp"));
+        List<CommentModel> comments=commentRepository.findCommentModelsByPostId(postid, Sort.by(Sort.Direction.DESC,"timeStamp"));
 
         PostCommentsResponse response=new PostCommentsResponse();
         response.postId=postid;

@@ -78,7 +78,7 @@ public class ForumController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         MessageListResponse response=new MessageListResponse();
 
-        List<ForumMessageModel> messageModels=forumMessageRepository.findForumMessageModelsByReceiverId(userId, Sort.by(Sort.Direction.ASC,"timeStamp"));
+        List<ForumMessageModel> messageModels=forumMessageRepository.findForumMessageModelsByReceiverId(userId, Sort.by(Sort.Direction.DESC,"timeStamp"));
 
         response.messages=messageModels.stream().map(forumMessageModel -> {
             MessageListResponse.MessageItem item=new MessageListResponse.MessageItem().setByModel(forumMessageModel);
