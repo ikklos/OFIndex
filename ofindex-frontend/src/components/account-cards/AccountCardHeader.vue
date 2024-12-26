@@ -22,18 +22,11 @@ watch(()=>route.name,
     (newVal, oldVal) => {
         SetHeaderInfo(newVal);
     })
-//跳转到手机登录页面
-const gotoPhoneLogin = function () {
-  router.push('/account/phone-login');
-}
 </script>
 
 <template>
-  <el-row style="align-items: center;">
-    <el-col :span="6" v-show="sideButtonVisible">
-      <el-button link @click="gotoPhoneLogin">手机号登录</el-button>
-    </el-col>
-    <el-col :span="12" style="font-size: 30px; color: #000000;">{{headString}}</el-col>
+  <el-row style="align-items: center;justify-items: center;justify-content: center; font-size: 30px; color: #000000;">
+    {{headString}}
   </el-row>
 </template>
 

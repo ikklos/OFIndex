@@ -211,7 +211,9 @@ onMounted(() => {
                 showAddToShelfDialog = true;
               }">添加到书架</el-button>
               <el-dialog v-model="showAddToShelfDialog" title="选择保存位置" style="width: 400px">
-                <add-to-shelf-dialog/>
+                <add-to-shelf-dialog @add-ok="()=>{
+                  showAddToShelfDialog = false;
+                }"/>
               </el-dialog>
             </el-col>
             <el-col :span="8">

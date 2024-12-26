@@ -14,7 +14,6 @@ import BookDetailPage from "@/components/detail-pages/BookDetailPage.vue";
 import PostDetailPage from "@/components/detail-pages/PostDetailPage.vue";
 import MessagePage from "@/components/detail-pages/MessagePage.vue";
 import ReadIndex from "@/components/reading-pages/ReadIndex.vue";
-import AccountCardPhoneLoginPassword from "@/components/account-cards/AccountCardPhoneLoginPassword.vue";
 
 const routes = [
     {
@@ -36,10 +35,6 @@ const routes = [
                 path:"register",
                 name: "r-account-card-register",
                 component: AccountCardRegister
-            },{
-                path:"phone-login",
-                name: "r-account-card-phone-login",
-                component: AccountCardPhoneLoginPassword
             },{
                 path:"register-succeed/:AccountId",
                 name: "r-account-card-register-succeed",

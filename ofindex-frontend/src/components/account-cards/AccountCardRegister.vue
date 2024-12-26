@@ -29,7 +29,6 @@ const sendRegisterReq = function () {
         passwd: Password.value,
       }).then(response => {
         if (response.status === 200) {
-          localStorage.setItem('Token',response.data.token);
           const AccountId = response.data.id;
           console.log(response.data);
           //跳转到成功页
