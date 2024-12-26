@@ -75,7 +75,8 @@ public class CreateController {
         bookModel.setDescription(request.description);
         bookModel.setCover(request.cover);
         ObjectMapper objectMapper=new ObjectMapper();
-        bookModel.setTags(objectMapper.writeValueAsString(request.tags));
+        var s=objectMapper.writeValueAsString(request.tags);
+        bookModel.setTags(s!=null?s:"[]");
         bookModel.setIsbn(request.isbn);
         bookModel.setBookClass(request.bookClass);
 

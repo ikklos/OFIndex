@@ -117,7 +117,7 @@ public class ForumPostController {
         postModel.setText(request.text);
         ObjectMapper mapper = new ObjectMapper();
         String s0= mapper.writeValueAsString(request.pictures);
-        postModel.setImageurls(s0);
+        postModel.setImageurls(s0!=null?s0:"[]");
         postModel.setTimeStamp(LocalDateTime.now());
 
         List<String> commonTags=new ArrayList<>();
@@ -133,7 +133,7 @@ public class ForumPostController {
             }
         }
         String s = mapper.writeValueAsString(commonTags);
-        postModel.setTags(s);
+        postModel.setTags(s!=null?s:"[]");
 
         postRepository.save(postModel);
 

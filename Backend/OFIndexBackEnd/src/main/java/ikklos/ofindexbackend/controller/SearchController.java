@@ -97,7 +97,7 @@ public class SearchController {
         List<BookModel> books;
 
         String searchText="%"+request.text+"%";
-        if(request.bookClass==null){
+        if(request.bookClass==0){
             books=bookRepository.findBookModelsByNameLike(searchText);
             books.addAll(bookRepository.findBookModelsByTagsLike(searchText));
             books.addAll(bookRepository.findBookModelsByDescriptionLike(searchText));

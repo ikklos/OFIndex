@@ -3,6 +3,7 @@ package ikklos.ofindexbackend.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecretKeyBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
 import java.security.SecureRandom;
@@ -16,7 +17,8 @@ public class JwtUtils {
 
     public static final String Claims_UserID="USER_ID";
 
-    public static final long KeyDuration = 24*60*60*1000;
+    @Value("${ikklos.ofindexbackend.jwtKeyDuration}")
+    public static final long KeyDuration = 24*60*60*1000L;
 
     private static String secretKey0;
 
