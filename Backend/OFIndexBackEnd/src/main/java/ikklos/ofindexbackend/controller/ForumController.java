@@ -43,11 +43,10 @@ public class ForumController {
                 return this;
             }
 
-            public MessageItem setByModel(UserModel model){
+            public void setByModel(UserModel model){
                 senderId=model.getUserid();
                 senderName=model.getUsername();
                 senderAvatar=model.getAvatar();
-                return this;
             }
         }
 
