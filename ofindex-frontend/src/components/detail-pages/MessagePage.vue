@@ -2,52 +2,58 @@
 
 import {ref, onMounted} from 'vue'
 import {Check, DeleteFilled} from "@element-plus/icons-vue";
-import axiosApp from "@/main.js";
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
+import axiosApp from "@/axiosApp.js"
 
 const MessageList = ref([]);
 const router = useRouter();
 //从服务器获取用户的消息列表并装载进MessageList
 const getMessages = function () {
-  axiosApp.get('/forum/message').then(response => {
-    for(let i = 0; i < response.data.count; i++){
-      MessageList.value.push({
-        messageId: response.data.messages[i].messageId,
-        title: response.data.messages[i].senderName,
-        time: response.data.messages[i].addTime,
-        text: response.data.messages[i].text,
-        read: response.data.messages[i].read,
-      })
-    }
-  }).catch(error => {
-    ElMessage.error('获取消息失败');
-    if(error.response.status === 601) {
-      ElMessage.error('登录信息已过期');
-      router.push('/account/login');
-    }
+  axiosApp().then(app=>{
+    app.get('/forum/message').then(response => {
+      for(let i = 0; i < response.data.count; i++){
+        MessageList.value.push({
+          messageId: response.data.messages[i].messageId,
+          title: response.data.messages[i].senderName,
+          time: response.data.messages[i].addTime,
+          text: response.data.messages[i].text,
+          read: response.data.messages[i].read,
+        })
+      }
+    }).catch(error => {
+      ElMessage.error('获取消息失败');
+      if(error.response.status === 601) {
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
   })
 }
 const flagAsRead = (id,index)=>{
-  axiosApp.get('/forum/message/read/'+id).then(response => {
-    MessageList.value[index].read = true;
-  }).catch(error => {
-    ElMessage.error('操作失败');
-    if(error.response.status === 601){
-      ElMessage.error('登录信息已过期');
-      router.push('/account/login');
-    }
+  axiosApp().then(app=>{
+    app.get('/forum/message/read/'+id).then(response => {
+      MessageList.value[index].read = true;
+    }).catch(error => {
+      ElMessage.error('操作失败');
+      if(error.response.status === 601){
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
   })
 }
 const deleteMessage = (id,index)=>{
-  axiosApp.delete('/forum/message/'+id).then(response => {
-    MessageList.value.splice(index,1);
-  }).catch(error => {
-    ElMessage.error('操作失败');
-    if(error.response.status === 601){
-      ElMessage.error('登录信息已过期');
-      router.push('/account/login');
-    }
+  axiosApp().then(app=>{
+    app.delete('/forum/message/'+id).then(response => {
+      MessageList.value.splice(index,1);
+    }).catch(error => {
+      ElMessage.error('操作失败');
+      if(error.response.status === 601){
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
   })
 }
 //挂载到onMounted

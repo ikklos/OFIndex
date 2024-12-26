@@ -3,7 +3,7 @@ import {useRoute, useRouter} from "vue-router";
 import {reactive, onMounted, ref} from "vue";
 import CommentItem from "@/components/index/CommentItem.vue";
 import PostItem from "@/components/index/PostItem.vue";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 import {ElMessage} from "element-plus";
 
 const route = useRoute();
@@ -17,32 +17,34 @@ const PageData = reactive({
   comment: []
 })
 const loadData = () => {
-  axiosApp.get('/forum/post/' + route.params.postId).then(response => {
-    PageData.postId = response.data.postId;
-    PageData.postData = JSON.parse(JSON.stringify({
-      postId: response.data.postId,
-      posterId: response.data.posterId,
-      avatar: response.data.posterAvatar,
-      tags: response.data.tags,
-      title: response.data.title,
-      text: response.data.text,
-      pictures: response.data.images,
-      likes: response.data.likes,
-      liked: response.data.liked,
-      createTime: response.data.createTime,
-    }));
-  }).catch(err => {
-    ElMessage.error('获取帖子内容失败');
-    router.back();
-  });
-  axiosApp.get('/forum/comments/' + route.params.postId).then(response => {
-    PageData.comment = JSON.parse(JSON.stringify(response.data.comments));
-  }).catch(err => {
-    ElMessage.error('获取评论失败');
-    if (err.response.status === 601) {
-      ElMessage.error('登录信息已过期');
-      router.push('/account/login');
-    }
+  axiosApp().then(app => {
+    app.get('/forum/post/' + route.params.postId).then(response => {
+      PageData.postId = response.data.postId;
+      PageData.postData = JSON.parse(JSON.stringify({
+        postId: response.data.postId,
+        posterId: response.data.posterId,
+        avatar: response.data.posterAvatar,
+        tags: response.data.tags,
+        title: response.data.title,
+        text: response.data.text,
+        pictures: response.data.images,
+        likes: response.data.likes,
+        liked: response.data.liked,
+        createTime: response.data.createTime,
+      }));
+    }).catch(err => {
+      ElMessage.error('获取帖子内容失败');
+      router.back();
+    });
+    app.get('/forum/comments/' + route.params.postId).then(response => {
+      PageData.comment = JSON.parse(JSON.stringify(response.data.comments));
+    }).catch(err => {
+      ElMessage.error('获取评论失败');
+      if (err.response.status === 601) {
+        ElMessage.error('登录信息已过期');
+        router.push('/account/login');
+      }
+    })
   })
 }
 onMounted(() => {
@@ -55,59 +57,10 @@ const submitComment = function (data) {
     return;
   }
   //发送评论
-  axiosApp.post('/forum/comments/add', data).then(response => {
-    ElMessage.success('评论成功');
-    editingComment.value = '';
-    loadData();
-  }).catch(err => {
-    ElMessage.error('操作失败');
-    if (err.response.status === 601) {
-      ElMessage.error('登录信息已过期');
-      router.push('/account/login');
-    }
-  })
-}
-const handleFlagLike = function (id,option) {
-  if(option){
-    axiosApp.get('/forum/post/like/'+id).then(response => {
-      loadData();
-      ElMessage.success('点赞成功，感谢支持');
-    }).catch(error => {
-      ElMessage.error('操作失败');
-      if(error.response.status === 601){
-        ElMessage.error('登录信息已过期');
-        router.push('/account/login');
-      }
-    })
-  }else{
-    axiosApp.delete('/forum/post/like/'+id).then(response => {
-      loadData();
-      ElMessage.success('已取消点赞');
-    }).catch(error => {
-      ElMessage.error('操作失败');
-      if(error.response.status === 601){
-        ElMessage.error('登录信息已过期');
-        router.push('/account/login');
-      }
-    })
-  }
-}
-const handleFlagLikeComment = (id,option) => {
-  console.log(id,option);
-  if(option){
-    axiosApp.get('/forum/comments/like/'+id).then(response => {
-      ElMessage.success('已点赞，感谢您的支持');
-      loadData();
-    }).catch(error => {
-      ElMessage.error('操作失败');
-      if (error.response.status === 601) {
-        ElMessage.error('登录信息已过期');
-        router.push('/account/login');
-      }
-    })
-  }else{
-    axiosApp.delete('/forum/comments/like/'+id).then(response => {
-      ElMessage.success('已取消点赞');
+  axiosApp().then(app => {
+    app.post('/forum/comments/add', data).then(response => {
+      ElMessage.success('评论成功');
+      editingComment.value = '';
       loadData();
     }).catch(err => {
       ElMessage.error('操作失败');
@@ -115,6 +68,65 @@ const handleFlagLikeComment = (id,option) => {
         ElMessage.error('登录信息已过期');
         router.push('/account/login');
       }
+    })
+  })
+}
+const handleFlagLike = function (id, option) {
+  if (option) {
+    axiosApp().then(app => {
+      app.get('/forum/post/like/' + id).then(response => {
+        loadData();
+        ElMessage.success('点赞成功，感谢支持');
+      }).catch(error => {
+        ElMessage.error('操作失败');
+        if (error.response.status === 601) {
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
+    })
+  } else {
+    axiosApp().then(app => {
+      app.delete('/forum/post/like/' + id).then(response => {
+        loadData();
+        ElMessage.success('已取消点赞');
+      }).catch(error => {
+        ElMessage.error('操作失败');
+        if (error.response.status === 601) {
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
+    })
+  }
+}
+const handleFlagLikeComment = (id, option) => {
+  console.log(id, option);
+  if (option) {
+    axiosApp().then(app => {
+      app.get('/forum/comments/like/' + id).then(response => {
+        ElMessage.success('已点赞，感谢您的支持');
+        loadData();
+      }).catch(error => {
+        ElMessage.error('操作失败');
+        if (error.response.status === 601) {
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
+    })
+  } else {
+    axiosApp().then(app=>{
+      app.delete('/forum/comments/like/' + id).then(response => {
+        ElMessage.success('已取消点赞');
+        loadData();
+      }).catch(err => {
+        ElMessage.error('操作失败');
+        if (err.response.status === 601) {
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
     })
   }
 }
@@ -151,7 +163,7 @@ const handleFlagLikeComment = (id,option) => {
                   <el-collapse-item title="展开评论" class="comment-collapse-item">
                     <comment-item v-for="(comment,index) in PageData.comment" :key="index" :avatar="comment.userAvatar"
                                   :children_list="comment.comments"
-                                  :id = "comment.commentId"
+                                  :id="comment.commentId"
                                   :content="comment.text"
                                   :likes="comment.likes"
                                   :liked="comment.liked"

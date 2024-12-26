@@ -4,7 +4,7 @@ import {reactive, ref} from "vue";
 import axios from "axios";
 import {Plus} from "@element-plus/icons-vue";
 import {ElMessage} from "element-plus";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 import {useRouter} from "vue-router";
 
 let UploadComponent = ref(null);
@@ -24,15 +24,22 @@ const uploadForm = function () {
   if(PostEditData.title === ''){
     ElMessage.error('标题不能为空');
   }else{
-    axiosApp.post('/forum/post/add',PostEditData).then((response)=>{
-      ElMessage.success('上传成功');
-      emit('refresh');
-    }).catch((err)=>{
-      ElMessage.error('发布失败');
-      if(err.response.status === 601){
-        ElMessage.error('登录信息已过期');
-        router.push('/account/login');
-      }
+    axiosApp().then(app=>{
+      app.post('/forum/post/add',PostEditData).then((response)=>{
+        ElMessage.success('上传成功');
+        PostEditData.title = '';
+        PostEditData.text = '';
+        PostEditData.pictures = [];
+        PostEditData.tags = [];
+        PicturesRaw.value.splice(0,PicturesRaw.value.length);
+        emit('refresh');
+      }).catch((err)=>{
+        ElMessage.error('发布失败');
+        if(err.response.status === 601){
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
     })
   }
 }

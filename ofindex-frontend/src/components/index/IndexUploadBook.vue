@@ -3,7 +3,7 @@ import {onMounted, reactive, ref} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus} from "@element-plus/icons-vue";
 import axios from "axios";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 
 //数据
 const formData = reactive({
@@ -113,20 +113,22 @@ const submitForm = (formEl, fileData) => {
   console.log(form);
   let data = new FormData();
   console.log(JSON.stringify(form));
-  data.append('formData',new Blob([JSON.stringify(form)], {type: 'application/json'}),{contentType: 'application/json'});
+  data.append('formData', new Blob([JSON.stringify(form)], {type: 'application/json'}), {contentType: 'application/json'});
   data.append('file', fileData.file, fileData.filename);
-  axiosApp.post('/create/book', data).then(response => {
-    if (response.data.message === 'Book created') {
-      ElMessage.success('创建成功');
-      fileData.onSuccess(response);
-      formEl.resetFields();
-    }
-    uploading.value = false;
-  }).catch(error => {
-    ElMessage.error(error);
-    fileData.onError(error);
-    uploading.value = false;
-  });
+  axiosApp().then(app => {
+    app.post('/create/book', data).then(response => {
+      if (response.data.message === 'Book created') {
+        ElMessage.success('创建成功');
+        fileData.onSuccess(response);
+        formEl.resetFields();
+      }
+      uploading.value = false;
+    }).catch(error => {
+      ElMessage.error(error);
+      fileData.onError(error);
+      uploading.value = false;
+    });
+  })
 }
 
 const createBook = async (formEl) => {
@@ -144,28 +146,30 @@ const resetForm = (formEl) => {
   if (!formEl) return
   formEl.resetFields()
 }
-onMounted(()=>{
-  axiosApp.get('/class').then(response => {
-    if(response.status === 200) {
-      if(response.data.message === 'BookClass Found'){
-        for(let i=0; i < response.data.count; i++){
-          classList.value.push(response.data.items[i]);
+onMounted(() => {
+  axiosApp().then(app=>{
+    app.get('/class').then(response => {
+      if (response.status === 200) {
+        if (response.data.message === 'BookClass Found') {
+          for (let i = 0; i < response.data.count; i++) {
+            classList.value.push(response.data.items[i]);
+          }
+        }
+      } else {
+        if (response.status === 601) {
+          throw new Error('tokenFailed');
         }
       }
-    }else{
-      if(response.status === 601){
-        throw new Error('tokenFailed');
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
       }
-    }
-  }).catch(error => {
-    ElMessage.error('哎怎么似了');
-    if (error.message === 'tokenFailed') {
-      ElMessageBox.alert('哥们怎么不登录','不是哥们').then(()=>{
-        router.push('/account/login');
-      }).catch(()=>{
-        router.push('/account/login');
-      })
-    }
+    })
   })
 })
 </script>

@@ -2,7 +2,7 @@
 import {ref, reactive, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import BookItem from "@/components/index/BookItem.vue";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 import {ElMessageBox, ElMessage} from 'element-plus'
 
 let router = useRouter();
@@ -28,27 +28,29 @@ let firstReq = function () {
   ReqForMore();
 }
 let ReqForMore = function () {
-  axiosApp.post('/search', filter).then(response => {
-    if (response.status === 200) {
-      for (let i = 0; i < response.data.count; i++) {
-        BookItems.value.push(response.data.items[i]);
+  axiosApp().then(app=>{
+    app.post('/search', filter).then(response => {
+      if (response.status === 200) {
+        for (let i = 0; i < response.data.count; i++) {
+          BookItems.value.push(response.data.items[i]);
+        }
+        filter.page += 1;
+        if (response.data.totalResult <= filter.count * filter.page) {
+          noMore.value = true;
+        }
+      } else if (response.status === 601) {
+        throw new Error('tokenFailed');
       }
-      filter.page += 1;
-      if (response.data.totalResult <= filter.count * filter.page) {
-        noMore.value = true;
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
       }
-    } else if (response.status === 601) {
-      throw new Error('tokenFailed');
-    }
-  }).catch(error => {
-    ElMessage.error('哎怎么似了');
-    if (error.message === 'tokenFailed') {
-      ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
-        router.push('/account/login');
-      }).catch(() => {
-        router.push('/account/login');
-      })
-    }
+    })
   })
 }
 let handleJumpToDetail = function (id) {
@@ -59,27 +61,34 @@ let handleSelect = function (id) {
   firstReq();
 }
 let getClassList = function () {
-  axiosApp.get('/class').then(response => {
-    if (response.status === 200) {
-      if (response.data.message === 'BookClass Found') {
-        for (let i = 0; i < response.data.count; i++) {
-          ClassList.value.push(response.data.items[i]);
+  ClassList.value.splice(0,ClassList.value.length);
+  ClassList.value.push({
+    id: 0,
+    name: "全部",
+  })
+  axiosApp().then(app=>{
+    app.get('/class').then(response => {
+      if (response.status === 200) {
+        if (response.data.message === 'BookClass Found') {
+          for (let i = 0; i < response.data.count; i++) {
+            ClassList.value.push(response.data.items[i]);
+          }
+        }
+      } else {
+        if (response.status === 601) {
+          throw new Error('tokenFailed');
         }
       }
-    } else {
-      if (response.status === 601) {
-        throw new Error('tokenFailed');
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
       }
-    }
-  }).catch(error => {
-    ElMessage.error('哎怎么似了');
-    if (error.message === 'tokenFailed') {
-      ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
-        router.push('/account/login');
-      }).catch(() => {
-        router.push('/account/login');
-      })
-    }
+    })
   })
 }
 onMounted(() => {

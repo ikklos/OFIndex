@@ -2,7 +2,7 @@
 
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useRoute,useRouter} from "vue-router";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 import VuePdfEmbed from 'vue-pdf-embed'
 import {ElMessage, ElCollapseTransition, ElMessageBox} from "element-plus";
 import {CaretLeft, EditPen, Minus, Plus} from "@element-plus/icons-vue";
@@ -94,7 +94,8 @@ const fillHeight = function () {
 
 const loadPack = (id) => {
   if(id !== undefined && id !== null){
-    axiosApp.get('/pack/'+id).then(res=>{
+    axiosApp().then(app=>{
+      app.get('/pack/'+id).then(res=>{
         packData.name = res.data.name;
         packData.content = res.data.content;
         packData.description = res.data.description;
@@ -102,8 +103,9 @@ const loadPack = (id) => {
         let note = JSON.parse(res.data.content).note;
         packContent.value.diagram = diagram;
         packContent.value.note = note;
-    }).catch((err)=>{
-      ElMessage.error('加载资源包失败');
+      }).catch((err)=>{
+        ElMessage.error('加载资源包失败');
+      })
     })
   }
 }
@@ -112,24 +114,26 @@ const loadPackList = ()=>{
   loading.value = true;
   packList.value.splice(0,packList.value.length);
   packData.packId = 0;
-  axiosApp.get('/user').then(res=>{
-    axiosApp.get('/pack/user/'+res.data.userId + '/' + packData.bookId).then(response=>{
-      packList.value.splice(0,packList.value.length);
-      for(let i=0; i < response.data.count; i++){
-        packList.value.push(response.data.packs[i]);
-      }
-      if(response.data.count > 0 && currentPack.value === -1){
-        currentPack.value= packList.value[0].packId;
-        packData.packId = currentPack.value;
-      }
+  axiosApp().then(app=>{
+    app.get('/user').then(res=>{
+      app.get('/pack/user/'+res.data.userId + '/' + packData.bookId).then(response=>{
+        packList.value.splice(0,packList.value.length);
+        for(let i=0; i < response.data.count; i++){
+          packList.value.push(response.data.packs[i]);
+        }
+        if(response.data.count > 0 && currentPack.value === -1){
+          currentPack.value= packList.value[0].packId;
+          packData.packId = currentPack.value;
+        }
+      }).catch((err)=>{
+        ElMessage.error('获取资源包列表失败');
+      })
     }).catch((err)=>{
-      ElMessage.error('获取资源包列表失败');
+      if(err.response.status === 601){
+        ElMessage.error('登录已过期');
+        router.push('/account/login');
+      }
     })
-  }).catch((err)=>{
-    if(err.response.status === 601){
-      ElMessage.error('登录已过期');
-      router.push('/account/login');
-    }
   })
   loading.value = false;
 }
@@ -154,15 +158,17 @@ const createPack = ()=>{
       }),
       shared: false,
     }
-    axiosApp.post('/upload/pack',data).then(response => {
-      ElMessage.success('创建成功');
-      showAddPackDialog.value = false;
-      loadPackList()
-    }).catch((err)=>{
-      if(err.response.status === 601){
-        ElMessage.error('登录已过期');
-        router.push('/account/login');
-      }
+    axiosApp().then(app=>{
+      app.post('/upload/pack',data).then(response => {
+        ElMessage.success('创建成功');
+        showAddPackDialog.value = false;
+        loadPackList()
+      }).catch((err)=>{
+        if(err.response.status === 601){
+          ElMessage.error('登录已过期');
+          router.push('/account/login');
+        }
+      })
     })
   }else{
     ElMessage.error('资源包名字不能为空')
@@ -174,15 +180,17 @@ const updatePack = ()=>{
   console.log('packContent:',packContent.value);
   packData.content = JSON.stringify(packContent.value);
   packData.shared = false;
-  axiosApp.post('/upload/pack',packData).then(response => {
-    if(response.status === 200){
-      ElMessage.success('保存成功');
-    }
-  }).catch((err)=>{
-    if(err.response.status === 601){
-      ElMessage.error('登陆已过期');
-      router.push('/account/login');
-    }
+  axiosApp().then(app=>{
+    app.post('/upload/pack',packData).then(response => {
+      if(response.status === 200){
+        ElMessage.success('保存成功');
+      }
+    }).catch((err)=>{
+      if(err.response.status === 601){
+        ElMessage.error('登陆已过期');
+        router.push('/account/login');
+      }
+    })
   })
 }
 const clearMap = (obj)=>{
@@ -206,16 +214,18 @@ watch(currentPack, (newVal, oldVal) => {
 })
 onMounted(()=>{
   pdfLoading.value = true;
-  axiosApp.get('/load/ebook/'+packData.bookId,{
-    responseType: 'blob',
-  }).then((response)=>{
-    let blobData = response.data;
-    let localUrl = URL.createObjectURL(blobData);
-    ebookUrl.value = localUrl;
-  }).catch((err)=>{
-    ElMessage.error('加载电子书失败');
-    router.back();
-  });
+  axiosApp().then((app)=>{
+    app.get('/load/ebook/'+packData.bookId,{
+      responseType: 'blob',
+    }).then((response)=>{
+      let blobData = response.data;
+      let localUrl = URL.createObjectURL(blobData);
+      ebookUrl.value = localUrl;
+    }).catch((err)=>{
+      ElMessage.error('加载电子书失败');
+      router.back();
+    });
+  })
   loadPackList();
   if(route.params.packId){
     currentPack.value = parseInt(route.params.packId);
@@ -448,18 +458,20 @@ const shareCurrentPack = ()=>{
   ElMessageBox.confirm(`你要分享名为>${packData.name}<的资源包吗？`).then(()=>{
     if(packData.packId >= 0){
       packData.shared = true;
-      axiosApp.post('/upload/pack', packData).then((response)=>{
-        if(response.status === 200){
-          ElMessage.success('分享成功');
-        }
-        packData.shared = false;
-      }).catch((error)=>{
-        packData.shared = false;
-        ElMessage.error('分享失败');
-        if(error.response.status === 601){
-          ElMessage.error('登录信息已过期');
-          router.push('/account/login');
-        }
+      axiosApp().then(app=>{
+        app.post('/upload/pack', packData).then((response)=>{
+          if(response.status === 200){
+            ElMessage.success('分享成功');
+          }
+          packData.shared = false;
+        }).catch((error)=>{
+          packData.shared = false;
+          ElMessage.error('分享失败');
+          if(error.response.status === 601){
+            ElMessage.error('登录信息已过期');
+            router.push('/account/login');
+          }
+        })
       })
     }
   }).catch((err)=>{});
@@ -471,20 +483,22 @@ const modifyPackName = () => {
   }else{
     let data = JSON.parse(JSON.stringify(packData));
     data.name = newPackName.value;
-    axiosApp.post('/upload/pack',data).then((response)=>{
-      if(response.status === 200){
-        packData.name = newPackName.value;
-        ElMessage.success('修改成功');
+    axiosApp().then(app=>{
+      app.post('/upload/pack',data).then((response)=>{
+        if(response.status === 200){
+          packData.name = newPackName.value;
+          ElMessage.success('修改成功');
+          showEditPackDialog.value = false;
+          loadPackList();
+        }
+      }).catch((error)=>{
+        ElMessage.error('修改失败');
         showEditPackDialog.value = false;
-        loadPackList();
-      }
-    }).catch((error)=>{
-      ElMessage.error('修改失败');
-      showEditPackDialog.value = false;
-      if(error.response.status === 601){
-        ElMessage.error('登录信息已过期');
-        router.push('/account/login');
-      }
+        if(error.response.status === 601){
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
     })
   }
 }
