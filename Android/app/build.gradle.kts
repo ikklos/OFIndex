@@ -95,6 +95,11 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
+    // https://mvnrepository.com/artifact/com.qcloud.cos/cos-android
+    implementation(libs.cos.android)
+
+
+
 
 
 

@@ -28,16 +28,16 @@ fun ReplyItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(model = reply.userAvatar,
-                placeholder = painterResource(id = R.drawable.outline_account_circle_24),
-                error = painterResource(id = R.drawable.outline_account_circle_24)
-            ),
-            contentDescription = null,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-        )
+//        Image(
+//            painter = rememberAsyncImagePainter(model = reply.userAvatar,
+//                placeholder = painterResource(id = R.drawable.outline_account_circle_24),
+//                error = painterResource(id = R.drawable.outline_account_circle_24)
+//            ),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .size(32.dp)
+//                .clip(CircleShape)
+//        )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             Text(

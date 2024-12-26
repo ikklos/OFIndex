@@ -1,7 +1,7 @@
 // To parse the JSON, install kotlin's serialization plugin and do:
 //
-// val json           = Json { allowStructuredMapKeys = true }
-// val addPostRequest = json.parse(AddPostRequest.serializer(), jsonString)
+// val json              = Json { allowStructuredMapKeys = true }
+// val addCommentRequest = json.parse(AddCommentRequest.serializer(), jsonString)
 
 package site.sayaz.ofindex.data.remote.request
 
@@ -11,9 +11,8 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 
 @Serializable
-data class AddPostRequest (
-    val pictures: List<String>,
-    val tags: List<String>,
-    val text: String,
-    val title: String
+data class AddCommentRequest (
+    val parent: Long?,
+    val postId: Long,
+    val text: String
 )

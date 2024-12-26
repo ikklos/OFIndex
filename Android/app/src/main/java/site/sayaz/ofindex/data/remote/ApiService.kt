@@ -11,12 +11,14 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.data.model.Post
+import site.sayaz.ofindex.data.remote.request.AddCommentRequest
 import site.sayaz.ofindex.data.remote.request.AddPostRequest
 import site.sayaz.ofindex.data.remote.request.LoginRequest
 import site.sayaz.ofindex.data.remote.request.RegisterRequest
 import site.sayaz.ofindex.data.remote.request.SearchRequest
 import site.sayaz.ofindex.data.remote.request.ShelfAddRequest
 import site.sayaz.ofindex.data.remote.request.ShelfRemoveRequest
+import site.sayaz.ofindex.data.remote.response.AddCommentResponse
 import site.sayaz.ofindex.data.remote.response.AddPostResponse
 import site.sayaz.ofindex.data.remote.response.BookDetailResponse
 import site.sayaz.ofindex.data.remote.response.ClassListResponse
@@ -104,5 +106,10 @@ interface ApiService {
     @GET("/pack/{packid}")
     suspend fun packDetail(@Path("packid") packid:Long):Response<Pack>
 
+    @POST("/forum/comments/add")
+    suspend fun addComment(@Body addCommentRequest: AddCommentRequest):Response<AddCommentResponse>
+
+    @GET("/forum/comments/like/{commentId}")
+    suspend fun likeComment(@Path("commentId") commentId : Long):Response<NormalResponse>
 
 }

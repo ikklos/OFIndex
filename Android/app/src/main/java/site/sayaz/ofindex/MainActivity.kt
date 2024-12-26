@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import site.sayaz.ofindex.data.remote.ImageRetrofitInstance
+import site.sayaz.ofindex.data.remote.ImageInstance
 import site.sayaz.ofindex.data.remote.RetrofitInstance
 import site.sayaz.ofindex.data.repository.ExploreRepository
 import site.sayaz.ofindex.data.repository.ForumRepository
@@ -29,7 +29,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val apiService = RetrofitInstance.apiService
-        val imageApiService = ImageRetrofitInstance.imageApiService
+        val imageInstance = ImageInstance(applicationContext)
+        val imageApiService = imageInstance.imageApiService
 
         val loginRep = AuthRepository(apiService,applicationContext)
         val exploreRep = ExploreRepository(apiService)

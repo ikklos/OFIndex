@@ -14,9 +14,7 @@ import kotlinx.serialization.encoding.*
 data class UserInfoResponse (
     val avatar: String,
     val message: JsonElement? = null,
-
-    @SerialName("userId")
-    val userID: Long,
+    val userId: Long,
 
     val userName: String
 )

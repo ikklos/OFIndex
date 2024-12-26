@@ -161,7 +161,8 @@ fun AddPostScreen(
                     )
                     IconButton(
                         onClick = {
-                            forumViewModel.addTag(tag.value.trim())
+                            if(tag.value.trim() != "")
+                                forumViewModel.addTag(tag.value.trim())
                         }
                     ) {
                         Icon(

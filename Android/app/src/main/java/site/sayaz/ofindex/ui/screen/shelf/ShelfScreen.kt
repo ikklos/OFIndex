@@ -36,7 +36,6 @@ import site.sayaz.ofindex.ui.theme.Typography
 @Composable
 fun ShelfScreen(
     shelfViewModel: ShelfViewModel,
-    onNavigateRead: (Long) -> Unit,
     onNavigateBookDetail: (Long) -> Unit
 ) {
     val bookLists by shelfViewModel.bookListList.collectAsState()

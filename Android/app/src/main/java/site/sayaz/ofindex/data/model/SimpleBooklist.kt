@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SimpleBooklist (
-    @SerialName("booklistId")
-    val booklistID: Long,
-
+    val booklistId: Long,
     val name: String
 )

@@ -48,6 +48,38 @@ class ForumDetailViewModel(
         }
     }
 
+    fun addComment(postID: Long, commentText: String,parentId : Long?) {
+        viewModelScope.launch(Dispatchers.IO){
+            val result = forumDetailRepository.addComment(
+                postId = postID,
+                parentId = parentId,
+                text = commentText
+            )
+            result
+                .onSuccess { response ->
+                    getPostComments(postID)
+                }
+                .onFailure { e->
+                    Log.e(TAG,"getPostComments:",e)
+                }
+        }
+    }
+
+    fun likeComment(commentId: Long){
+        viewModelScope.launch(Dispatchers.IO){
+            val result = forumDetailRepository.likeComment(commentId)
+            result
+                .onSuccess {
+                    if (it.body() == null){
+                        Log.e(TAG,"likeComment:${it.code()}")
+                    }
+                }
+                .onFailure {
+                    Log.e(TAG,"likeComment:",it)
+                }
+        }
+    }
+
 
 
 

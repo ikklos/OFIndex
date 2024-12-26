@@ -1,9 +1,12 @@
 package site.sayaz.ofindex.ui.screen.shelf
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,17 +31,34 @@ import site.sayaz.ofindex.data.model.PackContent
 import site.sayaz.ofindex.ui.theme.Typography
 
 @Composable
-fun ReadNotesContent(content: PackContent) {
-    Column(modifier = Modifier.padding(16.dp)) {
+fun ReadNotesContent(content: PackContent, onJumpClick: (Int) -> Unit = {}) {
+    Log.d(TAG, "ReadNotesContent: $content")
+    Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
         content.note.forEach { note ->
-            ReadNodeItem(note)
+            ReadNodeItem(
+                note,
+                onJumpClick = onJumpClick
+            )
+        }
+        if (content.note.isEmpty()) {
+            Text(
+                text = "No Notes",
+                fontWeight = FontWeight.Bold,
+                color = Color.Gray,
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
         }
     }
 }
 
 
 @Composable
-fun ReadNodeItem(note: Note) {
+fun ReadNodeItem(
+    note: Note,
+    onJumpClick: (Int) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,7 +78,9 @@ fun ReadNodeItem(note: Note) {
 
         }
         IconButton(
-            onClick = {},
+            onClick = {
+                onJumpClick(note.rect?.page ?: -1)
+            },
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {
             Icon(

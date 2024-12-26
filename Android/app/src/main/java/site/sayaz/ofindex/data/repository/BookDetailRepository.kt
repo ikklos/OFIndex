@@ -1,5 +1,7 @@
 package site.sayaz.ofindex.data.repository
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import retrofit2.Response
 import site.sayaz.ofindex.data.remote.ApiService
 import site.sayaz.ofindex.data.remote.apiCall
@@ -30,6 +32,7 @@ class BookDetailRepository(private val apiService: ApiService) {
     }
 
     suspend fun shelfAdd(bookId: Long, booklistId: Long): Result<Response<NormalResponse>> {
+        println("bookid:$bookId booklistid:$booklistId")
         return apiCall {
             apiService.shelfAdd(
                 ShelfAddRequest(
@@ -47,8 +50,7 @@ class BookDetailRepository(private val apiService: ApiService) {
         )) }
     }
 
-    suspend fun getSimpleShelf():
-            Result<Response<SimpleShelfResponse>> {
+    suspend fun getSimpleShelf(): Result<Response<SimpleShelfResponse>> {
         return apiCall { apiService.simpleShelf() }
     }
 
@@ -59,11 +61,13 @@ class BookDetailRepository(private val apiService: ApiService) {
     suspend fun getUserPackList(bookId: Long): Result<Response<UserPackResponse>> {
         var userId: Long? = null
         apiCall { apiService.user() }.onSuccess {
-            userId = it.body()?.userID
+            userId = it.body()?.userId
+            println("userid = $userId")
         }
         if (userId == null){
             return Result.failure(Exception("UserID not found"))
         }
+        Log.d(TAG,"getUserPackListRep userid:$userId,bookID:$bookId")
         return apiCall { apiService.userPackList(userId!!,bookId)}
     }
 

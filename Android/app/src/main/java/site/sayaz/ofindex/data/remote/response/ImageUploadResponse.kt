@@ -1,25 +1,8 @@
 package site.sayaz.ofindex.data.remote.response
 
-data class ImageUploadResponse (
+data class ImageUploadResponse(
     val success: Boolean,
-    val code: String,
-    val message: String,
-    val data: ImageData,
-    val RequestId: String
-)
-
-data class ImageData (
-    val file_id: Int,
-    val width: Int,
-    val height: Int,
-    val filename: String,
-    val storename: String,
-    val size: Int,
-    val path: String,
-    val hash: String,
-    val url: String,
-    val delete: String,
-    val page: String
+    val url: String
 )
 /*
 {

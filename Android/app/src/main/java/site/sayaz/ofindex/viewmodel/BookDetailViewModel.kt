@@ -131,6 +131,7 @@ class BookDetailViewModel(
                     val body = it.body()
                     if (body != null) {
                         _shelfList.value = body.booklists
+                        println("_shelfList${_shelfList.value}")
                     } else {
                         Log.e(TAG, "getSimpleShelf: ${it.code()}")
                     }
@@ -182,6 +183,7 @@ class BookDetailViewModel(
                 val body = it.body()
                 if (body != null) {
                     _userPackList.value = body.packs
+                    Log.d(TAG, "getUserPackList: ${_userPackList.value}")
                 } else {
                     Log.e(TAG, "getUserPackList: ${it.code()}")
                 }

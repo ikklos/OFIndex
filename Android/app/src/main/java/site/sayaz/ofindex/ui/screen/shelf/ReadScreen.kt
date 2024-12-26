@@ -1,5 +1,7 @@
 package site.sayaz.ofindex.ui.screen.shelf
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -32,10 +34,11 @@ import site.sayaz.ofindex.viewmodel.ReadViewModel
 fun ReadScreen(
     readViewModel: ReadViewModel,
     bookID: Long,
-    packID: Long?,
+    packID: Long,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    Log.d(TAG, "ReadScreen: $bookID, $packID")
 
     val pdfBytes by readViewModel.pdfBytes.collectAsState()
     val downloadProgress by RetrofitInstance.progress.collectAsState()
@@ -51,7 +54,7 @@ fun ReadScreen(
         readViewModel.loadBook(bookID)
     }
     LaunchedEffect(packID) {
-        if (packID != null) {
+        if (packID != -1L) {
             readViewModel.loadPack(packID)
         }
     }
@@ -94,16 +97,22 @@ fun ReadScreen(
 
             ) {
             if (pdfBytes != null) {
-                HorizontalPager(state = pagerState) { page ->
-                    PDFView(
-                        modifier = Modifier.fillMaxSize(),
-                        pdfBytes = pdfBytes!!,
-                        page = page,
-                        setPageCount = {
-                            pageCount = it
-                        }
-                    )
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ){
+                    HorizontalPager(state = pagerState) { page ->
+                        PDFView(
+                            modifier = Modifier.fillMaxSize(),
+                            pdfBytes = pdfBytes!!,
+                            page = page,
+                            setPageCount = {
+                                pageCount = it
+                            }
+                        )
+                    }
+                    Text("${pagerState.currentPage}/$pageCount", color = Color.White, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp))
                 }
+
             } else {
                 CircularProgressIndicator(
                     progress = { downloadProgress.div(1f) },
@@ -120,6 +129,9 @@ fun ReadScreen(
                 },
                 onTabSelected = {
                     readViewModel.selectTab(it)
+                },
+                onJumpClick = {
+                    readViewModel.scrollToPage(it, pagerState)
                 },
                 pack = pack?: Pack()
             )

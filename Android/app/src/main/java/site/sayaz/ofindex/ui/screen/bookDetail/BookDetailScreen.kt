@@ -1,5 +1,7 @@
 package site.sayaz.ofindex.ui.screen.bookDetail
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import site.sayaz.ofindex.R
 import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.ui.components.BookView
@@ -33,7 +36,7 @@ import site.sayaz.ofindex.viewmodel.BookDetailViewModel
 fun BookDetailScreen(
     bookDetailViewModel: BookDetailViewModel,
     bookId: Long,
-    onNavigateRead: (Long) -> Unit,
+    onNavigateRead: (Long,Long?) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val book by bookDetailViewModel.bookDetail.collectAsState()
@@ -59,7 +62,7 @@ fun BookDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { book.name },
+                title = { Text(book.name) },
                 navigationIcon = {
                     IconButton(onClick = {
                         onNavigateBack()
@@ -74,7 +77,8 @@ fun BookDetailScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(onClick = {
-                onNavigateRead(bookId)
+                Log.d(TAG, "BookDetailScreen: $bookId, $chosenPack")
+                onNavigateRead(bookId,chosenPack?.packId?:-1)
             }) {
                 Icon(
                     painterResource(R.drawable.baseline_arrow_right_24),
@@ -105,7 +109,7 @@ fun BookDetailScreen(
                             DropdownMenuItem(
                                 text = { Text(shelf.name) },
                                 onClick = {
-                                    bookDetailViewModel.addBook(bookId, shelf.booklistID)
+                                    bookDetailViewModel.addBook(bookId, shelf.booklistId)
                                     likeListExpanded.value = false
                                     unLikeListExpanded.value = false
                                 }
@@ -126,7 +130,7 @@ fun BookDetailScreen(
                             DropdownMenuItem(
                                 text = { Text(shelf.name) },
                                 onClick = {
-                                    bookDetailViewModel.removeBook(bookId, shelf.booklistID)
+                                    bookDetailViewModel.removeBook(bookId, shelf.booklistId)
                                     likeListExpanded.value = false
                                     unLikeListExpanded.value = false
                                 }
@@ -150,7 +154,7 @@ fun BookDetailScreen(
                                 onClick = {
                                     bookDetailViewModel.choosePack(
                                         Pack(
-                                            packId = pack.packID,
+                                            packId = pack.packId,
                                             name = pack.packName
                                         )
                                     )
@@ -158,14 +162,8 @@ fun BookDetailScreen(
                                 }
                             )
                         }
-
-
                     }
-
-
                 }
-
-
             }
             Spacer(modifier = Modifier.height(16.dp))
             if (packList.isNotEmpty()) {
@@ -177,6 +175,7 @@ fun BookDetailScreen(
                             },
                             onAddClick = {
                                 bookDetailViewModel.addPack(pack.packId ?: -1)
+                                bookDetailViewModel.getUserPackList(bookId)
                             })
                     }
                 }

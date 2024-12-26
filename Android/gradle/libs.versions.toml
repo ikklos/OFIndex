@@ -4,6 +4,8 @@ coilCompose = "2.7.0"
 coilComposeVersion = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
 converterGson = "2.11.0"
+cos_api = "5.6.238.2"
+cosAndroid = "5.9.35"
 datastorePreferences = "1.1.1"
 gson = "2.11.0"
 hiltAndroid = "2.51.1"
@@ -38,6 +40,8 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil3-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilComposeVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+
+cos-android = { module = "com.qcloud.cos:cos-android", version.ref = "cosAndroid" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }

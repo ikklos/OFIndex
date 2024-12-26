@@ -106,9 +106,6 @@ fun AppNavigation(
             }
             composable(Route.shelf()) {
                 ShelfScreen(shelfViewModel,
-                    onNavigateRead = { bookID ->
-                        navController.navigate(Route.read(bookID.toString()))
-                    },
                     onNavigateBookDetail = { bookID ->
                         navController.navigate(Route.bookDetail(bookID.toString()))
                     })
@@ -156,7 +153,7 @@ fun AppNavigation(
                         onNavigateBack = {
                             navController.popBackStack()
                         },
-                        packID = it.arguments?.getString("packID")?.toLong()
+                        packID = it.arguments?.getString("packID")?.toLong()?:-1
                     )
                 } else {
                     Toast.makeText(LocalContext.current, "bookID is null", Toast.LENGTH_SHORT)
@@ -168,8 +165,8 @@ fun AppNavigation(
                 val bookID = it.arguments?.getString("bookID")
                 if (bookID != null) {
                     BookDetailScreen(bookDetailViewModel, bookID.toLong(),
-                        onNavigateRead = { id ->
-                            navController.navigate(Route.read(id.toString()))
+                        onNavigateRead = { bookId,packId ->
+                            navController.navigate(Route.read(bookId.toString(),packId.toString()))
                         },
                         onNavigateBack = {
                             navController.popBackStack()
@@ -183,7 +180,10 @@ fun AppNavigation(
             composable(Route.forumDetail()) {
                 val postID = it.arguments?.getString("postID")
                 if (postID != null) {
-                    ForumDetailScreen(forumDetailViewModel,postID.toLong())
+                    ForumDetailScreen(forumDetailViewModel,postID.toLong(), onNavigateBack = {
+                        navController.popBackStack()
+                    })
+
                 } else{
                     Toast.makeText(LocalContext.current, "postID is null", Toast.LENGTH_SHORT)
                         .show()

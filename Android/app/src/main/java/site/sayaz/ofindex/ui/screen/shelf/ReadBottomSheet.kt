@@ -26,10 +26,11 @@ fun ReadBottomSheet(
     selectedTab: Int,
     onDismissRequest: () -> Unit,
     onTabSelected: (Int) -> Unit,
+    onJumpClick: (Int) -> Unit = {},
     pack: Pack = Pack()
 ){
     val context = LocalContext.current
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState()
     val tabList = listOf("Notes", "Mind Map")
     val packContent = remember { parseNotesContent(pack.content?:"") }
 
@@ -53,7 +54,7 @@ fun ReadBottomSheet(
         // 根据选中的 Tab 显示不同的内容
         if (packContent != null){
             when (selectedTab) {
-                0 -> ReadNotesContent(packContent)
+                0 -> ReadNotesContent(packContent,onJumpClick)
                 1 -> ReadMindMapContent(packContent)
             }
         }

@@ -19,9 +19,7 @@ data class UserPackResponse (
 
 @Serializable
 data class UserPack (
-    @SerialName("packId")
-    val packID: Long? = null,
-
+    val packId: Long? = null,
     val packLikes: Long? = null,
     val packName: String? = null,
     val shared: Boolean? = null

@@ -92,7 +92,7 @@ private fun DrawScope.drawDiagram(
         }
     )
 
-    if (node.children.isNotEmpty()) {
+    if (!node.children.isNullOrEmpty()) {
         val childCount = node.children.size
         val verticalSpacing = 80f * zoom
         val totalHeight = (childCount - 1) * verticalSpacing + nodeSize.height

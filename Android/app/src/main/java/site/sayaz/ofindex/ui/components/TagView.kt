@@ -39,8 +39,7 @@ fun TagView(
                 onClick = { onTagClick(tag) },
                 indication = null, // 禁用默认的点击指示
                 interactionSource = remember { MutableInteractionSource() } // 禁用交互源
-            )
-            .width(IntrinsicSize.Min), // 自适应宽度
+            ), // 自适应宽度
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
@@ -56,7 +55,6 @@ fun TagView(
                 textAlign = TextAlign.Center, // 文字水平居中
                 fontSize = 12.sp, // 设置字体大小
                 maxLines = 1, // 限制为一行
-                overflow = TextOverflow.Ellipsis, // 超出部分用省略号表示
             )
         }
     }

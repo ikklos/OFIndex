@@ -17,7 +17,7 @@ import site.sayaz.ofindex.data.model.SimpleBooklist
 data class SimpleShelfResponse (
     val booklists: List<SimpleBooklist>,
     val count: Long,
-    val message: JsonElement? = null
+    val message: String? = null
 )
 
 

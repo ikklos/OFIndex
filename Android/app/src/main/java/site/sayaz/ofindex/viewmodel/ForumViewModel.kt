@@ -90,9 +90,17 @@ class ForumViewModel(
 
     fun addPost(postData: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-
-
-
+                val result = forumRepository.addPost(postData)
+            result.onSuccess {
+                if (it.body() != null){
+                    Log.d(TAG, "addPost: $it")
+                }else{
+                    Log.e(TAG, "addPost: ${it.code()}")
+                }
+            }
+            result.onFailure {
+                Log.e(TAG, "addPost: $it")
+            }
         }
 
     }
@@ -115,38 +123,10 @@ class ForumViewModel(
         viewModelScope.launch {
             try {
                 val uploadResults = forumRepository.uploadImages(imageUris)
-
-                // 更新图片上传状态
-                val updatedStatus = uploadResults.mapIndexed { index, result ->
-                    result.fold(
-                        onSuccess = { response ->
-                            if (response.body()?.data?.url != null){
-                                ImageUploadStatus.Success(imageUris[index], response.body()?.data?.url)
-                            }else{
-                                Log.e(TAG, "uploadImages: ${response.code()}")
-                                ImageUploadStatus.Error(
-                                    imageUris[index],
-                                    response.code().toString()
-                                )
-                            }
-
-                        },
-                        onFailure = { e ->
-                            ImageUploadStatus.Error(
-                                imageUris[index],
-                                e.message ?: "Unknown error"
-                            )
-                        })
-                }
-
-
-                _imageUploadStatus.value = updatedStatus
-
-                // 更新帖子数据中的图片 URL
-                val successfulUrls =
-                    updatedStatus.filterIsInstance<ImageUploadStatus.Success>().map { it.url?:"" }
-                _postData.value = _postData.value.copy(images = successfulUrls)
-                Log.d(TAG, "Uploaded images: $successfulUrls")
+                _imageUploadStatus.value = uploadResults
+                _postData.value = _postData.value.copy(images = uploadResults.map{
+                    (it as ImageUploadStatus.Success).url?:""
+                })
             } catch (e: Exception) {
                 Log.e(TAG,"Error uploading images: ${e.message}")
             }
