@@ -155,6 +155,9 @@ const handleUploadAvatarRemove = function (response, uploadFile) {
   editInfoData.avatar = '';
   avatarUploading.value = false;
 }
+const handleUploadAvatarError = function (error,uploadFile, uploadFiles) {
+  avatarUploading.value = false;
+}
 const handleResetAvatar = function () {
   if (editInfoData.avatar === '') {
     ElMessage.error('头像还没上传呢');
@@ -362,6 +365,7 @@ const jumpToMessagePage = function () {
                    :limit="1"
                    :on-success="handleUploadAvatarSuccess"
                    :on-remove="handleUploadAvatarRemove"
+                   :on-error="handleUploadAvatarError"
                    :on-exceed="()=>{ElMessage.warning('只能上传一张头像=(')}"
                    :http-request="uploadAvatar"
                    list-type="picture-card">
