@@ -15,7 +15,6 @@ import site.sayaz.ofindex.data.model.Pack
 data class SearchPackResponse (
     val count: Long,
     val items: List<Pack>,
-    val message: String,
-    val result: Boolean
+    val message: String
 )
 

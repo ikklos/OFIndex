@@ -1,7 +1,13 @@
 <script setup>
 
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import axiosApp from "@/main.js";
+import {ElMessage} from "element-plus";
+import {useRoute, useRouter} from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
+const emit = defineEmits(["addOk"]);
 const showDialog = ref(false);
 const formRef = ref(null);
 const innerFormRef = ref(null);
@@ -19,16 +25,25 @@ const innerFormRules = reactive({
   }
 })
 //书单列表
-const optionList = ref([{
-  name: '书架',
-  id: 0
-}]);
+const optionList = ref([]);
 
 const submitForm = async (formEl) => {
   if(!formEl)return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      //submit
+      axiosApp.post('/shelf/add',{
+        booklistId: formData.bookListId,
+        bookId: parseInt(route.params.bookId),
+      }).then((response)=>{
+        ElMessage.success('添加成功');
+        emit('addOk');
+      }).catch(error=>{
+        ElMessage.error('操作失败');
+        if(error.response.status === 601){
+          ElMessage.error('登录信息已过期');
+          router.push('/account/login');
+        }
+      })
     } else {
       throw new Error();
     }
@@ -44,6 +59,26 @@ const createBookList = async (formEl) => {
     }
   })
 }
+const getShelfInfo = ()=>{
+  axiosApp.get('/shelf').then((res) => {
+    for(let i = 0; i < res.data.count; i++) {
+      optionList.value.push({
+        name: res.data.items[i].name,
+        id: res.data.items[i].shelfId,
+      });
+    }
+    formData.bookListId = optionList.value[0].id;
+  }).catch((err)=>{
+    ElMessage.error('获取书架信息失败');
+    if(err.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
+}
+onMounted(()=>{
+  getShelfInfo();
+})
 </script>
 
 <template>

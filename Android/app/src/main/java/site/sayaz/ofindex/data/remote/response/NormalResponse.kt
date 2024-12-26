@@ -12,6 +12,6 @@ import kotlinx.serialization.encoding.*
 
 @Serializable
 data class NormalResponse (
-    val message: String,
-    val result: Boolean
+    val message: String? = "message",
+    val result: Boolean = true
 )

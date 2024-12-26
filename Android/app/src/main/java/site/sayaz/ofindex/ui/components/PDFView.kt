@@ -3,6 +3,7 @@ package site.sayaz.ofindex.ui.components
 import android.content.Context
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.widget.ImageView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -13,12 +14,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import java.io.File
 
 @Composable
-fun PDFView(modifier: Modifier, pdfBytes: ByteArray, page: Int) {
+fun PDFView(modifier: Modifier, pdfBytes: ByteArray, page: Int,setPageCount: (Int) -> Unit) {
     val context = LocalContext.current
     val tempFile = File(context.cacheDir, "temp.pdf")
     tempFile.writeBytes(pdfBytes)
     val parcelFileDescriptor = ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_READ_ONLY)
     val pdfRenderer = PdfRenderer(parcelFileDescriptor)
+    setPageCount(pdfRenderer.pageCount)
     AndroidView(
         modifier = modifier,
         factory = { viewContext: Context ->

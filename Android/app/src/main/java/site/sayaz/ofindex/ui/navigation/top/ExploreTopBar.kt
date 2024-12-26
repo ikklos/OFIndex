@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import site.sayaz.ofindex.R
+import site.sayaz.ofindex.ui.components.BaseTopBar
 import site.sayaz.ofindex.ui.components.SearchBar
 import site.sayaz.ofindex.viewmodel.ExploreViewModel
 

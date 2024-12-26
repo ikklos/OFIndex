@@ -12,7 +12,7 @@ class TokenInterceptor(
         val token = tokenProvider()
         val response = if (token != null) {
             val newRequest = request.newBuilder()
-                .addHeader("Authorization", "Bearer $token")
+                .addHeader("Authorization", "$token")
                 .build()
             chain.proceed(newRequest)
         } else {

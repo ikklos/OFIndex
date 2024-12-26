@@ -15,9 +15,6 @@ const SetHeaderInfo = function (nowRoute){
       break;
     case 'r-account-card-register':
       headString.value = "注册";
-      break;
-    case 'r-account-card-admin':
-      headString.value = "管理员";
   }
 }
 onMounted(() => {SetHeaderInfo(route.name);});
@@ -25,25 +22,11 @@ watch(()=>route.name,
     (newVal, oldVal) => {
         SetHeaderInfo(newVal);
     })
-//跳转到手机登录页面
-const gotoPhoneLogin = function () {
-  router.push('/account/phone-login');
-}
-//跳转到管理员登录页面
-const gotoAdmin = function () {
-  router.push('/account/admin');
-}
 </script>
 
 <template>
-  <el-row :span="24" class="center-layout-row">
-    <el-col :span="6" v-show="sideButtonVisible">
-      <el-button link @click="gotoPhoneLogin">手机号登录</el-button>
-    </el-col>
-    <el-col :span="12" style="font-size: 30px; color: #000000;">{{headString}}</el-col>
-    <el-col :span="6" v-show="sideButtonVisible">
-      <el-button link @click="gotoAdmin" color="#3621ef">管理员入口</el-button>
-    </el-col>
+  <el-row style="align-items: center;justify-items: center;justify-content: center; font-size: 30px; color: #000000;">
+    {{headString}}
   </el-row>
 </template>
 

@@ -7,15 +7,8 @@ import site.sayaz.ofindex.data.model.Book
 
 @Serializable
 data class BookList (
-    val books: List<BookListItem>,
+    val books: List<Book>,
     val count: Long,
     val index: Long? = null,
     val name: String
-)
-
-@Serializable
-data class BookListItem (
-    val addTime: String? = null,
-    val bookId: Long? = null,
-    val name: String? = null
 )

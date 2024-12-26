@@ -7,9 +7,6 @@ import kotlinx.serialization.encoding.*
 
 @Serializable
 data class ShelfAddRequest (
-    @SerialName("bookId")
-    val bookID: Long,
-
-    @SerialName("shelfId")
-    val shelfID: Long
+    val bookId: Long,
+    val booklistId: Long
 )

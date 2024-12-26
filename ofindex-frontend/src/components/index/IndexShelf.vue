@@ -4,19 +4,17 @@ import LittleBalls from "@/components/index/LittleBalls.vue";
 import {ref, onMounted, onBeforeUnmount, reactive} from 'vue';
 import {useRouter} from 'vue-router'
 import {Picture} from "@element-plus/icons-vue";
+import axiosApp from "@/main.js";
+import {ElMessage} from "element-plus";
 
 let router = useRouter();
 const menuItems = ref([
   {name: "历史"}, {name: "书架"}, {name: "回退"},{name: '创建书单'}
 ]);
-//包括书单和书目
-const DataList = ref([
-  {
-    name: "书单",
-    id: 1,
-    type: "list",
-  }
-]);
+const DataList = ref([{
+  books:[]
+}]);
+const nowBookList = ref(0);
 const formRef = ref(null);
 const formRules = reactive({
   name:{
@@ -28,23 +26,23 @@ const formRules = reactive({
 const formData = reactive({
   name: ''
 });
-for(let i = 0; i < 80; i++){
-  DataList.value.push({
-    name: "支柱虾：血本无归",
-    id: 1,
-    cover: "https://s2.loli.net/2024/12/15/hUJM5k97sNg8SIb.jpg",
-    type: "book",
-  })
-}
 const dialogVisible = ref(false);
-const jumpToDetail = function(bookId, type) {
-  if(type==='book'){
-    router.push('/index/detail/book-detail/'+bookId);
-  }else{
-    //请求书单下的列表，覆盖当前的DataList
-  }
+const jumpToDetail = function(bookId) {
+  router.push('/index/detail/book-detail/'+bookId);
+}
+const jumpToBookList = function(index) {
+  nowBookList.value = index;
 }
 const handleLittleBallsClicked = function (index){
+  if(index === 0){
+    loadHistory();
+  }
+  if(index === 1){
+    reloadData();
+  }
+  if(index === 2){
+    nowBookList.value = 0;
+  }
   if(index === 3){
     dialogVisible.value = true;
   }
@@ -59,6 +57,37 @@ const submitForm = async (formEl) => {
     }
   })
 }
+const reloadData = ()=>{
+  DataList.value.splice(0,DataList.value.length);
+  axiosApp.get('/shelf').then(res => {
+    nowBookList.value = 0;
+    DataList.value = JSON.parse(JSON.stringify(res.data.items));
+  }).catch(err => {
+    ElMessage.error('获取书架信息失败');
+    if(err.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
+}
+const loadHistory = ()=>{
+  DataList.value.splice(0,DataList.value.length);
+  axiosApp.get('/shelf/history').then(res=>{
+    nowBookList.value = 0;
+    DataList.value.push({
+      books: JSON.parse(JSON.stringify(res.data.items)),
+    });
+  }).catch(err => {
+    ElMessage.error('获取浏览历史失败');
+    if(err.response.status === 601){
+      ElMessage.error('登录信息已过期');
+      router.push('/account/login');
+    }
+  })
+}
+onMounted(() => {
+  reloadData();
+})
 </script>
 
 <template>
@@ -66,8 +95,13 @@ const submitForm = async (formEl) => {
     <el-main style="z-index: 9" id="shelf-main-field">
       <el-scrollbar style="height: 80vh; min-height: 520px;">
         <div class="items-container">
-          <div v-for="(item,index) in DataList" :key="index" class="data-item">
-            <div class="item-inner" @click="jumpToDetail(item.id,item.type)">
+          <div v-for="(item,index) in DataList.slice(1)" :key="index" v-if="nowBookList === 0" class="data-item" >
+            <div class="item-inner" @click="jumpToBookList(index)" style="background: #eeec70">
+              {{item.name}}
+            </div>
+          </div>
+          <div v-for="(item,index) in DataList[nowBookList].books" :key="index" class="data-item">
+            <div class="item-inner" @click="jumpToDetail(item.bookId)">
               <el-image :src="item.cover" fit="contain">
                 <template #error>
                   <div class="error-image">
