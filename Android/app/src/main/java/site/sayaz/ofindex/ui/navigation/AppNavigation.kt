@@ -18,6 +18,7 @@ import site.sayaz.ofindex.ui.navigation.top.ExploreTopBar
 import site.sayaz.ofindex.ui.navigation.top.ForumTopBar
 import site.sayaz.ofindex.ui.navigation.top.MoreTopBar
 import site.sayaz.ofindex.ui.navigation.top.ShelfTopBar
+import site.sayaz.ofindex.ui.screen.ProfileScreen
 import site.sayaz.ofindex.ui.screen.auth.LoginScreen
 import site.sayaz.ofindex.ui.screen.auth.RegisterScreen
 import site.sayaz.ofindex.ui.screen.bookDetail.BookDetailScreen
@@ -33,6 +34,7 @@ import site.sayaz.ofindex.viewmodel.ForumViewModel
 import site.sayaz.ofindex.viewmodel.AuthViewModel
 import site.sayaz.ofindex.viewmodel.BookDetailViewModel
 import site.sayaz.ofindex.viewmodel.ForumDetailViewModel
+import site.sayaz.ofindex.viewmodel.ProfileViewModel
 import site.sayaz.ofindex.viewmodel.ReadViewModel
 import site.sayaz.ofindex.viewmodel.ShelfViewModel
 
@@ -44,7 +46,8 @@ fun AppNavigation(
     shelfViewModel: ShelfViewModel,
     bookDetailViewModel: BookDetailViewModel,
     readViewModel: ReadViewModel,
-    forumDetailViewModel: ForumDetailViewModel
+    forumDetailViewModel: ForumDetailViewModel,
+    profileViewModel: ProfileViewModel
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -68,7 +71,8 @@ fun AppNavigation(
                     Route.explore(),
                     Route.shelf(),
                     Route.forum(),
-                    Route.more()
+                    Route.more(),
+                    Route.profile()
                 )
             ) {
                 BottomNavigation ({ route: String ->
@@ -120,6 +124,10 @@ fun AppNavigation(
             }
             composable(Route.more()) {
                 TODOScreen("sa")
+            }
+
+            composable(Route.profile()){
+                ProfileScreen(profileViewModel)
             }
 
             // Login/Register

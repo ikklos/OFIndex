@@ -19,6 +19,7 @@ import site.sayaz.ofindex.data.remote.request.RegisterRequest
 import site.sayaz.ofindex.data.remote.request.SearchRequest
 import site.sayaz.ofindex.data.remote.request.ShelfAddRequest
 import site.sayaz.ofindex.data.remote.request.ShelfRemoveRequest
+import site.sayaz.ofindex.data.remote.request.UserModifyRequest
 import site.sayaz.ofindex.data.remote.response.AddCommentResponse
 import site.sayaz.ofindex.data.remote.response.AddPostResponse
 import site.sayaz.ofindex.data.remote.response.BookDetailResponse
@@ -36,6 +37,7 @@ import site.sayaz.ofindex.data.remote.response.ShelfHistoryResponse
 import site.sayaz.ofindex.data.remote.response.ShelfResponse
 import site.sayaz.ofindex.data.remote.response.SimpleShelfResponse
 import site.sayaz.ofindex.data.remote.response.UserInfoResponse
+import site.sayaz.ofindex.data.remote.response.UserModifierResponse
 import site.sayaz.ofindex.data.remote.response.UserPackResponse
 
 interface ApiService {
@@ -116,5 +118,8 @@ interface ApiService {
 
     @POST("/shelf/create")
     suspend fun createBookList(@Body name:CreateBookListRequest):Response<CreateBookListResponse>
+
+    @POST("/user/modify")
+    suspend fun modifyUser(@Body user:UserModifyRequest):Response<UserModifierResponse>
 
 }

@@ -30,8 +30,13 @@ object BottomItems{
         R.drawable.ic_android_black_24dp,
         R.drawable.ic_android_black_24dp,
         "More")
+    private val profile = BottomItem(
+        "Profile",
+        R.drawable.baseline_person_24,
+        R.drawable.outline_person_24,
+        "Profile")
 
     fun getList(): List<BottomItem> {
-        return listOf(explore, shelf, forum)
+        return listOf(explore, shelf, forum, profile)
     }
 }

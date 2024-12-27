@@ -5,6 +5,7 @@ object Route {
     fun shelf() = "shelf"
     fun forum() = "forum"
     fun more() = "more"
+    fun profile() = "profile"
 
     fun login() = "login"
     fun register() = "register"

@@ -26,7 +26,7 @@ fun BottomNavigation(
             Route.explore() -> 0
             Route.shelf() -> 1
             Route.forum() -> 2
-            Route.more() -> 3
+            Route.profile() -> 3
             else -> -1
         }
     }
@@ -50,7 +50,7 @@ fun BottomNavigation(
                         0 -> Route.explore()
                         1 -> Route.shelf()
                         2 -> Route.forum()
-                        3 -> Route.more()
+                        3 -> Route.profile()
                         else -> Route.explore()
                     }
                 )},
