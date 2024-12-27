@@ -4,7 +4,6 @@ import kotlinx.serialization.*
 
 @Serializable
 data class ShelfRemoveRequest (
-    @SerialName("bookId")
-    val bookID: Long,
+    val bookId: Long,
     val booklistId: Long
 )

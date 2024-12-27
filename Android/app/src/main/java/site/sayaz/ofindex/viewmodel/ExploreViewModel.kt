@@ -87,12 +87,12 @@ class ExploreViewModel(
                                 _searchResults.update { currentList ->
                                     currentList + newResults.map {
                                         Book(
-                                            bookId = it.id?:0,
-                                            name = it.name?:"",
-                                            author = it.author?:"",
-                                            description = it.description?:"",
-                                            cover = it.cover?:"",
-                                            tag = it.tags?: emptyList()
+                                            bookId = it.id ?: 0,
+                                            name = it.name ?: "",
+                                            author = it.author ?: "",
+                                            description = it.description ?: "",
+                                            cover = it.cover ?: "",
+                                            tag = it.tags ?: emptyList()
                                         )
                                     }.distinctBy { it.bookId }
                                 }
@@ -118,7 +118,11 @@ class ExploreViewModel(
                 .onSuccess { response ->
                     val classListResponse = response.body()
                     if (classListResponse != null) {
-                        _classList.value = classListResponse.items
+                        val classAll = Class(
+                            id = 0,
+                            name = "All"
+                        )
+                        _classList.value = listOf(classAll) + classListResponse.items
                     } else {
                         Log.e(TAG, "getClassList: ${response.code()}")
                     }

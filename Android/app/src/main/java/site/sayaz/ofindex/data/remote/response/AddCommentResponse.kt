@@ -13,16 +13,14 @@ import kotlinx.serialization.encoding.*
 
 @Serializable
 data class AddCommentResponse (
-    @SerialName("commentId")
-    val commentID: Long,
+    val commentId: Long,
 
     val createTime: String,
     val likes: Long,
     val text: String,
     val userAvatar: String,
 
-    @SerialName("userId")
-    val userID: Long,
+    val userId: Long,
 
     val userName: String
 )

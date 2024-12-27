@@ -44,10 +44,7 @@ class BookDetailRepository(private val apiService: ApiService) {
     }
 
     suspend fun shelfRemove(bookId: Long, booklistId: Long): Result<Response<NormalResponse>> {
-        return apiCall { apiService.shelfRemove(ShelfRemoveRequest(
-            bookID = bookId,
-            booklistId = booklistId
-        )) }
+        return apiCall { apiService.shelfRemove(booklistId, bookId) }
     }
 
     suspend fun getSimpleShelf(): Result<Response<SimpleShelfResponse>> {

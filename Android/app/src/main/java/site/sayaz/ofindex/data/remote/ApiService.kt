@@ -13,6 +13,7 @@ import site.sayaz.ofindex.data.model.Pack
 import site.sayaz.ofindex.data.model.Post
 import site.sayaz.ofindex.data.remote.request.AddCommentRequest
 import site.sayaz.ofindex.data.remote.request.AddPostRequest
+import site.sayaz.ofindex.data.remote.request.CreateBookListRequest
 import site.sayaz.ofindex.data.remote.request.LoginRequest
 import site.sayaz.ofindex.data.remote.request.RegisterRequest
 import site.sayaz.ofindex.data.remote.request.SearchRequest
@@ -22,6 +23,7 @@ import site.sayaz.ofindex.data.remote.response.AddCommentResponse
 import site.sayaz.ofindex.data.remote.response.AddPostResponse
 import site.sayaz.ofindex.data.remote.response.BookDetailResponse
 import site.sayaz.ofindex.data.remote.response.ClassListResponse
+import site.sayaz.ofindex.data.remote.response.CreateBookListResponse
 import site.sayaz.ofindex.data.remote.response.FindBookResponse
 import site.sayaz.ofindex.data.remote.response.ForumCommentResponse
 import site.sayaz.ofindex.data.remote.response.ForumPostsResponse
@@ -62,7 +64,7 @@ interface ApiService {
     suspend fun shelfAdd(@Body shelfAddRequest: ShelfAddRequest): Response<NormalResponse>
 
     @DELETE("/shelf/remove")
-    suspend fun shelfRemove(@Body shelfAddRequest: ShelfRemoveRequest): Response<NormalResponse>
+    suspend fun shelfRemove(@Query("booklistId") booklistId: Long, @Query("bookId") bookId: Long): Response<NormalResponse>
 
     @POST("/search")
     suspend fun search(@Body searchRequest: SearchRequest):Response<SearchResponse>
@@ -111,5 +113,8 @@ interface ApiService {
 
     @GET("/forum/comments/like/{commentId}")
     suspend fun likeComment(@Path("commentId") commentId : Long):Response<NormalResponse>
+
+    @POST("/shelf/create")
+    suspend fun createBookList(@Body name:CreateBookListRequest):Response<CreateBookListResponse>
 
 }

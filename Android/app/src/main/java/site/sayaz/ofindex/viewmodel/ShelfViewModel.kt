@@ -18,6 +18,7 @@ class ShelfViewModel(
     private val _bookListList = MutableStateFlow<List<BookList>>(emptyList())
     val bookListList: StateFlow<List<BookList>> = _bookListList
 
+
     fun getShelf() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = shelfRepository.getShelf()
@@ -34,5 +35,24 @@ class ShelfViewModel(
                     Log.e(TAG, "getShelf: $e")
                 }
         }
+    }
+
+    fun createBookList(bookListName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = shelfRepository.createBookList(bookListName)
+            result
+                .onSuccess { response ->
+                    val createBookListResponse = response.body()
+                    if (createBookListResponse != null) {
+                        getShelf()
+                    } else {
+                        Log.e(TAG, "createBookList: ${response.code()}")
+                        }
+                }
+                .onFailure { e ->
+                    Log.e(TAG, "createBookList: $e")
+                }
+        }
+
     }
 }
