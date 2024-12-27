@@ -119,7 +119,7 @@ fun BookDetailScreen(
                 }
                 Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
                     ButtonWithLabel(
-                        iconResId = R.drawable.baseline_favorite_24,
+                        iconResId = R.drawable.outline_heart_broken_24,
                         label = "remove from shelf",
                         onClick = { unLikeListExpanded.value = true }
                     )

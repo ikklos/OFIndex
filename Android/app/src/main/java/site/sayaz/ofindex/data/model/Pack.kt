@@ -11,6 +11,7 @@ data class Pack (
     val packId: Long? = -1,
     val description: String? = " ",
     val likes: Long? = 0,
+    val liked: Boolean? = false,
     val content: String? = "",
 )
 

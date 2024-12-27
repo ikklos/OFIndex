@@ -79,7 +79,7 @@ fun PackView(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        val isLike = remember { mutableStateOf(false) }
+        val isLike = remember { mutableStateOf(pack.liked?:false) }
         val likeIcon = if (isLike.value) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24
         // 点赞键
         IconButton(onClick = {
