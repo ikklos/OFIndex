@@ -71,9 +71,9 @@ fun AppNavigation(
                     Route.more()
                 )
             ) {
-                BottomNavigation { route: String ->
+                BottomNavigation ({ route: String ->
                     navController.navigate(route)
-                }
+                },currentRoute)
             }
         },
         topBar = {
