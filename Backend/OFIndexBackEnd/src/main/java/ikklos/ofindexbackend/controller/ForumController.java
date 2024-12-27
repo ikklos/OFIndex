@@ -9,6 +9,7 @@ import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +43,10 @@ public class ForumController {
                 return this;
             }
 
-            public MessageItem setByModel(UserModel model){
+            public void setByModel(UserModel model){
                 senderId=model.getUserid();
                 senderName=model.getUsername();
                 senderAvatar=model.getAvatar();
-                return this;
             }
         }
 
@@ -77,7 +77,7 @@ public class ForumController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         MessageListResponse response=new MessageListResponse();
 
-        List<ForumMessageModel> messageModels=forumMessageRepository.findForumMessageModelsByReceiverId(userId, Sort.by(Sort.Direction.ASC,"timeStamp"));
+        List<ForumMessageModel> messageModels=forumMessageRepository.findForumMessageModelsByReceiverId(userId, Sort.by(Sort.Direction.DESC,"timeStamp"));
 
         response.messages=messageModels.stream().map(forumMessageModel -> {
             MessageListResponse.MessageItem item=new MessageListResponse.MessageItem().setByModel(forumMessageModel);
@@ -121,10 +121,12 @@ public class ForumController {
         if(messageO.isEmpty())throw new UniversalBadReqException("No such message");
         ForumMessageModel forumMessageModel= messageO.get();
 
-        if(!Objects.equals(forumMessageModel.getReceiverId(), userId))
-            throw new UniversalBadReqException("Not your message");
+        if(!Objects.equals(forumMessageModel.getReceiverId(), userId)
+            && UserPermissions.noPermission(userRepository, userId, 5))
+            throw new UniversalBadReqException("Permission denied");
 
         forumMessageModel.setIsRead(1);
+        forumMessageRepository.save(forumMessageModel);
 
         UniversalResponse response=new UniversalResponse();
         response.message="Message read";

@@ -8,6 +8,7 @@ import ikklos.ofindexbackend.repository.*;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.PackContentResponse;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,8 @@ import java.util.Objects;
 @RequestMapping(value = "/upload",produces = "application/json")
 public class UploadController {
 
+
+    private final UserRepository userRepository;
 
     public static class UploadPackRequest {
         public Integer packId;
@@ -40,13 +43,14 @@ public class UploadController {
     public UploadController(BookRepository bookRepository,
                             LocalDocumentConfigs localDocumentConfigs,
                             PackRepository packRepository,
-                            UserPackLikeRepository userPackLikeRepository, SubscriptionRepository subscriptionRepository, ForumMessageRepository forumMessageRepository){
+                            UserPackLikeRepository userPackLikeRepository, SubscriptionRepository subscriptionRepository, ForumMessageRepository forumMessageRepository, UserRepository userRepository){
         this.bookRepository=bookRepository;
         this.packRepository = packRepository;
         this.localDocumentConfigs=localDocumentConfigs;
         this.userPackLikeRepository = userPackLikeRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.forumMessageRepository = forumMessageRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/pack")
@@ -56,6 +60,7 @@ public class UploadController {
 
         PackModel packModel;
         boolean isUpdate;
+        boolean byAdmin=false;
         if(request.packId!=null){
             isUpdate = false;
             if(request.bookId!=null&&!bookRepository.existsById(request.bookId)){
@@ -69,7 +74,10 @@ public class UploadController {
             packModel=packO.get();
 
             if(!Objects.equals(packModel.getOwnerId(), userid)){
-                throw new UniversalBadReqException("Not your pack");
+                if(UserPermissions.noPermission(userRepository, userid, 5))
+                    throw new UniversalBadReqException("Permission denied");
+                else
+                    byAdmin=true;
             }
 
             if(request.name!=null)packModel.setName(request.name);
@@ -96,11 +104,12 @@ public class UploadController {
             packModel.setAuthorId(userid);
         }
 
-        packModel.setOwnerId(userid);
+        if(!byAdmin)
+            packModel.setOwnerId(userid);
         packModel.setUpdateTime(LocalDateTime.now());
         packRepository.save(packModel);
 
-        if(packModel.getShared()!=0)
+        if(packModel.getShared()!=0&&!byAdmin)
             subscriptionRepository.findSubscriptionModelsByFollowingId(userid).forEach(
                 subscriptionModel -> ForumMessageModel.addForumMessage(forumMessageRepository,
                         userid,subscriptionModel.getFollowerId(),0,

@@ -3,6 +3,7 @@ package ikklos.ofindexbackend.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,7 +17,7 @@ public class UserModel implements Serializable {
     private static final long serialVersionUID=1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="userid")
     @Getter
     private Integer userid;

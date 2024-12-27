@@ -2,7 +2,7 @@
 import {ref, reactive, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import BookItem from "@/components/index/BookItem.vue";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 import {ElMessageBox, ElMessage} from 'element-plus'
 
 let router = useRouter();
@@ -28,60 +28,67 @@ let firstReq = function () {
   ReqForMore();
 }
 let ReqForMore = function () {
-  axiosApp.post('/search',filter).then(response => {
-    if(response.status === 200){
-      if(response.data.message === 'Result found'){
-        for(let i=0; i < response.data.count; i++){
+  axiosApp().then(app=>{
+    app.post('/search', filter).then(response => {
+      if (response.status === 200) {
+        for (let i = 0; i < response.data.count; i++) {
           BookItems.value.push(response.data.items[i]);
         }
         filter.page += 1;
-        if(response.data.totalResult <= filter.count*filter.page){
+        if (response.data.totalResult <= filter.count * filter.page) {
           noMore.value = true;
         }
+      } else if (response.status === 601) {
+        throw new Error('tokenFailed');
       }
-    }else if(response.status === 601){
-      throw new Error('tokenFailed');
-    }
-  }).catch(error => {
-    ElMessage.error('哎怎么似了');
-    if (error.message === 'tokenFailed') {
-      ElMessageBox.alert('哥们怎么不登录','不是哥们').then(()=>{
-        router.push('/account/login');
-      }).catch(()=>{
-        router.push('/account/login');
-      })
-    }
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
+      }
+    })
   })
 }
 let handleJumpToDetail = function (id) {
   router.push('/index/detail/book-detail/' + id);
 }
 let handleSelect = function (id) {
-  filter.bookId = id;
+  filter.bookClass = id;
   firstReq();
 }
 let getClassList = function () {
-  axiosApp.get('/class').then(response => {
-    if(response.status === 200) {
-      if(response.data.message === 'BookClass Found'){
-        for(let i=0; i < response.data.count; i++){
-          ClassList.value.push(response.data.items[i]);
+  ClassList.value.splice(0,ClassList.value.length);
+  ClassList.value.push({
+    id: 0,
+    name: "全部",
+  })
+  axiosApp().then(app=>{
+    app.get('/class').then(response => {
+      if (response.status === 200) {
+        if (response.data.message === 'BookClass Found') {
+          for (let i = 0; i < response.data.count; i++) {
+            ClassList.value.push(response.data.items[i]);
+          }
+        }
+      } else {
+        if (response.status === 601) {
+          throw new Error('tokenFailed');
         }
       }
-    }else{
-      if(response.status === 601){
-        throw new Error('tokenFailed');
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
       }
-    }
-  }).catch(error => {
-    ElMessage.error('哎怎么似了');
-    if (error.message === 'tokenFailed') {
-      ElMessageBox.alert('哥们怎么不登录','不是哥们').then(()=>{
-        router.push('/account/login');
-      }).catch(()=>{
-        router.push('/account/login');
-      })
-    }
+    })
   })
 }
 onMounted(() => {
@@ -96,8 +103,9 @@ onMounted(() => {
       <el-scrollbar style="height:calc(100vh - max(8vh,60px))">
         <el-menu default-active="0">
           <el-menu-item v-if="ClassList.length === 0" :disabled="true" key="no-class">No List</el-menu-item>
-          <el-menu-item v-for="(item,index) in ClassList" :key="index" :index="item.id.toString()" @click="handleSelect(item.id)">
-            {{item.name}}
+          <el-menu-item v-for="(item,index) in ClassList" :key="index" :index="item.id.toString()"
+                        @click="handleSelect(item.id)">
+            {{ item.name }}
           </el-menu-item>
         </el-menu>
       </el-scrollbar>
@@ -135,9 +143,11 @@ onMounted(() => {
 .el-aside {
   width: 10vw;
 }
-.explore-aside{
+
+.explore-aside {
   background: #fcfce5;
 }
+
 .el-menu-item {
   width: 100%;
   color: #3621ef !important;
@@ -204,24 +214,29 @@ onMounted(() => {
   padding: 0;
   margin: 0;
 }
-.infinite-list::-webkit-scrollbar{
-  width:10px;
-  height:10px;
+
+.infinite-list::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
   /**/
 }
-.infinite-list::-webkit-scrollbar-track{
+
+.infinite-list::-webkit-scrollbar-track {
   background: #FFFFFF;
-  border-radius:2px;
+  border-radius: 2px;
 }
-.infinite-list::-webkit-scrollbar-thumb{
+
+.infinite-list::-webkit-scrollbar-thumb {
   background: #8e6df9;
-  border-radius:10px;
+  border-radius: 10px;
 }
-.infinite-list::-webkit-scrollbar-thumb:hover{
+
+.infinite-list::-webkit-scrollbar-thumb:hover {
   background: #0012e2;
   cursor: pointer;
 }
-.infinite-list::-webkit-scrollbar-corner{
+
+.infinite-list::-webkit-scrollbar-corner {
   background: #179a16;
 }
 </style>

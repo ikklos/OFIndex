@@ -52,6 +52,7 @@ public class ForumPostController {
         public String text;
         public List<String> images;
         public Integer likes;
+        public Boolean liked;
         public LocalDateTime createTime;
 
         public void setByModel(UserModel userModel){
@@ -71,11 +72,13 @@ public class ForumPostController {
             JavaType javaType=objectMapper.getTypeFactory().constructParametricType(List.class,String.class);
             tags= objectMapper.readValue(postModel.getTags(),javaType);
             images =objectMapper.readValue(postModel.getImageurls(),javaType);
+            if(images==null)images=new ArrayList<>();
             return this;
         }
 
-        public PostGetResponse setLikes(UserPostLikeRepository repository){
+        public PostGetResponse setLikes(UserPostLikeRepository repository,Integer userId){
             likes=repository.countAllByPostId(postId);
+            liked=userId!=null&&repository.existsByUserIdAndPostId(userId,postId);
             return this;
         }
     }
@@ -114,7 +117,7 @@ public class ForumPostController {
         postModel.setText(request.text);
         ObjectMapper mapper = new ObjectMapper();
         String s0= mapper.writeValueAsString(request.pictures);
-        postModel.setImageurls(s0);
+        postModel.setImageurls(s0!=null?s0:"[]");
         postModel.setTimeStamp(LocalDateTime.now());
 
         List<String> commonTags=new ArrayList<>();
@@ -130,7 +133,7 @@ public class ForumPostController {
             }
         }
         String s = mapper.writeValueAsString(commonTags);
-        postModel.setTags(s);
+        postModel.setTags(s!=null?s:"[]");
 
         postRepository.save(postModel);
 
@@ -147,7 +150,10 @@ public class ForumPostController {
     }
 
     @GetMapping("/post/{postid}")
-    public PostGetResponse getPostContent(@PathVariable("postid") Integer postId) throws JsonProcessingException, UniversalBadReqException {
+    public PostGetResponse getPostContent(@PathVariable("postid") Integer postId,
+                                          @RequestHeader(value = "Authorization",required = false) String token)throws JsonProcessingException, UniversalBadReqException {
+
+        Integer userId=token!=null?JwtUtils.getUserIdJWT(token):null;
 
         var postOption=postRepository.findById(postId);
 
@@ -157,7 +163,7 @@ public class ForumPostController {
 
         PostModel postModel=postOption.get();
 
-        PostGetResponse response=new PostGetResponse().setByModel(postModel).setLikes(userPostLikeRepository);
+        PostGetResponse response=new PostGetResponse().setByModel(postModel).setLikes(userPostLikeRepository,userId);
         var userOption=userRepository.findById(postModel.getUserId());
         if(userOption.isPresent()){
             UserModel userModel=userOption.get();
@@ -169,30 +175,32 @@ public class ForumPostController {
 
     @GetMapping("/posts")
     public PostListResponse getPostList(@RequestParam Integer page,
-                                        @RequestParam Integer pagesize) throws UniversalBadReqException {
-        List<PostModel> posts=postRepository.findAll(Sort.by(Sort.Direction.ASC,"timeStamp"));
+                                        @RequestParam Integer pagesize) {
+        List<PostModel> posts=postRepository.findAll(Sort.by(Sort.Direction.DESC,"timeStamp"));
 
         PostListResponse response=new PostListResponse();
 
         int from=page*pagesize;
         int to=from+pagesize;
 
-        if(from>=posts.size()){
-            throw new UniversalBadReqException("No enough post");
-        }
+        if(from<posts.size()){
+            if(to>=posts.size())to=posts.size();
 
-        if(to>=posts.size())to=posts.size();
-
-        response.posts=posts.subList(from,to).stream().map(postModel -> {
-            try {
-                PostGetResponse item=new PostGetResponse().setByModel(postModel);
-                var userO=userRepository.findById(postModel.getUserId());
-                userO.ifPresent(item::setByModel);
-                return item;
-            } catch (JsonProcessingException e) {
-                return null;
-            }
-        }).filter(Objects::nonNull).toList();
+            response.posts=posts.subList(from,to).stream().map(postModel -> {
+                try {
+                    PostGetResponse item=new PostGetResponse().setByModel(postModel);
+                    var userO=userRepository.findById(postModel.getUserId());
+                    if(userO.isPresent()){
+                        item.setByModel(userO.get());
+                        item.setLikes(userPostLikeRepository,userO.get().getUserid());
+                    }
+                    return item;
+                } catch (JsonProcessingException e) {
+                    return null;
+                }
+            }).filter(Objects::nonNull).toList();
+        }else
+            response.posts=new ArrayList<>();
         response.count=response.posts.size();
         response.total=posts.size();
         return response;

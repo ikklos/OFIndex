@@ -14,4 +14,6 @@ public interface ShelfRepository extends JpaRepository<ShelfModel,Integer> {
 
     List<ShelfModel> findShelfModelByUserIdAndIndex(Integer userId, Integer index);
 
+    int countShelfModelByUserId(Integer userId);
+
 }

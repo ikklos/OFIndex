@@ -54,10 +54,7 @@ public class UserController {
                                            @RequestBody ModifyUserInfoRequest request) throws UniversalBadReqException {
         Integer userId= JwtUtils.getUserIdJWT(token);
         var userO=userRepository.findById(userId);
-        if(userO.isEmpty()){
-            throw new UniversalBadReqException("No such user");
-        }
-
+        if(userO.isEmpty())throw new UniversalBadReqException("No such user");
         UserModel userModel=userO.get();
 
         if(request.avatar!=null)userModel.setAvatar(request.avatar);

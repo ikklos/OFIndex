@@ -2,7 +2,7 @@
 import {ref} from 'vue'
 import {Back, Right} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 
 const router = useRouter();
 const NickName = ref('');
@@ -23,26 +23,27 @@ const sendRegisterReq = function () {
     let allowed = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
     if (allowed.test(Password.value)) {
       //发送请求
-      axiosApp.post('/register',{
-        username: NickName.value,
-        phoneNumber:null,
-        passwd: Password.value,
-      }).then(response => {
-        if (response.status === 200) {
-          localStorage.setItem('Token',response.data.token);
-          const AccountId = response.data.id;
-          console.log(response.data);
-          //跳转到成功页
-          router.push({
-            name: 'r-account-card-register-succeed',
-            params: {
-              AccountId: AccountId,
-            }
-          });
-        }else throw new Error(response.statusText);
-      }).catch(error => {
+      axiosApp().then((app)=>{
+      app.post('/register',{
+          username: NickName.value,
+          phoneNumber:null,
+          passwd: Password.value,
+        }).then(response => {
+          if (response.status === 200) {
+            const AccountId = response.data.id;
+            console.log(response.data);
+            //跳转到成功页
+            router.push({
+              name: 'r-account-card-register-succeed',
+              params: {
+                AccountId: AccountId,
+              }
+            });
+          }else throw new Error(response.statusText);
+        }).catch(error => {
           //弹窗提示注册失败
-        console.log(error);
+          console.log(error);
+        })
       })
     } else {
       //弹窗提示密码含有非法字符

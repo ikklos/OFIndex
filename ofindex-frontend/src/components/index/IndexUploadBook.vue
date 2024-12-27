@@ -1,9 +1,9 @@
 <script setup>
-import {reactive, ref} from 'vue'
-import {ElMessage} from 'element-plus'
+import {onMounted, reactive, ref} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus} from "@element-plus/icons-vue";
 import axios from "axios";
-import axiosApp from "@/main.js";
+import axiosApp from "@/axiosApp.js";
 
 //数据
 const formData = reactive({
@@ -50,14 +50,11 @@ const formRules = reactive({
     trigger: 'change',
   }
 });
-const classList = ref([
-  {
-    name: '小说',
-    id: 1
-  }
-])
+const classList = ref([]);
 const imageData = ref([]);
 const uploadPdfRef = ref(null);
+const uploading = ref(false);
+
 const handleUploadCover = function (option) {
   console.log(JSON.stringify(option));
   let data = {
@@ -77,12 +74,11 @@ const handleUploadCover = function (option) {
       throw new Error('请求失败，可能是网络原因');
     }
   }).catch(error => {
-    ElMessage.error(error);
+    ElMessage.error(error.message);
     option.onError(error);
   })
 }
 const handlePreview = function (uploadFile) {
-
 }
 const handleExceed = function (response, fileList) {
   ElMessage.warning('只能上传一张封面图');
@@ -91,7 +87,6 @@ const handleRemove = function (file, fileList) {
   formData.cover = null;
 }
 const handleSuccess = function (response, file, fileList) {
-  console.log('success');
   if (response.data.success === true) {
     formData.cover = response.data.data.url;
   } else {
@@ -106,7 +101,6 @@ const beforeUpload = function (file) {
   return true;
 }
 const submitForm = (formEl, fileData) => {
-
   const form = {
     name: formData.name,
     author: formData.author,
@@ -119,18 +113,22 @@ const submitForm = (formEl, fileData) => {
   console.log(form);
   let data = new FormData();
   console.log(JSON.stringify(form));
-  data.append('formData',new Blob([JSON.stringify(form)], {type: 'application/json'}),{contentType: 'application/json'});
+  data.append('formData', new Blob([JSON.stringify(form)], {type: 'application/json'}), {contentType: 'application/json'});
   data.append('file', fileData.file, fileData.filename);
-  axiosApp.post('/create/book', data).then(response => {
-    if (response.data.message === 'Book created') {
-      ElMessage.success('创建成功');
-      fileData.onSuccess(response);
-      formEl.resetFields();
-    }
-  }).catch(error => {
-    ElMessage.error(error);
-    fileData.onError(error);
-  });
+  axiosApp().then(app => {
+    app.post('/create/book', data).then(response => {
+      if (response.data.message === 'Book created') {
+        ElMessage.success('创建成功');
+        fileData.onSuccess(response);
+        formEl.resetFields();
+      }
+      uploading.value = false;
+    }).catch(error => {
+      ElMessage.error(error);
+      fileData.onError(error);
+      uploading.value = false;
+    });
+  })
 }
 
 const createBook = async (formEl) => {
@@ -138,6 +136,7 @@ const createBook = async (formEl) => {
   await formEl.validate((valid, fields) => {
         if (valid) {
           //submit
+          uploading.value = true;
           uploadPdfRef.value.submit();
         }
       }
@@ -147,13 +146,39 @@ const resetForm = (formEl) => {
   if (!formEl) return
   formEl.resetFields()
 }
+onMounted(() => {
+  axiosApp().then(app=>{
+    app.get('/class').then(response => {
+      if (response.status === 200) {
+        if (response.data.message === 'BookClass Found') {
+          for (let i = 0; i < response.data.count; i++) {
+            classList.value.push(response.data.items[i]);
+          }
+        }
+      } else {
+        if (response.status === 601) {
+          throw new Error('tokenFailed');
+        }
+      }
+    }).catch(error => {
+      ElMessage.error('哎怎么似了');
+      if (error.message === 'tokenFailed') {
+        ElMessageBox.alert('哥们怎么不登录', '不是哥们').then(() => {
+          router.push('/account/login');
+        }).catch(() => {
+          router.push('/account/login');
+        })
+      }
+    })
+  })
+})
 </script>
 
 <template>
   <el-container>
     <el-main class="form-main">
       <el-scrollbar>
-        <div class="form-container">
+        <div class="form-container" v-loading.fullscreen.lock="uploading">
           <el-form ref="formRef"
                    :model="formData"
                    :rules="formRules"

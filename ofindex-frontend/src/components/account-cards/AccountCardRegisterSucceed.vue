@@ -10,8 +10,8 @@ AccountId.value = String(route.params.AccountId);
 const goBack = function () {
   router.back();
 }
-const gotoIndex = function () {
-  router.push('/index');
+const gotoLogin = function () {
+  router.push('/account/login');
 }
 </script>
 
@@ -32,7 +32,7 @@ const gotoIndex = function () {
           </el-button>
         </el-col>
         <el-col :span="8" :offset="8" class="center-layout-row">
-          <el-button color="#3621ef" @click="gotoIndex" :icon="Right">
+          <el-button color="#3621ef" @click="gotoLogin" :icon="Right">
           </el-button>
         </el-col>
       </el-row>

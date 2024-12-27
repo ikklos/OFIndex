@@ -2,7 +2,6 @@ package ikklos.ofindexbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ikklos.ofindexbackend.domain.BookModel;
-import ikklos.ofindexbackend.domain.UserModel;
 import ikklos.ofindexbackend.filesystem.BookFileFinder;
 import ikklos.ofindexbackend.repository.BookClassRepository;
 import ikklos.ofindexbackend.repository.BookRepository;
@@ -10,6 +9,7 @@ import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
 import ikklos.ofindexbackend.utils.UniversalResponse;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -61,15 +61,8 @@ public class CreateController {
         Integer userId= JwtUtils.getUserIdJWT(token);
         CreateBookResponse response=new CreateBookResponse();
 
-        var userO=userRepository.findById(userId);
-        if(userO.isEmpty()){
-            throw new UniversalBadReqException("No such user");
-        }
-        UserModel userModel=userO.get();
-
-        //TODO add privilege level
-        if(userModel.getLevel()<5){
-            throw new UniversalBadReqException("Not Administrator");
+        if(UserPermissions.noPermission(userRepository, userId, 6)){
+            throw new UniversalBadReqException("Permission denied");
         }
 
         if(!bookClassRepository.existsById(request.bookClass)){
@@ -82,7 +75,8 @@ public class CreateController {
         bookModel.setDescription(request.description);
         bookModel.setCover(request.cover);
         ObjectMapper objectMapper=new ObjectMapper();
-        bookModel.setTags(objectMapper.writeValueAsString(request.tags));
+        var s=objectMapper.writeValueAsString(request.tags);
+        bookModel.setTags(s!=null?s:"[]");
         bookModel.setIsbn(request.isbn);
         bookModel.setBookClass(request.bookClass);
 

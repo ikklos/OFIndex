@@ -3,8 +3,10 @@ package ikklos.ofindexbackend.controller;
 import ikklos.ofindexbackend.domain.FileModel;
 import ikklos.ofindexbackend.filesystem.UserFileFinder;
 import ikklos.ofindexbackend.repository.FileRepository;
+import ikklos.ofindexbackend.repository.UserRepository;
 import ikklos.ofindexbackend.utils.JwtUtils;
 import ikklos.ofindexbackend.utils.UniversalBadReqException;
+import ikklos.ofindexbackend.utils.UserPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
@@ -24,6 +26,7 @@ import java.util.Objects;
 @RequestMapping(value = "/file",produces = "application/json")
 public class FileController {
 
+
     public static class FileInfo {
         public Integer fileId;
         public Integer ownerId;
@@ -38,12 +41,15 @@ public class FileController {
 
     private final FileRepository fileRepository;
     private final UserFileFinder userFileFinder;
+    private final UserRepository userRepository;
 
     @Autowired
     public FileController(FileRepository fileRepository,
-                          UserFileFinder userFileFinder){
+                          UserFileFinder userFileFinder,
+                          UserRepository userRepository){
         this.fileRepository=fileRepository;
         this.userFileFinder = userFileFinder;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -71,8 +77,9 @@ public class FileController {
         }
 
         FileModel fileModel=fileO.get();
-        if(fileModel.getShared()==0&&!Objects.equals(userId,fileModel.getUserId())){
-            throw new UniversalBadReqException("Not your file");
+        if(fileModel.getShared()==0&&!Objects.equals(userId,fileModel.getUserId())
+            && UserPermissions.noPermission(userRepository, userId, 5)){
+            throw new UniversalBadReqException("Permission denied");
         }
 
         Path filePath = userFileFinder.getFilePath(fileModel);

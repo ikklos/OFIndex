@@ -1,9 +1,17 @@
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 const name = ref('');
+const props = defineProps({
+  userInfo: {
+    type: Object,
+  }
+})
 onMounted(() => {
-  name.value = 'ikklo';
+  name.value = JSON.parse(JSON.stringify(props.userInfo.userName));
 });
+watch(props.userInfo,(newVal, oldVal)=>{
+  name.value = JSON.parse(JSON.stringify(props.userInfo.userName));
+})
 const calcPenPos = function(){
   if(!document.getElementById('index-container')){
     return {};
@@ -14,17 +22,20 @@ const calcPenPos = function(){
     top: `${rect.top + 50}px`,
   };
 }
-const emit = defineEmits(['changeAvatar','editName','showMessagePage'])
+const emit = defineEmits(['changeAvatar','editName','showMessagePage','changePassword'])
 </script>
 
 <template>
   <div class="menu-container" id="avatar-menu-container">
     <el-button icon="EditPen" link :style="calcPenPos()" class="edit-pen" @click="()=>{emit('changeAvatar')}" ></el-button>
-    <el-row style="height:50px" class="name-row">
-      <el-col style="font-size:30px; border: 1px solid rgba(0,0,0,0.2);
-      border-radius: 30px" :span="20" :offset="2" class="name-area"
-      @click="()=>{emit('editName')}">{{name}}</el-col>
-    </el-row>
+    <div style="height:100px" class="name-row">
+      <el-row style="font-size:30px; border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 30px; align-items: center; justify-content: center; justify-items: center"
+              class="name-area" @click="()=>{emit('editName')}">{{name}}</el-row>
+      <el-row style="padding: 10px 0 10px 0;align-items: center; justify-content: center; justify-items: center">
+        <el-button color="#3621ef" @click="emit('changePassword')" class="reset-pass-button">修改密码</el-button>
+      </el-row>
+    </div>
     <el-button icon="Message" link class="message-button" @click="()=>{emit('showMessagePage')}"></el-button>
   </div>
 </template>

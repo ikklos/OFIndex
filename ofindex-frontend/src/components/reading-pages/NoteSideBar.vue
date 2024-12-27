@@ -127,6 +127,7 @@ onMounted(()=>{
     <el-container>
       <el-header style="height: 60px">
         <el-button color="#3621ef" @click="handleUpdate">保存更改</el-button>
+        记得及时保存～(　TロT)σ
       </el-header>
       <el-main>
         <el-scrollbar>
