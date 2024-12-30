@@ -4,6 +4,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import site.sayaz.ofindex.R
 import site.sayaz.ofindex.ui.components.BaseTopBar
 import site.sayaz.ofindex.viewmodel.ForumViewModel
@@ -14,7 +15,7 @@ fun ForumTopBar(
     onNavigateAddPost: () -> Unit
 ){
     BaseTopBar(
-        title = "Forum",
+        title = stringResource(R.string.action_forum),
         actions = {
             IconButton(onClick = {
                 forumViewModel.refreshForumPosts()

@@ -18,12 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import site.sayaz.ofindex.ui.components.Loading
+import site.sayaz.ofindex.R
 import site.sayaz.ofindex.ui.theme.Typography
 import site.sayaz.ofindex.viewmodel.AuthViewModel
 import site.sayaz.ofindex.viewmodel.LoginState
-import site.sayaz.ofindex.viewmodel.RegisterState
 
 @Composable
 fun LoginScreen(
@@ -36,6 +36,8 @@ fun LoginScreen(
     val userid = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val textEnabled = remember { mutableStateOf(true) }
+
+
 
     LaunchedEffect(loginState) {
         authViewModel.resetLoginState()
@@ -77,12 +79,12 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "OFIndex",
+                text = stringResource(R.string.app_name),
                 style = Typography.titleLarge
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Text(
-                text = "Login",
+                text = stringResource(R.string.login_title),
                 style = Typography.titleMedium
             )
             Spacer(modifier = Modifier.padding(16.dp))
@@ -97,7 +99,7 @@ fun LoginScreen(
                     ){
                         Toast.makeText(
                             context,
-                            "Please fill in all fields",
+                            context.resources.getString(R.string.login_empty_field),
                             Toast.LENGTH_SHORT
                         ).show()
                         return@Button
@@ -105,15 +107,13 @@ fun LoginScreen(
                     authViewModel.login(userid.value.toInt(), password.value)
                 }
             ) {
-                when (loginState) {
-                    is LoginState.Loading -> Loading()
-                    else -> Text("login")
-                }
+                    Text(text = stringResource(R.string.login_title))
+
             }
             TextButton(
                 onClick = onNavigateRegister
             ) {
-                Text("don't have an account? Register")
+                Text(stringResource(R.string.register_title))
             }
         }
     }

@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -109,12 +110,12 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // 显示用户ID
-        Text(text = "User ID: ${user.value.userId}", style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(R.string.user_id)+": ${user.value.userId}", style = MaterialTheme.typography.bodyLarge)
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // 显示用户名
-        Text(text = "User Name: ${user.value.userName}", style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(R.string.user_id)+": ${user.value.userName}", style = MaterialTheme.typography.bodyLarge)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,7 +125,7 @@ fun ProfileScreen(
                 onChangeAvatar()
             }, modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Change Avatar")
+            Text(stringResource(R.string.change_avatar))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -135,7 +136,7 @@ fun ProfileScreen(
                 showUserNameDialog = true
             }, modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Change User Name")
+            Text(stringResource(R.string.change_user_name))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -145,7 +146,7 @@ fun ProfileScreen(
                 showPasswordDialog = true
             }, modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Change Password")
+            Text(stringResource(R.string.change_password))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -155,11 +156,11 @@ fun ProfileScreen(
 
     if (showUserNameDialog) {
         AlertDialog(onDismissRequest = { showUserNameDialog = false },
-            title = { Text("更改用户名") },
+            title = { Text(stringResource(R.string.change_user_name) )},
             text = {
                 TextField(value = username, onValueChange = { newValue ->
                     username = newValue
-                }, label = { Text("请输入新用户名") }, singleLine = true
+                }, label = { stringResource(R.string.new_user_name) }, singleLine = true
                 )
             },
             confirmButton = {
@@ -169,25 +170,25 @@ fun ProfileScreen(
                         showUserNameDialog = false
                     }
                 }) {
-                    Text("确认")
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showUserNameDialog = false }) {
-                    Text("取消")
+                    Text(stringResource(R.string.cancel))
                 }
             })
     }
     if (showPasswordDialog) {
         AlertDialog(onDismissRequest = { showPasswordDialog = false },
-            title = { Text("更改密码") },
+            title = { Text(stringResource(R.string.change_password)) },
             text = {
                 Column {
                     TextField(value = password,
                         onValueChange = { newValue ->
                             password = newValue
                         },
-                        label = { Text("请输入新密码") },
+                        label = { Text(stringResource(R.string.new_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation()
                     )
@@ -196,7 +197,7 @@ fun ProfileScreen(
                         onValueChange = { newValue ->
                             confirmPassword = newValue
                         },
-                        label = { Text("请再次输入新密码") },
+                        label = { Text(stringResource(R.string.confirm_new_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation()
                     )
@@ -205,7 +206,7 @@ fun ProfileScreen(
             confirmButton = {
                 TextButton(onClick = {
                     if (password.text != confirmPassword.text) {
-                        Toast.makeText(context, "两次输入的密码不一致", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.resources.getString(R.string.password_not_match), Toast.LENGTH_SHORT).show()
                         return@TextButton
                     }
                     if (username.text.isNotBlank()) {
@@ -213,12 +214,12 @@ fun ProfileScreen(
                         showPasswordDialog = false
                     }
                 }) {
-                    Text("确认")
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPasswordDialog = false }) {
-                    Text("取消")
+                    Text(stringResource(R.string.cancel))
                 }
             })
     }

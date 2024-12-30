@@ -4,8 +4,23 @@
     <string name="action_shelf">Shelf</string>
     <string name="action_forum">forum</string>
     <string name="action_more">More</string>
-    <string name="description_explore">Explore</string>
-    <string name="description_shelf">Shelf</string>
-    <string name="description_forum">forum</string>
-    <string name="description_more">More</string>
+    <string name="login_title">Login</string>
+    <string name="login_empty_field">Please fill in all fields</string>
+    <string name="register_title">Register</string>
+    <string name="search">Search</string>
+    <string name="class_title">Class</string>
+    <string name="action_profile">Profile</string>
+    <string name="register_success">Remember your userid:</string>
+    <string name="user_id">User ID</string>
+    <string name="user_name">User Name</string>
+    <string name="change_avatar">Change Avatar</string>
+    <string name="change_user_name">Change User Name</string>
+    <string name="change_password">Change Password</string>
+    <string name="new_user_name">New User Name</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="password_not_match">Password Not Match</string>
+    <string name="password_too_short">Password Too Short</string>
 </resources>

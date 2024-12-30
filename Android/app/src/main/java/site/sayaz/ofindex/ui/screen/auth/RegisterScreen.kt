@@ -9,17 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,12 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import site.sayaz.ofindex.ui.components.Loading
+import site.sayaz.ofindex.R
 import site.sayaz.ofindex.ui.theme.Typography
 import site.sayaz.ofindex.viewmodel.AuthViewModel
 import site.sayaz.ofindex.viewmodel.RegisterState
@@ -87,12 +83,12 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "OFIndex",
+                text = stringResource(R.string.app_name),
                 style = Typography.titleLarge
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Text(
-                text = "Register",
+                text = stringResource(R.string.register_title),
                 style = Typography.titleMedium
             )
             Spacer(modifier = Modifier.padding(16.dp))
@@ -101,18 +97,32 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
+                    if (password.value != confirmPassword.value) {
+                        Toast.makeText(
+                            context,
+                            context.resources.getString(R.string.password_not_match),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
+                    if (isPasswordValid(password.value)){
+                        Toast.makeText(
+                            context,
+                            context.resources.getString(R.string.password_too_short),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@Button
+                    }
                     authViewModel.register(username.value, password.value)
                 }
             ) {
-                when (registerState) {
-                    is RegisterState.Loading -> Loading()
-                    else -> Text("register")
-                }
+                Text(stringResource(R.string.register_title))
+
             }
             TextButton(
                 onClick = onNavigateLogin
             ) {
-                Text("already have an account? Login")
+                Text(stringResource(R.string.login_title))
             }
 
 
@@ -132,9 +142,10 @@ fun RegisterScreen(
                             .fillMaxSize()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.SpaceAround,
-                        horizontalAlignment = Alignment.CenterHorizontally){
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = "Remember your userid:",
+                            text = stringResource(R.string.register_success),
                             textAlign = TextAlign.Center,
                         )
                         Text(
@@ -142,7 +153,7 @@ fun RegisterScreen(
                             fontWeight = FontWeight.Bold,
                         )
                         TextButton(onClick = onNavigateLogin) {
-                            Text("Login")
+                            Text(stringResource(R.string.login_title))
                         }
                     }
 
@@ -150,7 +161,9 @@ fun RegisterScreen(
             }
         }
     }
+}
 
-
+fun isPasswordValid(password: String): Boolean {
+    return password.length >= 8
 }
 
