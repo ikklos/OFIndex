@@ -19,7 +19,7 @@ const route = useRoute();
 
 <style scoped>
 .account-index {
-  background-color: #fcfce5;
+  background-color: #f0f0f0;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -29,7 +29,7 @@ const route = useRoute();
   min-width: 800px;
 }
 .account-card {
-  background-color: #eee6fe;
+  background-color: #FFFFFF;
   border-radius: 15px;
   border: 1px solid #3621ef;
   width: 23vw;

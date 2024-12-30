@@ -110,12 +110,10 @@ const submitForm = (formEl, fileData) => {
     isbn: formData.isbn,
     bookClass: formData.bookClass,
   }
-  console.log(form);
-  let data = new FormData();
-  console.log(JSON.stringify(form));
-  data.append('formData', new Blob([JSON.stringify(form)], {type: 'application/json'}), {contentType: 'application/json'});
-  data.append('file', fileData.file, fileData.filename);
   axiosApp().then(app => {
+    let data = new FormData();
+    data.append('formData', new Blob([JSON.stringify(form)], {type: 'application/json'}), {contentType: 'application/json'});
+    data.append('file', fileData.file, fileData.filename);
     app.post('/create/book', data).then(response => {
       if (response.data.message === 'Book created') {
         ElMessage.success('创建成功');

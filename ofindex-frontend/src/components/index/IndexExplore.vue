@@ -112,7 +112,7 @@ onMounted(() => {
     </el-aside>
     <el-main class="center-layout-column">
       <div class="div-main">
-        <el-row style="padding: 20px 0 20px 0; box-sizing: border-box; height: 10vh">
+        <el-row style="padding: 20px 0 20px 0; box-sizing: border-box; height: 10vh; background: #e7e5fd;">
           <el-col :span="16" :offset="4">
             <el-input v-model="filter.text" prefix-icon="Search" @keyup.enter="firstReq">
             </el-input>
@@ -145,12 +145,13 @@ onMounted(() => {
 }
 
 .explore-aside {
-  background: #fcfce5;
+  background: #06041c;
 }
 
 .el-menu-item {
+  background: #06041c;
   width: 100%;
-  color: #3621ef !important;
+  color: #f3f2fe !important;
 
   i {
     color: #fff !important;
@@ -163,12 +164,12 @@ onMounted(() => {
 .el-menu-item:hover {
   outline: 0 !important;
   color: #3621ef !important;
-  background: #b198fa;
+  background: #0a062a;
 }
 
 .el-menu-item.is-active {
-  color: #fff !important;
-  background: #3621ef !important;
+  color: #3621ef !important;
+  background: #0a062a !important;
 }
 
 .el-submenu :deep(.el-submenu__title) {
@@ -196,7 +197,7 @@ onMounted(() => {
 }
 
 :deep() .el-input__wrapper {
-  background-color: #fcfce5;
+  background-color: #f0f0f0;
   border-radius: 25px;
 }
 
@@ -213,6 +214,7 @@ onMounted(() => {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  background: #e7e5fd;
 }
 
 .infinite-list::-webkit-scrollbar {

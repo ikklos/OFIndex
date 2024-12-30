@@ -346,7 +346,7 @@ const jumpToMessagePage = function () {
                          @click="jumpToForum" v-if="!showBackButton" color="#3621ef">
                 社区
               </el-button>
-              <el-button class="back-button" link v-if="showBackButton" style="font-size: 25px; color:#3621ef"
+              <el-button class="back-button" link v-if="showBackButton" style="font-size: 25px; color:#f3f2fe"
                          @click="jumpBack">
                 <el-icon>
                   <CaretLeft></CaretLeft>
@@ -441,28 +441,26 @@ const jumpToMessagePage = function () {
 .index {
   width: 100vw;
   height: 100vh;
-  background: #eee6fe;
   min-width: 800px;
   min-height: 600px;
 }
 
 .index-container {
-  width: 90vw;
+  width: 100vw;
   height: 100%;
   min-width: 720px;
-  background: #FFFFFF;
+  background: #e7e5fd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .el-header {
   box-sizing: border-box;
-  border-top: 5px solid #6f4bf8;
   height: 8vh;
   position: sticky;
   min-height: 60px;
   z-index: 11;
-  background-color: #d1c2fb;
-  color: #0219e7;
+  background-color: #06041c;
+  color: #f3f2fe;
 }
 
 .el-col {
