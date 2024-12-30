@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import site.sayaz.ofindex.R
 import site.sayaz.ofindex.ui.components.BaseTopBar
 import site.sayaz.ofindex.ui.components.SearchBar
@@ -21,7 +22,7 @@ fun ExploreTopBar(
     val bookClass by exploreViewModel.currentClass.collectAsState()
 
     BaseTopBar(
-        title = "Explore",
+        title = stringResource(R.string.action_explore),
         actions = {
             if (searchActive) {
                 SearchBar(
@@ -33,7 +34,7 @@ fun ExploreTopBar(
                     active = searchActive,
                     onActiveChange = { exploreViewModel.toggleSearchMode(it) },
                     modifier = Modifier,
-                    placeHolder = "Search"
+                    placeHolder = stringResource(R.string.search)
                 )
             } else {
                 IconButton(onClick = {
@@ -41,7 +42,7 @@ fun ExploreTopBar(
                 }) {
                     Icon(
                         painterResource(R.drawable.baseline_search_24),
-                        contentDescription = "Search"
+                        contentDescription = stringResource(R.string.search)
                     )
                 }
 
@@ -50,7 +51,7 @@ fun ExploreTopBar(
                 }) {
                     Icon(
                         painterResource(R.drawable.baseline_filter_list_24),
-                        contentDescription = "Filter"
+                        contentDescription = stringResource(R.string.class_title)
                     )
                 }
             }

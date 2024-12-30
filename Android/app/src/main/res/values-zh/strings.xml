@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OFIndex</string>
+    <string name="action_explore">探索</string>
+    <string name="action_shelf">书架</string>
+    <string name="action_forum">论坛</string>
+    <string name="action_more">更多</string>
+    <string name="login_title">登录</string>
+    <string name="login_empty_field">请补全空白</string>
+    <string name="register_title">注册</string>
+    <string name="search">搜索</string>
+    <string name="class_title">分类</string>
+    <string name="action_profile">我的</string>
+    <string name="register_success">你的用户名是：</string>
+    <string name="user_id">用户ID</string>
+    <string name="user_name">用户名</string>
+    <string name="change_avatar">更改头像</string>
+    <string name="change_user_name">更改用户名</string>
+    <string name="change_password">更改密码</string>
+    <string name="new_user_name">新用户名</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_new_password">确认新密码</string>
+    <string name="password_not_match">两次密码不一致</string>
+    <string name="password_too_short">密码太短</string>
+</resources>
