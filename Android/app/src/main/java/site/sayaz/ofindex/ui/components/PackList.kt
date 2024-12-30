@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,7 +57,8 @@ fun PackView(
             contentDescription = "Author Avatar",
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(24.dp)) // 圆形头像
+                .clip(RoundedCornerShape(24.dp)), // 圆形头像，
+            contentScale = ContentScale.Crop
         )
         Spacer(modifier = Modifier.width(16.dp))
 
