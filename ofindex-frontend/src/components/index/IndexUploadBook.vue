@@ -61,22 +61,28 @@ const handleUploadCover = function (option) {
     smfile: option,
     format: "json"
   }
-  axios.post('/api/upload', data, {
-    headers: {"Content-Type": "multipart/form-data", "Authorization": 'WQe6xnSzY6sbQlH0YMmEdFIxTvx7PxzE'}
-  }).then(response => {
-    if (response.status === 200) {
-      if (response.data.success === true || response.data.code === 'image_repeated') {
-        option.onSuccess(response);
+  axios.get('/back-end-config.json').then(response => {
+    let k = response.data.apikey;
+    axios.post('/api/upload', data, {
+      headers: {"Content-Type": "multipart/form-data", "Authorization": k}
+    }).then(response => {
+      if (response.status === 200) {
+        if (response.data.success === true || response.data.code === 'image_repeated') {
+          option.onSuccess(response);
+        } else {
+          throw new Error('上传失败');
+        }
       } else {
-        throw new Error('上传失败');
+        throw new Error('请求失败，可能是网络原因');
       }
-    } else {
-      throw new Error('请求失败，可能是网络原因');
-    }
-  }).catch(error => {
-    ElMessage.error(error.message);
-    option.onError(error);
+    }).catch(error => {
+      ElMessage.error(error.message);
+      option.onError(error);
+    })
+  }).catch(error=>{
+    ElMessage.error('请求配置文件错误');
   })
+
 }
 const handlePreview = function (uploadFile) {
 }

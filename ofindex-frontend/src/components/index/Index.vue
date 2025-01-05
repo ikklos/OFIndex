@@ -189,21 +189,26 @@ const uploadAvatar = function (options) {
     format: "json",
   }
   avatarUploading.value = true;
-  axios.post('/api/upload', data,
-      {headers: {"Content-Type": "multipart/form-data", "Authorization": 'WQe6xnSzY6sbQlH0YMmEdFIxTvx7PxzE'}}
-  ).then(response => {
-    if (response.status === 200) {
-      if (response.data.success === true || response.data.code === 'image_repeated') {
-        options.onSuccess(response);
+  axios.get('/back-end-config.json').then(response => {
+    let k = response.data.apikey;
+    axios.post('/api/upload', data,
+        {headers: {"Content-Type": "multipart/form-data", "Authorization": k}}
+    ).then(response => {
+      if (response.status === 200) {
+        if (response.data.success === true || response.data.code === 'image_repeated') {
+          options.onSuccess(response);
+        } else {
+          throw new Error('上传失败，疑似图片太大或格式不符');
+        }
       } else {
-        throw new Error('上传失败，疑似图片太大或格式不符');
+        throw new Error('请求错误，疑似网络问题');
       }
-    } else {
-      throw new Error('请求错误，疑似网络问题');
-    }
-  }).catch(error => {
-    options.onError(error);
-    ElMessage.error(error.message);
+    }).catch(error => {
+      options.onError(error);
+      ElMessage.error(error.message);
+    })
+  }).catch(error=>{
+    ElMessage.error('请求配置文件错误');
   })
 }
 //折叠展开目录函数
