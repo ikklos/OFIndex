@@ -22,6 +22,10 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import site.sayaz.ofindex.data.remote.Config.BUCKET_NAME
+import site.sayaz.ofindex.data.remote.Config.REGION
+import site.sayaz.ofindex.data.remote.Config.SECRET_ID
+import site.sayaz.ofindex.data.remote.Config.SECRET_KEY
 import site.sayaz.ofindex.data.remote.response.ImageUploadResponse
 
 
@@ -29,11 +33,7 @@ class ImageInstance(
     context: Context
 ) {
 
-    // COS配置
-    private val SECRET_ID = "AKIDADAtOegT1KPn8GAqOltnTu67wZ0FH7lK"
-    private val SECRET_KEY = "RefT5VhDappb2bzAtVu65uVu8B0c2HME"
-    private val BUCKET_NAME = "ofindex-1318773774"
-    private val REGION = "ap-beijing"
+
 
 
     // 初始化COS客户端

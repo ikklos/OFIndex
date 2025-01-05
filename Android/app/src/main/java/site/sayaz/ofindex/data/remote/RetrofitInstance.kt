@@ -7,11 +7,11 @@ import okhttp3.Interceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
+import site.sayaz.ofindex.data.remote.Config.BASE_URL
 
 object RetrofitInstance {
 
-    //private const val BASE_URL = "http://10.194.189.228:8080"
-    private const val BASE_URL = "http://175.178.5.83:8080"
+
 
     private val _token = MutableStateFlow<String?>("")
     val token: StateFlow<String?> get() = _token.asStateFlow()
