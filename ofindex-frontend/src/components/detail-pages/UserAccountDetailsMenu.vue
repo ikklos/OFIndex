@@ -29,7 +29,7 @@ const emit = defineEmits(['changeAvatar','editName','showMessagePage','changePas
   <div class="menu-container" id="avatar-menu-container">
     <el-button icon="EditPen" link :style="calcPenPos()" class="edit-pen" @click="()=>{emit('changeAvatar')}" ></el-button>
     <div style="height:100px" class="name-row">
-      <el-row style="font-size:30px; border: 1px solid rgba(0,0,0,0.2);
+      <el-row style="color: #1a1a1a; font-size:30px; border: 1px solid rgba(0,0,0,0.2);
       border-radius: 30px; align-items: center; justify-content: center; justify-items: center"
               class="name-area" @click="()=>{emit('editName')}">{{name}}</el-row>
       <el-row style="padding: 10px 0 10px 0;align-items: center; justify-content: center; justify-items: center">
@@ -47,12 +47,12 @@ const emit = defineEmits(['changeAvatar','editName','showMessagePage','changePas
   left: 5vw;
   width: 20vw;
   height: 50vh;
-  background: #fffbf0;
+  background: #ffffff;
   min-width: 300px;
   min-height: 400px;
   z-index: 99;
   box-sizing: border-box;
-  border: 1px solid #edd1d8;
+  border: 1px solid #ffffff;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }

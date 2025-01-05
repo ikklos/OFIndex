@@ -57,12 +57,12 @@ const JumpToDetail = function(){
   height: 100%;
   width: 100%;
   transition: all 0.3s ease;
-  background: #d1c2fb;
+  background: #ffffff;
   color: #000000;
 }
 .book-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05,1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02,1.02);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -87,7 +87,7 @@ const JumpToDetail = function(){
   width: 100%;
   padding : 5px;
   box-sizing: border-box;
-  background-color: #eee6fe;
+  background-color: #ffffff;
   color: #292929;
 }
 </style>

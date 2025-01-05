@@ -176,7 +176,8 @@ onMounted(() => {
               </el-button>
             </el-row>
             <el-row style="width: 100%;height: 92%">
-              <div class="item-inner" @click="jumpToBookList(index+1)" style="background: #eeec70">
+              <div class="item-inner" @click="jumpToBookList(index+1)" style="background: #06041c;
+              box-sizing: border-box; border: 1px #0a062a solid;color: #ffffff; font-size: 18px">
                 {{item.name}}
               </div>
             </el-row>
@@ -224,7 +225,7 @@ onMounted(() => {
 
 <style scoped>
 .shelf-page-container {
-  background: #fcfce5;
+  background: #f3f2fe;
   min-width: 720px;
 }
 .el-aside {

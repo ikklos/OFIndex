@@ -3,6 +3,7 @@ import {ref} from 'vue'
 import {Back, Right} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import axiosApp from "@/axiosApp.js";
+import {ElMessage} from "element-plus";
 
 const router = useRouter();
 const NickName = ref('');
@@ -15,7 +16,7 @@ const sendRegisterReq = function () {
   //判断两次输入的密码是否相同
   if (Password.value !== ConfirmPassword.value || (Password.value.length < 8)) {
     //弹窗提示两次输入密码不相同或者密码太短
-
+    ElMessage.error('两次输入密码不同或密码太短：需要至少8位');
     //清空输入框
     Password.value = ConfirmPassword.value = '';
   } else {
@@ -42,11 +43,12 @@ const sendRegisterReq = function () {
           }else throw new Error(response.statusText);
         }).catch(error => {
           //弹窗提示注册失败
-          console.log(error);
+          ElMessage.error('网络错误');
         })
       })
     } else {
       //弹窗提示密码含有非法字符
+      ElMessage.error('密码不合规：不能包含非法字符');
     }
   }
 }
@@ -130,9 +132,6 @@ const sendRegisterReq = function () {
 :deep() .el-input__inner {
   font-size: 20px;
   color: #000000;
-}
-:deep() .el-input__wrapper {
-  background-color: #d1c2fb;
 }
 .card-body {
   height: 40vh;

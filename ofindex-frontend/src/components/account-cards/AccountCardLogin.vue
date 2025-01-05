@@ -104,9 +104,6 @@ const SendLoginReq = function () {
   font-size: 20px;
   color: #000000;
 }
-:deep() .el-input__wrapper {
-  background-color: #d1c2fb;
-}
 .card-body {
   height: 40vh;
   min-height: 250px;
